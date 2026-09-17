@@ -10,11 +10,14 @@ type: software
 authors:
   - family-names: Thirupallikrishnan
     given-names: Nirmal Kumar
-repository-code: "https://github.com/NirmalKumar31/aml-evaluation-harness"
+repository-code: "https://github.com/NirmalKumar31/aml-evaluation-harness-public"
 license: MIT
-# No `version:` or `date-released:` until a tag and a GitHub Release
-# exist. Declaring 0.1.0 released on a private repository with no tag
-# is release metadata describing a release that never happened.
+# Stamped only after v0.1.0 was tagged and released here, with ci, gates
+# and image green on that exact commit. Until then this carried no version,
+# because release metadata describing a release that never happened is the
+# same defect as a published number with no artifact behind it.
+version: 0.1.0
+date-released: '2026-09-17'
 keywords:
   - anti-money-laundering
   - evaluation methodology
