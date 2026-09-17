@@ -11,7 +11,7 @@
 # both call themselves 3.12.3-slim-bookworm. The trade is that a security
 # update is now a deliberate edit -- which is the point, and Dependabot
 # raises it.
-FROM python:3.12.3-slim-bookworm@sha256:afc139a0a640942491ec481ad8dda10f2c5b753f5c969393b12480155fe15a63
+FROM python:3.12.14-slim-bookworm@sha256:782412e85d0f0984994c290652577d4018aff08145c85b262bb63dc0c7522254
 
 # - build-essential: some wheels still compile on arm64/musl edge cases
 # - ca-certificates: TLS to ADLS
