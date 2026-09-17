@@ -1,7 +1,7 @@
 # aml-evaluation-harness
 
 The Python package. **Start at the repository README on GitHub**
-<https://github.com/NirmalKumar31/aml-evaluation-harness> — it
+<https://github.com/NirmalKumar31/aml-evaluation-harness-public> — it
 carries the findings, the claim boundaries and the quick start. This file
 exists so the package has metadata of its own and so a reader who lands here
 from PyPI-style tooling is not stranded.

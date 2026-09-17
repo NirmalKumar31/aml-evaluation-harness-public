@@ -1,6 +1,8 @@
 # Changelog
 
-Dates are when the work landed on `main`. No release has been tagged yet; see
+Dates are when the work landed on `main`. **v0.1.0 was tagged and released on
+2026-09-17** from the public snapshot at <https://github.com/NirmalKumar31/aml-evaluation-harness-public/releases/tag/v0.1.0>; the
+remaining release items are in
 [`aml-platform/docs/RELEASE_CHECKLIST.md`](aml-platform/docs/RELEASE_CHECKLIST.md).
 
 Corrections and retractions are listed **first** in each entry, because they are

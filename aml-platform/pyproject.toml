@@ -56,9 +56,9 @@ dev = ["pytest>=8", "ruff>=0.6", "fsspec>=2024.6"]
 azure = ["fsspec>=2024.6", "adlfs>=2024.7", "azure-identity>=1.17"]
 
 [project.urls]
-Homepage = "https://github.com/NirmalKumar31/aml-evaluation-harness"
-Repository = "https://github.com/NirmalKumar31/aml-evaluation-harness"
-Issues = "https://github.com/NirmalKumar31/aml-evaluation-harness/issues"
+Homepage = "https://github.com/NirmalKumar31/aml-evaluation-harness-public"
+Repository = "https://github.com/NirmalKumar31/aml-evaluation-harness-public"
+Issues = "https://github.com/NirmalKumar31/aml-evaluation-harness-public/issues"
 
 [project.scripts]
 aml = "aml.cli:main"
