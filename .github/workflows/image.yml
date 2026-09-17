@@ -95,7 +95,7 @@ jobs:
 
       # Not on pull requests: a fork PR must never receive a token that can
       # write packages, and the PR path does not push.
-      - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         if: github.event_name != 'pull_request'
         with:
           registry: ghcr.io
