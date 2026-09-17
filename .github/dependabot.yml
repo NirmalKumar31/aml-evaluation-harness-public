@@ -1,3 +1,22 @@
+# ---------------------------------------------------------------------------
+# 2026-09-17: the first six PRs Dependabot opened here were closed by
+# ACCIDENT, not by a decision. Cutting the public release involved a
+# force-push of `main` that orphaned their merge base, so GitHub closed all
+# six and attributed it to the repository owner. Their branches went with
+# them, which is why they cannot simply be reopened. `main` is now protected
+# against force-pushes, so it cannot recur.
+#
+# The standing decision on those bumps, unchanged:
+#   * the five GitHub Actions MAJOR bumps (checkout 4->7, setup-python 5->7,
+#     buildx 3->4, build-push 6->7, login 3->4) are deferred. They touch CI
+#     only, not the released artifact, and this repository pins actions to
+#     commit SHAs on purpose -- a major bump needs its own verification pass.
+#   * `python` 3.12.3 -> 3.12.14 is the one with security relevance and should
+#     be taken FIRST. It moves the image base under a project that pins
+#     3.12.3 in `check_python`, in CI and in the image self-check, so the
+#     whole chain needs re-verifying with it.
+# ---------------------------------------------------------------------------
+
 # Keep the pinned action SHAs current.
 #
 # Pinning actions to a commit SHA is the right call -- a mutable tag means the
