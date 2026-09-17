@@ -1,0 +1,88 @@
+{
+  "n_account_days": 6204374,
+  "n_positive_account_days": 18130,
+  "average_precision": 0.30146382791155607,
+  "roc_auc_footnote_only": 0.9827765162317506,
+  "recall@10": 0.007225592939878654,
+  "recall_ceiling@10": 0.010148924434638721,
+  "recall_efficiency@10": 0.7119565217391304,
+  "precision@10": 0.7119565217391305,
+  "alerts_per_true_positive@10": 1.4045801526717556,
+  "ring_recall@10": 0.09262759924385633,
+  "recall@25": 0.01958080529509101,
+  "recall_ceiling@25": 0.024379481522338667,
+  "recall_efficiency@25": 0.8031674208144797,
+  "precision@25": 0.797752808988764,
+  "alerts_per_true_positive@25": 1.2535211267605635,
+  "ring_recall@25": 0.21550094517958412,
+  "recall@50": 0.0395477109762824,
+  "recall_ceiling@50": 0.04732487589630447,
+  "recall_efficiency@50": 0.8356643356643355,
+  "precision@50": 0.8298611111111112,
+  "alerts_per_true_positive@50": 1.205020920502092,
+  "ring_recall@50": 0.34215500945179583,
+  "recall@100": 0.07253171538885825,
+  "recall_ceiling@100": 0.08532818532818533,
+  "recall_efficiency@100": 0.8500323206205559,
+  "precision@100": 0.8280856423173804,
+  "alerts_per_true_positive@100": 1.2076045627376426,
+  "ring_recall@100": 0.5198487712665406,
+  "recall@200": 0.1265857694429123,
+  "recall_ceiling@200": 0.15488141202426917,
+  "recall_efficiency@200": 0.8173076923076923,
+  "precision@200": 0.7954939341421143,
+  "alerts_per_true_positive@200": 1.2570806100217864,
+  "ring_recall@200": 0.6899810964083176,
+  "recall@500": 0.24726971869829012,
+  "recall_ceiling@500": 0.3375620518477661,
+  "recall_efficiency@500": 0.7325163398692811,
+  "precision@500": 0.7040992618187529,
+  "alerts_per_true_positive@500": 1.420254293999554,
+  "ring_recall@500": 0.8809073724007561,
+  "recall@1000": 0.34715940430226144,
+  "recall_ceiling@1000": 0.5726420297848869,
+  "recall_efficiency@1000": 0.6062415719514544,
+  "precision@1000": 0.5630199481170051,
+  "alerts_per_true_positive@1000": 1.7761360025421036,
+  "ring_recall@1000": 0.9565217391304348,
+  "typology_coverage_pct": 49.54,
+  "ci_lo": 0.03305341510336904,
+  "ci_hi": 0.046198149151396174,
+  "n_clusters": 9653,
+  "n_ring_clusters": 529,
+  "n_bootstrap": 1000,
+  "per_typology": {
+    "BIPARTITE": {
+      "n_rings": 61,
+      "ring_recall@50": 0.2459016393442623
+    },
+    "CYCLE": {
+      "n_rings": 78,
+      "ring_recall@50": 0.34615384615384615
+    },
+    "FAN-IN": {
+      "n_rings": 74,
+      "ring_recall@50": 0.17567567567567569
+    },
+    "FAN-OUT": {
+      "n_rings": 65,
+      "ring_recall@50": 0.24615384615384617
+    },
+    "GATHER-SCATTER": {
+      "n_rings": 60,
+      "ring_recall@50": 0.7333333333333333
+    },
+    "RANDOM": {
+      "n_rings": 76,
+      "ring_recall@50": 0.25
+    },
+    "SCATTER-GATHER": {
+      "n_rings": 60,
+      "ring_recall@50": 0.35
+    },
+    "STACK": {
+      "n_rings": 55,
+      "ring_recall@50": 0.4727272727272727
+    }
+  }
+}

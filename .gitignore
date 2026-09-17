@@ -1,0 +1,53 @@
+# 29 GB of CSV and Parquet. Lives in ADLS, never in git.
+aml-platform/data/
+**/data/bronze/
+**/data/silver/
+**/data/gold/
+*.csv
+*.parquet
+!aml-platform/tests/fixtures/*.csv
+
+.venv/
+__pycache__/
+
+# Generated, and two of these were committed by accident.
+#
+# `.coverage` is a SQLite database that embeds ABSOLUTE LOCAL PATHS -- the
+# tracked copy contained 64 occurrences of the maintainer's home directory --
+# and is not a portable report. `build/` held a stale second copy of io.py,
+# leakproof/sweep.py and models/train.py that had drifted from src/aml,
+# creating two apparent implementations for any reader or scanner.
+#
+# They are untracked now. They remain in history; see docs/RELEASE_CHECKLIST.md,
+# which treats that as a decision rather than a cleanup.
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+build/
+dist/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+*.log
+
+# HTML council reports are large generated artifacts; the transcripts are kept.
+council-report-*.html
+
+# Personal working notes: narrative learning material and superseded plans.
+# Kept locally, not published. The technical record that IS published lives in
+# aml-platform/paper/ (results), Cloud/ (architecture, cost, teardown) and
+# AML_PROJECT_KNOWLEDGE.md (dataset facts the code comments cite).
+Learning/
+council-transcript-*.md
+
+# NOTE, because this bit us: `Cloud/_v1_superseded/` used to be listed here.
+# Those five files had already been committed in bfaa463, and ignoring a
+# TRACKED file does not untrack it -- they were public the whole time. The
+# entry read like a privacy control and was not one. They now live in
+# docs/archive/Cloud/_v1_superseded/ and are deliberately published.
+#
+# If something must not be published, it must not be committed. A .gitignore
+# entry added afterwards changes nothing.

@@ -1,0 +1,49 @@
+// Markdown rules, chosen deliberately rather than defaulted.
+//
+// A default markdownlint-cli2 run over this repository returns ~3,148
+// findings, 2,234 of them long lines. Applying the default line-length rule
+// would wrap tables and reference links and make the documents WORSE, so the
+// finding that matters is not "3,148 problems" -- it is that nothing had
+// decided which rules apply.
+//
+// What is enforced: heading structure, fenced-code languages, list
+// consistency, trailing whitespace, and link/anchor shape. What is not: line
+// length (tables and URLs), inline HTML (the <!-- derived --> provenance
+// markers are load-bearing), and anything inside archived or educational
+// material, which is preserved as-written on purpose.
+{
+  "config": {
+    "default": true,
+    "MD013": false,          // line length -- tables and URLs, see above
+    "MD033": false,          // inline HTML -- the provenance markers
+    "MD024": { "siblings_only": true },  // repeated headings in sibling sections
+    "MD029": { "style": "ordered" },
+    "MD041": false,          // first line need not be a top-level heading
+    "MD034": false,          // bare URLs appear inside fenced output samples
+    // Consecutive callout blockquotes separated by a blank line. The rule
+    // exists because the separation is ambiguous to a parser; here it is
+    // three deliberate, differently-titled callouts, and merging them would
+    // change the meaning to make a linter happy.
+    "MD028": false
+  },
+  "globs": [
+    "README.md",
+    "HANDOFF.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "DATA_LICENSE.md",
+    "aml-platform/docs/**/*.md",
+    "aml-platform/paper/**/*.md"
+  ],
+  "ignores": [
+    "**/node_modules/**",
+    "**/.venv/**",
+    // Archived audits, retracted results and study notes are kept verbatim.
+    // Linting them would mean editing a record.
+    "aml-platform/docs/archive/**",
+    "aml-platform/paper/archive/**",
+    "docs/archive/**",
+    "Learning/**"
+  ]
+}

@@ -1,0 +1,219 @@
+{
+ "_comment": [
+  "Values and phrases that must NOT appear as a current claim, with what",
+  "replaced them. scripts/make_tables.py --check fails on any of these in a",
+  "current document unless the line is marked <!-- historical -->, which is",
+  "how a retraction narrative quotes the number it is retracting.",
+  "",
+  "WHY A LIST AND NOT A DERIVATION. The provenance checker asks whether a",
+  "token appears in SOME artifact. With 56 result sets and 101 archived",
+  "manifests, nearly every three-decimal number does -- so 0.945 was quoted",
+  "as the current HI-Large lift on five lines while the canonical lineage",
+  "says 0.9497, and the gate stayed green because 0.945 existed somewhere.",
+  "Token membership cannot express 'this number is the OLD answer'. Nothing",
+  "derives that. It has to be written down."
+ ],
+ "retracted": [
+  {
+   "pattern": "(?:lift|ring_recall_lift)[^|\\n]{0,40}\\b0\\.945\\b|\\b0\\.945\\b[^|\\n]{0,30}(?:lift|ring)",
+   "was": "ring_recall_lift@200, HI-Large",
+   "now": "0.9497",
+   "why": "large_eval3_lgbm evaluated unsorted fits; canonical is large_sorted_lgbm_s{0,1,2}",
+   "scoping_note": "scoped to a nearby cue: a bare decimal pattern false-positives on unrelated values indefinitely"
+  },
+  {
+   "pattern": "\\b0\\.87425\\b|\\b0\\.874\\b|\\b0\\.8738\\b",
+   "was": "ring_recall@200, HI-Large",
+   "now": "0.86876",
+   "why": "same superseded lineage"
+  },
+  {
+   "pattern": "(?:null|ring_recall_null)[^|\\n]{0,40}\\b0\\.92472\\b|\\b0\\.92472\\b[^|\\n]{0,30}null",
+   "was": "ring_recall_null@200, HI-Large",
+   "now": "0.91492",
+   "why": "same superseded lineage",
+   "scoping_note": "scoped to a nearby cue: a bare decimal pattern false-positives on unrelated values indefinitely"
+  },
+  {
+   "pattern": "recall@200[^|]{0,40}\\b0\\.092\\b|\\b0\\.0918\\b",
+   "was": "recall@200, HI-Large",
+   "now": "0.08785",
+   "why": "same superseded lineage"
+  },
+  {
+   "pattern": "\\b1\\.43\\s*[x×]",
+   "was": "ring lift under the closed-form independence null",
+   "now": "0.9497",
+   "why": "the null assumed independence between account-days that share a transaction"
+  },
+  {
+   "pattern": "near-saturat",
+   "was": "a characterisation of the benchmark",
+   "now": "(nothing)",
+   "why": "precision@50 spans 0.356-0.485 across three seeds on the canonical lineage; the word was withdrawn"
+  },
+  {
+   "pattern": "97%\\s*(is|of)?\\s*prevalence|prevalence[^|]{0,20}97%",
+   "was": "the split-inflation decomposition",
+   "now": "47% prevalence / 53% detectability",
+   "why": "the 97% came from dividing an AP ratio by a prevalence ratio, which is not a share of the uplift"
+  },
+  {
+   "pattern": "(?:floor|noise|placebo|spread)[^|\\n]{0,40}\\b21\\.97\\b|\\b21\\.97\\b[^|\\n]{0,30}(?:floor|spread|%)",
+   "was": "the leak-sweep noise floor",
+   "now": "46.10",
+   "why": "the global placebo permutation understated it; leaksweep2_Small uses a (side, day) stratified placebo",
+   "scoping_note": "scoped to a nearby cue: a bare decimal pattern false-positives on unrelated values indefinitely"
+  },
+  {
+   "pattern": "bitwise-identical[^|]{0,60}(arm64|amd64|architect)|identical predictions[^|]{0,40}architect",
+   "was": "a cross-architecture determinism claim",
+   "now": "bitwise repeatable WITHIN an architecture",
+   "why": "the arm64 manifest predates predictions_sha256, so what was compared was printed metrics"
+  },
+  {
+   "pattern": "gbdt\\s*0\\.920|0\\.920[^|]{0,30}gbdt|ring[^|]{0,30}\\b0\\.920\\b",
+   "was": "HI-Medium GBDT ring_recall_lift@200",
+   "now": "0.907",
+   "why": "eval3_Medium evaluated fits made while the training load did not sort; canonical is canonical_Medium_gbdt"
+  },
+  {
+   "pattern": "logistic\\s*0\\.946|0\\.946[^|]{0,30}logistic",
+   "was": "HI-Medium logistic ring_recall_lift@200",
+   "now": "(nothing)",
+   "why": "eval3_Medium is superseded and no canonical HI-Medium logistic re-evaluation under the permutation null exists"
+  },
+  {
+   "pattern": "most of the separability|largely \\*?\\*?linear|separability is linear|there for the taking",
+   "was": "an unmeasured share of the benchmark's separability attributed to linearity",
+   "now": "logistic precision@50 = 0.57060 against an eight-seed GBDT mean of 0.82480 (range 0.59144-0.89815)",
+   "why": "one baseline and one comparator cannot apportion separability; the fraction has no measured denominator, no ceiling and no preregistered estimand"
+  },
+  {
+   "pattern": "benchmark gave away|what the benchmark gave",
+   "was": "the same inference in shorthand",
+   "now": "(nothing)",
+   "why": "same defect: it asserts a share of the separability belongs to the generator without measuring one"
+  },
+  {
+   "pattern": "substantially a property of (the benchmark|IBM|the simulator|the generator)|property of IBM's simulator|mostly a property of",
+   "was": "an unmeasured share of a result attributed to the data generator",
+   "now": "logistic precision@50 = 0.57060 against an eight-seed GBDT mean of 0.82480; the difference averages 0.254 and spans 0.021-0.328",
+   "why": "the same attribution the 'most of the separability' retraction withdrew, in different words. No denominator, no ceiling, no attribution design"
+  },
+  {
+   "pattern": "increment from model complexity is small|model complexity adds (only )?a small|gap the model adds is small",
+   "was": "a judgement that the model's contribution is small",
+   "now": "the GBDT-minus-logistic difference: mean 0.254, range 0.021-0.328 across eight seeds",
+   "why": "'small' is a judgement about a quantity with no stated scale, over a range that spans more than an order of magnitude"
+  },
+  {
+   "pattern": "\\b(?:about|approximately|~|≈)\\s*28 transactions\\b",
+   "was": "the alert-unit coupling restated in transaction units",
+   "now": "at least 28 and at most 50 -- a bound, not a point value",
+   "why": "the score-tie proxy CAN merge transactions -- unrelated transactions may share a score -- so the group count is a LOWER bound on distinct transactions and the ratio an UPPER bound on the over-counting factor, not an estimate. The 46.4% figure once cited as evidence for this was itself wrong and is separately retracted"
+  },
+  {
+   "pattern": "ceiling_unit_sensitivity",
+   "was": "an event-unit recall ceiling derived from the score-tie proxy",
+   "now": "(nothing)",
+   "why": "the factor was measured on the ALERTED set and applied to the positive POPULATION, and rests on a proxy that merges transactions. The field is no longer emitted"
+  },
+  {
+   "pattern": "1\\.578\\s*[–-]\\s*1\\.720|\\b0\\.07672\\b|\\b0\\.07683\\b",
+   "was": "the event-unit ceiling on HI-Medium and its sensitivity range",
+   "now": "(nothing)",
+   "why": "same defect; an event-unit ceiling needs transaction identity for every account-day, which the archived bundles do not carry"
+  },
+  {
+   "pattern": "\\b46\\.4%|\\b47\\.5%|\\b14\\.6%",
+   "was": "the share of score groups said to span more than one ring transaction",
+   "now": "0% on all nine bundles, once the score source is required",
+   "why": "the figures came from joining ring_endpoints to alerted account-days on (day, acct) with no score filter, which attaches an account-day to EVERY ring transaction touching the account rather than to the one that supplied its maximum. They measured 'this account-day touches several ring transactions', not score-group merging"
+  },
+  {
+   "pattern": "1\\.51 to 1\\.89|\\b1\\.513\\b|\\b1\\.888\\b|\\b1\\.603\\b|\\b1\\.881\\b",
+   "was": "account-days per ring transaction, called exact",
+   "now": "1.624 to 1.950",
+   "why": "same unfiltered join; the transaction count was inflated by transactions that did not cause the alert, which depressed the ratio"
+  },
+  {
+   "pattern": "linear baseline is already strong|a linear model is already strong|linear model is already strong here",
+   "was": "the headline reading of precision@50 = 0.5706, this file's self-declared biggest finding",
+   "now": "retracted -- 97.0% of it comes from 12 days holding 0.056% of transactions; on volume days it is 0.0429 vs the GBDT's 0.7571",
+   "why": "AMLworld's generator winds down (3,021,866 txns at 0.0008 prevalence on 09-16 -> 2,020 at 0.5936 on 09-17). The published window pools two regimes and `sum_d min(P_d,B)` inverts the intuition, so the tail is 59.2% of the ceiling despite holding 18.7% of positives"
+  },
+  {
+   "pattern": "dominated by week one|dominated by the first week",
+   "was": "the claim that budget metrics and the permutation null are driven by the busy days",
+   "now": "the reverse: week one is 40.8% of the ceiling and 3.0% of the logistic model's true positives",
+   "why": "reasoned from the 81.3% positive front-loading without noticing that the budget cap redistributes the attainable count toward the thin days"
+  },
+  {
+   "pattern": "budget-binds framing survives|budget binds and that `ring_recall`",
+   "was": "the claim that the budget-binds framing survives the window decomposition",
+   "now": "false on the three days where the budget exceeds the population",
+   "why": "2022-09-26, 2022-09-27 and 2022-09-28 hold 44, 16 and 4 account-days against a budget of 50, so the top-50 is the whole day and precision@50 equals the day's prevalence for every ranker"
+  },
+  {
+   "pattern": "^(?!.*(?:null|chance|volume|retract|RETRACT|pooled|POOLED)).*\\b0\\.5706\\b",
+   "was": "the pooled logistic precision@50 quoted as a model-quality statement",
+   "now": "1.16x-1.26x a random ranker pooled; 10.18x on the volume segment",
+   "why": "a uniformly random ranker scores 0.45392-0.49147 on the EVALUATED ring-aware test split because account-day prevalence runs 0.001926 to 1.0. The pooled level barely clears it and is not a model comparison. An earlier version of this entry said 0.60209 and 'below chance': that null was read from the raw CSV with only a date cut, so it included the 736 rings the split drops",
+   "scoping_note": "line-scoped: the caveat may precede the number, so a forward-only lookahead missed correctly caveated lines"
+  },
+  {
+   "pattern": "^(?!.*(?:retract|RETRACT|cliff|wind-down)).*\\bp\\s*[=≈]\\s*0\\.0008\\b",
+   "was": "the typology-spread p-value",
+   "now": "withdrawn. Against the repository's own within-day permutation null the observed spread of 3.46875 sits at the 53.5th percentile of chance (p = 0.46633), and the per-typology ordering INVERTS: GATHER-SCATTER 0.9159, CYCLE 1.264, rho(rate, lift) = 0.3095",
+   "why": "a binomial H0 cannot describe a budget-constrained metric. 14 of the 529 evaluated rings end on a day where the budget exceeds the whole population and are caught by every ranker including a constant one -- and all 14 are GATHER-SCATTER, the numerator of the spread. The repo has documented that defect for precision@k since the section-1 retraction and never applied it to ring_recall",
+   "scoping_note": "scoped to the `p = ` form: a bare 0.0008 also matches the wind-down prevalence, which is a different quantity entirely"
+  },
+  {
+   "pattern": "\\b0\\.60209\\b",
+   "was": "the random-ranker null for precision@50 on HI-Medium",
+   "now": "0.45392-0.49147 on the evaluated ring-aware split",
+   "why": "computed from the raw CSV with only a date cut, so it included the 736 dropped test rings -- 30,867 positive account-days against the evaluated 18,130. A 70% inflation of the positive class inflates a prevalence-weighted null"
+  },
+  {
+   "pattern": "\\b10\\.18\\s*[x×]|\\b179\\.84\\s*[x×]",
+   "was": "the volume-segment lifts over the null",
+   "now": "17.6x (logistic) and 310.3x (GBDT seed 0)",
+   "why": "derived from the wrong-population null; the head null was 0.00421 and is 0.00243-0.00244 on the evaluated split"
+  },
+  {
+   "pattern": "headline is below chance|below a uniformly random ranker|is \\*\\*below chance\\*\\*",
+   "was": "the claim that the published precision@50 is below chance",
+   "now": "it is ABOVE chance, by 1.16x-1.26x pooled",
+   "why": "same wrong-population null. The direction of this conclusion reversed"
+  },
+  {
+   "pattern": "^(?!.*(?:retract|RETRACT|withdraw|wrong population)).*(?:0\\.11\\s*[-–]\\s*0\\.44|p\\s*[=≈~]\\s*0\\.17\\b(?!0)|cliff_aware_spread|0\\.1925|0\\.5863|rho\\s*[=≈]\\s*0\\.762)",
+   "was": "the FIRST cliff-aware replacement for the typology-spread p-value: exposure 0.1925 (BIPARTITE) to 0.5863 (GATHER-SCATTER), rho 0.762 against detection, and p = 0.11-0.44 from assumed thin-day rates of 0.80/0.90/0.95",
+   "now": "withdrawn. Against the repository's own within-day permutation null the observed spread of 3.46875 sits at the 53.5th percentile of chance (p = 0.46633), and the per-typology ordering INVERTS: GATHER-SCATTER 0.9159, CYCLE 1.264, rho(rate, lift) = 0.3095",
+   "why": "two independent defects. (1) WRONG POPULATION: exposure was measured over every ring in the patterns file, including the 736 the ring-aware split drops, so it described a different ring set from the detection rates it was explaining. (2) INFEASIBLE ASSUMED RATES: an after-cliff share of 0.66352 and a pooled rate of 0.3724 cap the after-cliff rate at 0.56125, so 0.80/0.90/0.95 cannot reproduce the observed pooled rate at any head rate in [0,1]. Inside the feasible range the p-value spans 0.0014 to 0.9014, so the assumption chose the answer. Superseded entirely: the defensible null is the within-day permutation, not any binomial",
+   "scoping_note": "`cliff_aware_spread` is registered as a bare key name because the withdrawn artifact field is the most likely route back in; `p = 0.17` is scoped to the p-value form so HI-Small's 0.170 is not matched"
+  },
+  {
+   "pattern": "^(?!.*(?:retract|RETRACT|withdraw|wrong budget|record)).*(?:p\\s*[=≈]\\s*0\\.0026\\b|exposure[- ]only\\s+p|0\\.78348|0\\.57303|1\\.85128|1\\.2577|rho\\s*[=≈]\\s*0\\.7143|p\\s*[=≈]\\s*0\\.0465)",
+   "was": "the SECOND cliff-aware replacement: exposure-only p = 0.0026 from fixed head/tail strata measured at ring budget 200 (tail 0.78348, head 0.57303, observed spread 1.85128, exposure-blind 1.2577), with rho 0.7143 and a t-approximated p = 0.0465",
+   "now": "withdrawn. Against the repository's own within-day permutation null the observed spread of 3.46875 sits at the 53.5th percentile of chance (p = 0.46633), and the per-typology ordering INVERTS: GATHER-SCATTER 0.9159, CYCLE 1.264, rho(rate, lift) = 0.3095; exposure still correlates with the RAW rate at rho = 0.7857, exact permutation p = 0.02793, but that is a statement about the generator, not a detection result",
+   "why": "three defects at once. (1) WRONG BUDGET: the 3.05x spread is ring_recall@50 -- src/aml/eval/metrics.py sets b = 50 -- while these strata were measured at 200, so the artifact published a tail rate of 0.78348 beside its own feasibility cap of 0.56125. (2) WRONG MODEL: medium_gbdt_s0 is source_lineage 'models'; its ring_recall@200 of 0.71267 matches none of the eight typology seeds. (3) WRONG NULL: two strata flatten a per-day process, and no binomial belongs on a budget-constrained metric. The rho was also a t-approximation on n=8; exactly, it is 0.0576, not 0.0465",
+   "scoping_note": "scoped to the p-value and rate forms. 1.2577 and 1.85128 are registered bare because they appear nowhere else"
+  },
+  {
+   "pattern": "^(?!.*(?:retract|RETRACT|withdraw|historical|used to|no longer|superseded|was wrong|record)).*(?:significant on HI-Medium|(?:spread|variation).{0,30}(?:is|are)\\s+(?:real|significant)|detection\\s+varies\\s+(?:substantially\\s+)?(?:by|across)\\s+(?:structure|typolog)|(?:typolog|structure)\\w*.{0,40}statistically\\s+significant)",
+   "was": "the per-structure spread stated as an established finding, in WORDS",
+   "now": "withdrawn: its H0 -- one detection probability per ring -- is false. No valid null has been computed for the 3.05x ensemble figure itself; on the nearest measurable basis (one archived replay, current ring join, ring_recall@50) the observed spread is the 53.5th percentile of chance (p = 0.46633) and no per-typology ordering is established",
+   "why": "the registry matched the withdrawn NUMBER and nothing else, so the claim walked back in as prose: paper/README.md indexed this result as 'significant on HI-Medium' while the file it linked to retracted it, and no gate could see the contradiction. Register the CLAIM, not only its digits",
+   "scoping_note": "prose forms only; the numeric forms are registered above"
+  },
+  {
+   "pattern": "^(?!.*(?:retract|RETRACT|withdraw|historical|used to|no longer|superseded|was wrong|record)).*(?:1\\.43\\s*(?:times|x|×)\\b.{0,14}chance|143%\\s*of\\s*chance|nearly\\s+saturat|near-saturat|benchmark\\s+is\\s+saturat|97\\s*percent\\s*(?:is\\s*)?prevalence)",
+   "was": "three withdrawn claims restated without their digits: the 1.43 ring-recall lift, 'near-saturated', and '97% of the uplift is prevalence'",
+   "now": "lift 0.9497 against a within-day permutation null; 'saturated' is removed from every current document; the decomposition is 47% prevalence / 53% detectability",
+   "why": "a probe of all 29 patterns found that every prose paraphrase and every numeric reformat passed clean -- '1.43 times chance', '143% of chance', 'nearly saturated', '97 percent prevalence'. A registry that matches only the exact string it was given catches the copy-paste and misses the rewrite",
+   "scoping_note": "word forms; the digit forms are registered separately"
+  }
+ ]
+}

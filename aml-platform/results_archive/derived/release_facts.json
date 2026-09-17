@@ -1,0 +1,48 @@
+{
+ "generated_at": "2026-09-17T02:42:24Z",
+ "tests_collected": 415,
+ "tests_passed": 398,
+ "tests_skipped": 17,
+ "skip_reason": "data-dependent HI-Small contract tests whose built intermediates are absent from a fresh checkout -- NOT 'without Azure extras', which is what the docs used to say",
+ "result_sets": 56,
+ "derived_markers": 9,
+ "derived_markers_scope": "every git-TRACKED .md, archives INCLUDED. Untracked and ignored files are excluded: they differ between a working copy and a clean checkout",
+ "derived_markers_current": 1,
+ "derived_markers_current_scope": "the same, with docs/archive and paper/archive excluded",
+ "markdown_files": 53,
+ "markdown_files_current": 26,
+ "manifests_archived": 101,
+ "replay_bundles": 9,
+ "replay_parquet_files": 45,
+ "replay_rows": 526355,
+ "replay_rows_by_kind": {
+  "account_days_topk.parquet": 335269,
+  "per_day_positives.parquet": 586,
+  "ring_endpoints.parquet": 79264,
+  "ring_membership.parquet": 71604,
+  "ring_transactions.parquet": 39632
+ },
+ "published_values_checked": 1244,
+ "published_values_exempted": 114,
+ "published_documents": 23,
+ "retraction_patterns": 32,
+ "pytest_ok": true,
+ "code_git_sha": "4302785927f169679bb1ea986596f6c46fd5cdc1",
+ "generator_script": "aml-platform/scripts/release_facts.py",
+ "generator_sha256": "9431bfb4a620349d758863ccb0d9a3c4a45d7b6ba04a5f4d636e2fe2b0400234",
+ "generator_matches_commit": true,
+ "code_tree_sha256": "0bb75f20e3948e7be78a23c117048b797537faf6b1834d39a4e5530f580a478f",
+ "code_tree_matches_commit": true,
+ "provenance_scope": [
+  ""
+ ],
+ "scope_clean": true,
+ "python_version": "3.12.3",
+ "platform": "macOS-26.5.2-arm64-arm-64bit",
+ "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
+ "status": "ok",
+ "parameters": {
+  "root": ".",
+  "allow_red": false
+ }
+}

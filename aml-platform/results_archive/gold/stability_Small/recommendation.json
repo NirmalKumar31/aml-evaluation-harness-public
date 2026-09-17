@@ -1,0 +1,9 @@
+{
+  "recommended_config": "bigleaf",
+  "incumbent_spread_pct": 9.79,
+  "recommended_spread_pct": 6.91,
+  "recommended_ensemble_ap": 0.21609,
+  "recommended_ensemble_eff50": 0.73473,
+  "halved_incumbent_spread": false,
+  "reason": "NO config halved the incumbent's 9.79% spread. Least-unstable is bigleaf at 6.91%. Report ensembles with ranges and do not claim a point value."
+}

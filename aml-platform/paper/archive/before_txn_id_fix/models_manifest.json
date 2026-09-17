@@ -1,0 +1,151 @@
+{
+  "component": "train_model[gbdt]",
+  "run_key": "31bac88d23f6d42f",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "features": "data/silver/features_Medium",
+    "splits": "data/gold/splits_Medium",
+    "model": "gbdt",
+    "seed": 0,
+    "sample": 1.0,
+    "feature_list": [
+      "log_amount_paid",
+      "log_amount_received",
+      "fx_ratio",
+      "currency_mismatch",
+      "amount_roundness",
+      "hour",
+      "dayofweek",
+      "is_weekend",
+      "is_self_transfer",
+      "is_cross_bank",
+      "payment_format_code",
+      "payment_currency_code",
+      "s_n_1d",
+      "s_n_7d",
+      "s_n_30d",
+      "s_mean_amt_7d",
+      "s_std_amt_7d",
+      "s_max_amt_30d",
+      "s_n_out_7d",
+      "s_secs_since_prev",
+      "s_secs_since_prev_cp",
+      "s_amt_vs_hist",
+      "r_n_1d",
+      "r_n_7d",
+      "r_n_30d",
+      "r_mean_amt_7d",
+      "r_std_amt_7d",
+      "r_max_amt_30d",
+      "r_n_out_7d",
+      "r_secs_since_prev",
+      "r_secs_since_prev_cp",
+      "r_amt_vs_hist"
+    ],
+    "n_features": 32
+  },
+  "config_hash": "433710d9acc6f4d52bd1572bddd08642c32156bcdbac1b339573863c84a59a76",
+  "code_git_sha": "03e84ad7ea5cf77c40db1176e812abce3ce92865",
+  "wall_clock_sec": 348.464,
+  "metrics": {
+    "train_rows": 19487126,
+    "train_positives": 15713,
+    "test_rows": 12402530,
+    "test_positives": 10935,
+    "model_artifact_sha256": "d9f263bdce6164b79805a44c0b2d1647394e7016db374c7bf0b36b142933aa5c",
+    "model_artifact_mb": 1.12,
+    "sample_fraction": 1.0,
+    "n_account_days": 6204374,
+    "n_positive_account_days": 18130,
+    "average_precision": 0.3005071606200804,
+    "roc_auc_footnote_only": 0.9828218520855364,
+    "recall@10": 0.007335907335907336,
+    "recall_ceiling@10": 0.010148924434638721,
+    "recall_efficiency@10": 0.7228260869565217,
+    "precision@10": 0.7228260869565217,
+    "alerts_per_true_positive@10": 1.3834586466165413,
+    "ring_recall@10": 0.09262759924385633,
+    "recall@25": 0.018587975730832873,
+    "recall_ceiling@25": 0.024379481522338667,
+    "recall_efficiency@25": 0.7624434389140271,
+    "precision@25": 0.7573033707865169,
+    "alerts_per_true_positive@25": 1.3204747774480712,
+    "ring_recall@25": 0.2003780718336484,
+    "recall@50": 0.039382239382239385,
+    "recall_ceiling@50": 0.04732487589630447,
+    "recall_efficiency@50": 0.8321678321678322,
+    "precision@50": 0.8263888888888888,
+    "alerts_per_true_positive@50": 1.2100840336134453,
+    "ring_recall@50": 0.34593572778827975,
+    "recall@100": 0.07170435741864313,
+    "recall_ceiling@100": 0.08532818532818533,
+    "recall_efficiency@100": 0.8403361344537815,
+    "precision@100": 0.818639798488665,
+    "alerts_per_true_positive@100": 1.2215384615384615,
+    "ring_recall@100": 0.5160680529300568,
+    "recall@200": 0.1259238830667402,
+    "recall_ceiling@200": 0.15488141202426917,
+    "recall_efficiency@200": 0.813034188034188,
+    "precision@200": 0.7913344887348354,
+    "alerts_per_true_positive@200": 1.2636881296539642,
+    "ring_recall@200": 0.6918714555765595,
+    "recall@500": 0.24936569222283508,
+    "recall_ceiling@500": 0.3375620518477661,
+    "recall_efficiency@500": 0.7387254901960785,
+    "precision@500": 0.7100675357311136,
+    "alerts_per_true_positive@500": 1.4083167440831674,
+    "ring_recall@500": 0.8865784499054821,
+    "recall@1000": 0.3501930501930502,
+    "recall_ceiling@1000": 0.5726420297848869,
+    "recall_efficiency@1000": 0.6115392024658063,
+    "precision@1000": 0.5679398872886663,
+    "alerts_per_true_positive@1000": 1.760749724366042,
+    "ring_recall@1000": 0.9565217391304348,
+    "typology_coverage_pct": 49.54,
+    "ci_lo": 0.03331297540391983,
+    "ci_hi": 0.045974786575058296,
+    "n_clusters": 9653,
+    "n_ring_clusters": 529,
+    "n_bootstrap": 1000,
+    "per_typology": {
+      "BIPARTITE": {
+        "n_rings": 61,
+        "ring_recall@50": 0.2459016393442623
+      },
+      "CYCLE": {
+        "n_rings": 78,
+        "ring_recall@50": 0.3333333333333333
+      },
+      "FAN-IN": {
+        "n_rings": 74,
+        "ring_recall@50": 0.17567567567567569
+      },
+      "FAN-OUT": {
+        "n_rings": 65,
+        "ring_recall@50": 0.27692307692307694
+      },
+      "GATHER-SCATTER": {
+        "n_rings": 60,
+        "ring_recall@50": 0.7666666666666667
+      },
+      "RANDOM": {
+        "n_rings": 76,
+        "ring_recall@50": 0.27631578947368424
+      },
+      "SCATTER-GATHER": {
+        "n_rings": 60,
+        "ring_recall@50": 0.4
+      },
+      "STACK": {
+        "n_rings": 55,
+        "ring_recall@50": 0.36363636363636365
+      }
+    }
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-18T00:09:57Z"
+}

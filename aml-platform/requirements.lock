@@ -1,0 +1,77 @@
+# Exact environment the pipeline is TESTED against. Generated: 2026-08-24T16:08Z
+# Python 3.12.3
+#
+# The Dockerfile installs from requirements.linux-amd64.lock, which is THIS
+# file resolved for linux/amd64 with a sha256 per wheel. pyproject declares
+# what the package is compatible with; this declares what was actually
+# verified; that one declares the bytes that ran.
+#
+# Why it matters: pyproject said pandas>=2.2 while the tested version is a
+# major version apart. A container built from the ranges could install either,
+# and the 182M-row cloud run is not the place to discover which.
+#
+# Regenerate with: make lock && make lock-hashes
+
+PyJWT==2.13.0
+PyYAML==6.0.3
+adlfs==2026.8.0
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.3
+aiosignal==1.4.0
+attrs==26.1.0
+azure-core==1.41.0
+azure-identity==1.25.3
+azure-storage-blob==12.30.0
+bleach==6.4.0
+certifi==2026.7.22
+cffi==2.1.1
+charset-normalizer==3.4.9
+cryptography==50.0.0
+duckdb==1.5.5
+fastjsonschema==2.22.1
+frozenlist==1.8.0
+fsspec==2026.7.0
+idna==3.18
+isodate==0.7.2
+joblib==1.5.3
+jsonschema-specifications==2025.9.1
+jsonschema==4.26.0
+jupyter_core==5.9.1
+jupytext==1.19.5
+kaggle==2.2.4
+kagglesdk==0.1.37
+lightgbm==4.7.0
+markdown-it-py==4.2.0
+mdit-py-plugins==0.6.1
+mdurl==0.1.2
+msal-extensions==1.3.1
+msal==1.38.0
+multidict==6.7.1
+narwhals==2.24.0
+nbformat==5.11.0
+numpy==2.5.2
+packaging==26.3
+pandas==3.0.5
+pip==26.2.1
+platformdirs==4.11.2
+propcache==0.5.2
+protobuf==7.35.1
+pyarrow==25.0.1
+pycparser==3.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.2
+python-slugify==8.0.4
+referencing==0.37.0
+requests==2.34.2
+rpds-py==2026.6.3
+scikit-learn==1.9.0
+scipy==1.18.0
+six==1.17.0
+text-unidecode==1.3
+threadpoolctl==3.6.0
+tqdm==4.70.0
+traitlets==5.16.1
+typing_extensions==4.16.0
+urllib3==2.7.0
+webencodings==0.5.1
+yarl==1.24.5

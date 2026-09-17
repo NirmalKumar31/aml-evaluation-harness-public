@@ -1,0 +1,81 @@
+{
+ "code_git_sha": "ace21577081472bbfffb4f56a6352d10d9b2e2af",
+ "generator_script": "aml-platform/scripts/categorical_ablation.py",
+ "generator_sha256": "cb8e4e81ad105265b35849f252a91ea36d46bbb414b69bfb9c44b5e67899e552",
+ "generator_matches_commit": true,
+ "code_tree_sha256": "0bb75f20e3948e7be78a23c117048b797537faf6b1834d39a4e5530f580a478f",
+ "code_tree_matches_commit": true,
+ "provenance_scope": [
+  "aml-platform/src",
+  "aml-platform/scripts"
+ ],
+ "scope_clean": true,
+ "generated_at": "2026-09-17T00:23:52Z",
+ "python_version": "3.12.3",
+ "platform": "macOS-26.5.2-arm64-arm-64bit",
+ "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
+ "status": "ok",
+ "inputs": [
+  {
+   "path": "data/silver/features_Small",
+   "kind": "directory",
+   "n_files": 19,
+   "bytes": 571973979,
+   "listing_sha256": "6055a445bdb26686667981b99adb9ab37ec75a90aced34ca818446b5c9a314e5",
+   "identity": "metadata (path and size), NOT content",
+   "identity_reason": "571973979 bytes exceeds OUTPUT_HASH_MAX_BYTES=67108864"
+  },
+  {
+   "path": "data/gold/infl_splits_ring-aware_Small",
+   "kind": "directory",
+   "n_files": 22,
+   "bytes": 224173838,
+   "listing_sha256": "2b74f43a93a9a0877c3118cfa4b80814303235e8733a5caec0e89976f0f5a3a7",
+   "identity": "metadata (path and size), NOT content",
+   "identity_reason": "224173838 bytes exceeds OUTPUT_HASH_MAX_BYTES=67108864"
+  }
+ ],
+ "parameters": {
+  "features": "data/silver/features_Small",
+  "splits": "data/gold/infl_splits_ring-aware_Small",
+  "seed": 0
+ },
+ "seed": 0,
+ "n_train": 2284182,
+ "n_test": 2793197,
+ "categorical_features": [
+  "payment_format_code",
+  "payment_currency_code"
+ ],
+ "arms": {
+  "full": {
+   "average_precision__txn": 0.011960506903504602,
+   "precision@50": 0.511265164644714,
+   "recall@50": 0.06847725162488394,
+   "recall_efficiency@50": 0.5148342059336825,
+   "ring_recall@200": 0.5486111111111112
+  },
+  "no_categorical": {
+   "average_precision__txn": 0.010864755834504868,
+   "precision@50": 0.49740034662045063,
+   "recall@50": 0.06662024141132776,
+   "recall_efficiency@50": 0.5008726003490401,
+   "ring_recall@200": 0.5555555555555556
+  },
+  "onehot": {
+   "average_precision__txn": 0.012788008886051817,
+   "precision@50": 0.5251299826689775,
+   "recall@50": 0.07033426183844012,
+   "recall_efficiency@50": 0.5287958115183247,
+   "ring_recall@200": 0.5347222222222222
+  }
+ },
+ "onehot_vocabulary_sizes": {
+  "payment_format_code": 7,
+  "payment_currency_code": 15
+ },
+ "by_segment_note": "NOT COMPUTED: pass --thin-from <YYYY-MM-DD> (the rung's transaction-volume collapse, from window_decomposition.json). Without it the arms are only comparable on pooled levels, which this window does not support.",
+ "wall_clock_sec": 56.5,
+ "ap_ratio_full_over_no_categorical": 1.1008537224113026,
+ "ap_ratio_full_over_onehot": 0.9352907876495308
+}

@@ -1,0 +1,33 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+*.csv
+!tests/fixtures/*.csv
+*.parquet
+
+# ...EXCEPT the replay bundles. They are the one Parquet in this repository
+# that is meant to be published: a few hundred kilobytes per run that let a
+# reader recompute every budget metric without the dataset. The blanket rule
+# above silently dropped them -- `bundle.json` committed, the data files not --
+# so the archive looked complete and the verification test passed locally and
+# failed in a clean clone. Same shape as the bare `gold/` rule that once
+# matched at any depth.
+!results_archive/replay/**/*.parquet
+
+# Pipeline stage outputs: tens of GB of Parquet, regenerable from the raw
+# input. Anchored to data/ on purpose -- a bare `gold/` matches ANY directory
+# of that name at ANY depth, and it silently swallowed results_archive/gold/,
+# which is how every published figure ended up with no artifact behind it in
+# CI. The manifests there are the provenance for the README; they must ship.
+data/bronze/
+data/silver/
+data/gold/
+
+# The manifests behind every published number. 3.6 MB of JSON, no Parquet.
+# Committed so that `scripts/make_tables.py --check` can verify the documents
+# in CI and so a reader who clones this can verify them too.
+!results_archive/
+!results_archive/**/*.json
+.pytest_cache/
+.DS_Store

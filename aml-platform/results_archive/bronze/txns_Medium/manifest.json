@@ -1,0 +1,30 @@
+{
+  "component": "normalize_schema",
+  "run_key": "a4b2e6f656f269ee",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "src": "data/HI-Medium_Trans.csv",
+    "dest": "data/bronze/txns_Medium",
+    "schema_version": "1.1.0"
+  },
+  "config_hash": "a7c863cd4b975f5832b18a3e7cb7f3c5620ded1a091ae6407027d09bc802267c",
+  "code_git_sha": "23393ceff144e3ff633600b12b22a7b88a476bbc",
+  "wall_clock_sec": 26.823,
+  "metrics": {
+    "input_sha256": "3126afb8155e7c8815d62bc5370549a7b5ae6bf7dfe872b3cd7813e66a3d7ff5",
+    "rows": 31898238,
+    "positives": 35230,
+    "prevalence_pct": 0.1104,
+    "min_event_time": "2022-09-01 00:00:00",
+    "max_event_time": "2022-09-28 15:58:00",
+    "days": 28,
+    "distinct_senders": 2013639,
+    "txn_id_contiguous": true
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-20T20:40:13Z"
+}

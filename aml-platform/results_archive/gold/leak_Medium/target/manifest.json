@@ -1,0 +1,30 @@
+{
+  "component": "plant_leak[target]",
+  "run_key": "199db8689a7f9abd",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "labeled": "data/gold/reconcile_Medium/txns_labeled",
+    "dest": "data/gold/leak_Medium/target",
+    "kind": "target",
+    "plant_version": "1.1.0"
+  },
+  "config_hash": "560780a791bc1fd64685ab094beddeac6de8b34175191ff552e5685e4b81daef",
+  "code_git_sha": "23393ceff144e3ff633600b12b22a7b88a476bbc",
+  "wall_clock_sec": 5.657,
+  "metrics": {
+    "kind": "target",
+    "rows": 31898238,
+    "leak_columns": [
+      "s_account_ever_laundered",
+      "r_account_ever_laundered",
+      "s_account_laundering_rate",
+      "r_account_laundering_rate"
+    ]
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-20T20:46:40Z"
+}

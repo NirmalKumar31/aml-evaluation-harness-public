@@ -1,0 +1,430 @@
+{
+ "_comment": "Random-ranker expectations for the budget metrics, computed on the EVALUATED ring-aware test split. An earlier version read the raw CSV with only a date cut, which included the 736 dropped test rings -- 30,867 positive account-days against the evaluated 18,130 -- and so reported a null far too high. Values are BRACKETED: per-day positives are exact from the bundle, N_d is exact only where the day's highest written rank is BELOW the bundle's top-k cap -- proof that nothing was dropped -- and otherwise bounded between the highest rank written and the raw per-day count, because the split only removes account-days. A day truncated at exactly the cap is NOT exact, however contiguous its ranks look. `null_precision_high` is the adverse bound; an 'above chance' claim must clear it. `*_sd` is the hypergeometric standard deviation of the pooled count. `nonbinding_day_list@k` names days where N_d <= k, on which precision@k equals the day's prevalence for every ranker.",
+ "budgets": [
+  50,
+  200
+ ],
+ "rungs": {
+  "Medium": {
+   "days": 19,
+   "head_days": 7,
+   "tail_days": 12,
+   "thin_from": "2022-09-17",
+   "n_positive_total": 18130,
+   "null_precision_high@50": 0.49147,
+   "null_precision_high@50_head": 0.00244,
+   "null_precision_high@50_tail": 0.82447,
+   "null_precision_high_sd@50": 0.008194,
+   "null_precision_high_sd_is_a_lower_bound@50": true,
+   "null_precision_low@50": 0.45392,
+   "null_precision_low@50_head": 0.00243,
+   "null_precision_low@50_tail": 0.76135,
+   "null_precision_low_sd@50": 0.009078,
+   "null_precision_low_sd_is_a_lower_bound@50": true,
+   "alert_slots@50": 864,
+   "ceiling_count@50": 858,
+   "ceiling_budget_limited@50": 800,
+   "ceiling_positive_limited@50": 58,
+   "nonbinding_days@50": 3,
+   "nonbinding_day_list@50": [
+    "2022-09-26",
+    "2022-09-27",
+    "2022-09-28"
+   ],
+   "null_precision_high@200": 0.4167,
+   "null_precision_high@200_head": 0.00244,
+   "null_precision_high@200_tail": 0.80725,
+   "null_precision_high_sd@200": 0.003688,
+   "null_precision_high_sd_is_a_lower_bound@200": true,
+   "null_precision_low@200": 0.37171,
+   "null_precision_low@200_head": 0.00243,
+   "null_precision_low@200_tail": 0.71985,
+   "null_precision_low_sd@200": 0.004353,
+   "null_precision_low_sd_is_a_lower_bound@200": true,
+   "alert_slots@200": 2885,
+   "ceiling_count@200": 2808,
+   "ceiling_budget_limited@200": 2400,
+   "ceiling_positive_limited@200": 408,
+   "nonbinding_days@200": 7,
+   "nonbinding_day_list@200": [
+    "2022-09-22",
+    "2022-09-23",
+    "2022-09-24",
+    "2022-09-25",
+    "2022-09-26",
+    "2022-09-27",
+    "2022-09-28"
+   ],
+   "split_manifest": {
+    "test_positive_account_days": 18130,
+    "test_total_account_days": 6204374,
+    "dropped_rings": 736,
+    "test_rings_kept": 529,
+    "cut_time": "2022-09-10"
+   },
+   "population_source": "positives EXACT from replay bundle medium_baseline_s0; N_d exact only on days whose highest written rank is below the bundle cap of 1000, else bracketed between max(highest rank, P_d, raw count - the window's total removal of 4074 account-days) and the raw count",
+   "per_day": [
+    {
+     "day": "2022-09-10",
+     "n_positive": 1431,
+     "n_d_low": 587394,
+     "n_d_high": 591468,
+     "n_d_source": "bounded (raw 591468, highest rank 129661, window removal 4074)"
+    },
+    {
+     "day": "2022-09-11",
+     "n_positive": 1543,
+     "n_d_low": 585736,
+     "n_d_high": 589810,
+     "n_d_source": "bounded (raw 589810, highest rank 108006, window removal 4074)"
+    },
+    {
+     "day": "2022-09-12",
+     "n_positive": 1938,
+     "n_d_low": 895963,
+     "n_d_high": 900037,
+     "n_d_source": "bounded (raw 900037, highest rank 268388, window removal 4074)"
+    },
+    {
+     "day": "2022-09-13",
+     "n_positive": 2220,
+     "n_d_low": 894549,
+     "n_d_high": 898623,
+     "n_d_source": "bounded (raw 898623, highest rank 302637, window removal 4074)"
+    },
+    {
+     "day": "2022-09-14",
+     "n_positive": 2331,
+     "n_d_low": 896620,
+     "n_d_high": 900694,
+     "n_d_source": "bounded (raw 900694, highest rank 220980, window removal 4074)"
+    },
+    {
+     "day": "2022-09-15",
+     "n_positive": 2548,
+     "n_d_low": 895982,
+     "n_d_high": 900056,
+     "n_d_source": "bounded (raw 900056, highest rank 363769, window removal 4074)"
+    },
+    {
+     "day": "2022-09-16",
+     "n_positive": 2737,
+     "n_d_low": 1417295,
+     "n_d_high": 1421369,
+     "n_d_source": "bounded (raw 1421369, highest rank 440735, window removal 4074)"
+    },
+    {
+     "day": "2022-09-17",
+     "n_positive": 940,
+     "n_d_low": 1026,
+     "n_d_high": 1873,
+     "n_d_source": "bounded (raw 1873, highest rank 1026, window removal 4074)"
+    },
+    {
+     "day": "2022-09-18",
+     "n_positive": 738,
+     "n_d_low": 1000,
+     "n_d_high": 1466,
+     "n_d_source": "bounded (raw 1466, highest rank 1000, window removal 4074)"
+    },
+    {
+     "day": "2022-09-19",
+     "n_positive": 584,
+     "n_d_low": 769,
+     "n_d_high": 769,
+     "n_d_source": "exact (highest rank 769 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-20",
+     "n_positive": 417,
+     "n_d_low": 543,
+     "n_d_high": 543,
+     "n_d_source": "exact (highest rank 543 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-21",
+     "n_positive": 295,
+     "n_d_low": 382,
+     "n_d_high": 382,
+     "n_d_source": "exact (highest rank 382 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-22",
+     "n_positive": 161,
+     "n_d_low": 197,
+     "n_d_high": 197,
+     "n_d_source": "exact (highest rank 197 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-23",
+     "n_positive": 69,
+     "n_d_low": 87,
+     "n_d_high": 87,
+     "n_d_source": "exact (highest rank 87 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-24",
+     "n_positive": 62,
+     "n_d_low": 70,
+     "n_d_high": 70,
+     "n_d_source": "exact (highest rank 70 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-25",
+     "n_positive": 58,
+     "n_d_low": 67,
+     "n_d_high": 67,
+     "n_d_source": "exact (highest rank 67 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-26",
+     "n_positive": 41,
+     "n_d_low": 44,
+     "n_d_high": 44,
+     "n_d_source": "exact (highest rank 44 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-27",
+     "n_positive": 13,
+     "n_d_low": 16,
+     "n_d_high": 16,
+     "n_d_source": "exact (highest rank 16 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-28",
+     "n_positive": 4,
+     "n_d_low": 4,
+     "n_d_high": 4,
+     "n_d_source": "exact (highest rank 4 is below the cap of 1000, so the day was written in full)"
+    }
+   ]
+  },
+  "Small": {
+   "days": 14,
+   "head_days": 6,
+   "tail_days": 8,
+   "thin_from": "2022-09-11",
+   "n_positive_total": 4308,
+   "null_precision_high@50": 0.46278,
+   "null_precision_high@50_head": 0.00271,
+   "null_precision_high@50_tail": 0.96104,
+   "null_precision_high_sd@50": 0.003986,
+   "null_precision_high_sd_is_a_lower_bound@50": true,
+   "null_precision_low@50": 0.46277,
+   "null_precision_low@50_head": 0.0027,
+   "null_precision_low@50_tail": 0.96104,
+   "null_precision_low_sd@50": 0.003985,
+   "null_precision_low_sd_is_a_lower_bound@50": true,
+   "alert_slots@50": 577,
+   "ceiling_count@50": 573,
+   "ceiling_budget_limited@50": 500,
+   "ceiling_positive_limited@50": 73,
+   "nonbinding_days@50": 4,
+   "nonbinding_day_list@50": [
+    "2022-09-15",
+    "2022-09-16",
+    "2022-09-17",
+    "2022-09-18"
+   ],
+   "null_precision_high@200": 0.35168,
+   "null_precision_high@200_head": 0.00271,
+   "null_precision_high@200_tail": 0.96212,
+   "null_precision_high_sd@200": 0.001355,
+   "null_precision_high_sd_is_a_lower_bound@200": true,
+   "null_precision_low@200": 0.35168,
+   "null_precision_low@200_head": 0.0027,
+   "null_precision_low@200_tail": 0.96212,
+   "null_precision_low_sd@200": 0.001355,
+   "null_precision_low_sd_is_a_lower_bound@200": true,
+   "alert_slots@200": 1886,
+   "ceiling_count@200": 1873,
+   "ceiling_budget_limited@200": 1400,
+   "ceiling_positive_limited@200": 473,
+   "nonbinding_days@200": 6,
+   "nonbinding_day_list@200": [
+    "2022-09-13",
+    "2022-09-14",
+    "2022-09-15",
+    "2022-09-16",
+    "2022-09-17",
+    "2022-09-18"
+   ],
+   "split_manifest": {
+    "test_positive_account_days": 4308,
+    "test_total_account_days": 1395196,
+    "dropped_rings": 85,
+    "test_rings_kept": 144,
+    "cut_time": "2022-09-05"
+   },
+   "population_source": "positives EXACT from replay bundle small_gbdt_s0; N_d exact only on days whose highest written rank is below the bundle cap of 1000, else bracketed between max(highest rank, P_d, raw count - the window's total removal of 334 account-days) and the raw count",
+   "per_day": [
+    {
+     "day": "2022-09-05",
+     "n_positive": 420,
+     "n_d_low": 224706,
+     "n_d_high": 225040,
+     "n_d_source": "bounded (raw 225040, highest rank 120037, window removal 334)"
+    },
+    {
+     "day": "2022-09-06",
+     "n_positive": 534,
+     "n_d_low": 224282,
+     "n_d_high": 224616,
+     "n_d_source": "bounded (raw 224616, highest rank 86743, window removal 334)"
+    },
+    {
+     "day": "2022-09-07",
+     "n_positive": 576,
+     "n_d_low": 224740,
+     "n_d_high": 225074,
+     "n_d_source": "bounded (raw 225074, highest rank 33521, window removal 334)"
+    },
+    {
+     "day": "2022-09-08",
+     "n_positive": 717,
+     "n_d_low": 224836,
+     "n_d_high": 225170,
+     "n_d_source": "bounded (raw 225170, highest rank 89177, window removal 334)"
+    },
+    {
+     "day": "2022-09-09",
+     "n_positive": 681,
+     "n_d_low": 346350,
+     "n_d_high": 346684,
+     "n_d_source": "bounded (raw 346684, highest rank 58753, window removal 334)"
+    },
+    {
+     "day": "2022-09-10",
+     "n_positive": 633,
+     "n_d_low": 147689,
+     "n_d_high": 148023,
+     "n_d_source": "bounded (raw 148023, highest rank 12946, window removal 334)"
+    },
+    {
+     "day": "2022-09-11",
+     "n_positive": 274,
+     "n_d_low": 290,
+     "n_d_high": 290,
+     "n_d_source": "exact (highest rank 290 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-12",
+     "n_positive": 197,
+     "n_d_low": 202,
+     "n_d_high": 202,
+     "n_d_source": "exact (highest rank 202 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-13",
+     "n_positive": 123,
+     "n_d_low": 127,
+     "n_d_high": 127,
+     "n_d_source": "exact (highest rank 127 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-14",
+     "n_positive": 80,
+     "n_d_low": 82,
+     "n_d_high": 82,
+     "n_d_source": "exact (highest rank 82 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-15",
+     "n_positive": 26,
+     "n_d_low": 28,
+     "n_d_high": 28,
+     "n_d_source": "exact (highest rank 28 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-16",
+     "n_positive": 27,
+     "n_d_low": 28,
+     "n_d_high": 28,
+     "n_d_source": "exact (highest rank 28 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-17",
+     "n_positive": 10,
+     "n_d_low": 11,
+     "n_d_high": 11,
+     "n_d_source": "exact (highest rank 11 is below the cap of 1000, so the day was written in full)"
+    },
+    {
+     "day": "2022-09-18",
+     "n_positive": 10,
+     "n_d_low": 10,
+     "n_d_high": 10,
+     "n_d_source": "exact (highest rank 10 is below the cap of 1000, so the day was written in full)"
+    }
+   ]
+  }
+ },
+ "code_git_sha": "26314edf28b5ea018648b69388d0c4fe844ea08f",
+ "generator_script": "aml-platform/scripts/budget_null.py",
+ "generator_sha256": "45f8e0cddce522b1f2cdffe11710c787526a1e3a73a770f38806c2aeb8f8f68f",
+ "generator_matches_commit": true,
+ "code_tree_sha256": "0bb75f20e3948e7be78a23c117048b797537faf6b1834d39a4e5530f580a478f",
+ "code_tree_matches_commit": true,
+ "provenance_scope": [
+  "aml-platform/src",
+  "aml-platform/scripts"
+ ],
+ "scope_clean": true,
+ "generated_at": "2026-09-17T00:17:45Z",
+ "python_version": "3.12.3",
+ "platform": "macOS-26.5.2-arm64-arm-64bit",
+ "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
+ "status": "ok",
+ "inputs": [
+  {
+   "path": "aml-platform/results_archive/replay/medium_baseline_s0",
+   "kind": "directory",
+   "n_files": 6,
+   "bytes": 625930,
+   "listing_sha256": "b59c6c3aba3a979151709ee8d698fefd37741e1a36af78dcc78cc376d24f9b40",
+   "content_sha256": "97bed7f69cf826709ef8c374baf35180d216e1c00eeef2645738d227e38127d6",
+   "identity": "content (every file hashed)"
+  },
+  {
+   "path": "aml-platform/data/HI-Medium_Trans.csv",
+   "bytes": 3031783420,
+   "kind": "file",
+   "sha256": null,
+   "sha256_skipped": "larger than 67108864 bytes"
+  },
+  {
+   "path": "aml-platform/results_archive/gold/splits_Medium/manifest.json",
+   "bytes": 1360,
+   "kind": "file",
+   "sha256": "9f2b8e71dd47158f4c3ffeaa8d62db03a41471451768c216c96e83367449c0fc"
+  },
+  {
+   "path": "aml-platform/results_archive/replay/small_gbdt_s0",
+   "kind": "directory",
+   "n_files": 6,
+   "bytes": 231908,
+   "listing_sha256": "e6662b79218bf2c644611e9a05f4ae902472a79b70db5c79645a4f8e6214ae70",
+   "content_sha256": "96037be8e775f848de542386f26399f4d2b158bfd71ceda333e49f6a21cf66b8",
+   "identity": "content (every file hashed)"
+  },
+  {
+   "path": "aml-platform/data/HI-Small_Trans.csv",
+   "bytes": 475664283,
+   "kind": "file",
+   "sha256": null,
+   "sha256_skipped": "larger than 67108864 bytes"
+  },
+  {
+   "path": "aml-platform/results_archive/gold/splits_Small/manifest.json",
+   "bytes": 1347,
+   "kind": "file",
+   "sha256": "beccc04624c60c4fea39f5e9519fb222468a4039bf0da14b67e16a3e337fbfdd"
+  }
+ ],
+ "parameters": {
+  "budgets": [
+   50,
+   200
+  ]
+ }
+}

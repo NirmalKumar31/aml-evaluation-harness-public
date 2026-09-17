@@ -1,0 +1,92 @@
+{
+  "component": "model_stability",
+  "run_key": null,
+  "status": "ok",
+  "error": null,
+  "config": {
+    "features": "data/silver/features_Small",
+    "splits": "data/gold/splits_Small",
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "configs": {
+      "current": {
+        "learning_rate": 0.1,
+        "max_iter": 300,
+        "max_depth": 8,
+        "min_samples_leaf": 40,
+        "class_weight": "balanced"
+      }
+    },
+    "sample": 1.0,
+    "stability_version": "1.1.0",
+    "feature_set": [
+      "log_amount_paid",
+      "log_amount_received",
+      "fx_ratio",
+      "currency_mismatch",
+      "amount_roundness",
+      "hour",
+      "dayofweek",
+      "is_weekend",
+      "is_self_transfer",
+      "is_cross_bank",
+      "payment_format_code",
+      "payment_currency_code",
+      "s_n_1d",
+      "s_n_7d",
+      "s_n_30d",
+      "s_mean_amt_7d",
+      "s_std_amt_7d",
+      "s_max_amt_30d",
+      "s_n_out_7d",
+      "s_secs_since_prev",
+      "s_secs_since_prev_cp",
+      "s_amt_vs_hist",
+      "r_n_1d",
+      "r_n_7d",
+      "r_n_30d",
+      "r_mean_amt_7d",
+      "r_std_amt_7d",
+      "r_max_amt_30d",
+      "r_n_out_7d",
+      "r_secs_since_prev",
+      "r_secs_since_prev_cp",
+      "r_amt_vs_hist",
+      "s_new_cp_rate_7d",
+      "r_new_cp_rate_7d",
+      "s_out_share_7d",
+      "r_out_share_7d"
+    ],
+    "n_features": 36
+  },
+  "config_hash": "d097789d6f7c29b803e9482df169c54661c5cd5d04ea68e1856a42d216aedf2f",
+  "code_git_sha": "bfaa4632550282c81158e768e53895f58242254a",
+  "wall_clock_sec": 406.66,
+  "metrics": {
+    "n_configs": 1,
+    "n_seeds": 8,
+    "n_fits": 8,
+    "train_rows": 2284182,
+    "test_rows": 2793197,
+    "recommended_config": "current",
+    "incumbent_spread_pct": 13.04,
+    "recommended_spread_pct": 13.04,
+    "recommended_ensemble_ap": 0.1774,
+    "recommended_ensemble_eff50": 0.71204,
+    "halved_incumbent_spread": false,
+    "reason": "NO config halved the incumbent's 13.04% spread. Least-unstable is current at 13.04%. Report ensembles with ranges and do not claim a point value."
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-28T05:47:01Z"
+}

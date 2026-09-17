@@ -1,0 +1,45 @@
+{
+  "component": "make_drift",
+  "run_key": "60cd3f67600c0fcb",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "patterns": "data/bronze/patterns_Medium",
+    "dest": "data/gold/drift_Medium/m0.25",
+    "n_buckets": 4,
+    "magnitude": 0.25,
+    "seed": 0,
+    "rings_per_bucket": null,
+    "tolerance": 0.03,
+    "train_buckets": 2,
+    "drift_spec_version": "1.1.0"
+  },
+  "config_hash": "701e78be7a87cd8af7c0998b4d930d014fdee7d0d8b73f8478171758ea34ff56",
+  "code_git_sha": "a7ae98743e336b022ed17234143bf018bc201f14",
+  "wall_clock_sec": 1.973,
+  "metrics": {
+    "instances": 2756,
+    "drift_txns": 23153,
+    "distinct_accounts": 26957,
+    "n_buckets": 4,
+    "magnitude": 0.25,
+    "train_buckets": 2,
+    "train_instances": 1378,
+    "test_instances": 1378,
+    "source_rings_in_two_buckets": 0,
+    "max_within_bucket_reuse": 1.15,
+    "distinct_source_rings": 2593,
+    "bucket_length_days": 4.6655,
+    "max_schedule_deviation": 0.00127,
+    "chi2": 43.15,
+    "p_value": 0.003006711490168758,
+    "cramers_v": 0.0722,
+    "baseline_cramers_v_on_real_ibm_data": 0.0747,
+    "drift_is": "INDUCED, not observed"
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-19T15:24:36Z"
+}

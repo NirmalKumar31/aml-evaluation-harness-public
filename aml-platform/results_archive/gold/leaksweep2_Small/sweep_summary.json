@@ -1,0 +1,84 @@
+{
+  "ladder": [
+    {
+      "kind": "reversed_window",
+      "ap_ratio_real_mean": 0.9951,
+      "ap_ratio_real_range": [
+        0.9493,
+        1.1075
+      ],
+      "ap_ratio_placebo_mean": 0.8834,
+      "ap_ratio_placebo_range": [
+        0.8317,
+        0.9361
+      ],
+      "paired_diff_mean": 0.1117,
+      "paired_diff_range": [
+        0.068,
+        0.1713
+      ],
+      "separates_from_placebo": true,
+      "error_reduction_real_mean": -0.2949,
+      "error_reduction_placebo_mean": -0.0758
+    },
+    {
+      "kind": "future_counterparty",
+      "ap_ratio_real_mean": 1.192,
+      "ap_ratio_real_range": [
+        1.0385,
+        1.2953
+      ],
+      "ap_ratio_placebo_mean": 0.9841,
+      "ap_ratio_placebo_range": [
+        0.9042,
+        1.0986
+      ],
+      "paired_diff_mean": 0.2079,
+      "paired_diff_range": [
+        0.1271,
+        0.3513
+      ],
+      "separates_from_placebo": false,
+      "error_reduction_real_mean": 0.203,
+      "error_reduction_placebo_mean": 0.0428
+    },
+    {
+      "kind": "target",
+      "ap_ratio_real_mean": 3.4508,
+      "ap_ratio_real_range": [
+        3.2722,
+        3.8647
+      ],
+      "ap_ratio_placebo_mean": 0.7713,
+      "ap_ratio_placebo_range": [
+        0.6932,
+        0.8335
+      ],
+      "paired_diff_mean": 2.6795,
+      "paired_diff_range": [
+        2.4788,
+        3.085
+      ],
+      "separates_from_placebo": true,
+      "error_reduction_real_mean": 0.8808,
+      "error_reduction_placebo_mean": -0.0658
+    }
+  ],
+  "noise_floor": {
+    "placebo_ap_ratio_mean": 0.8796,
+    "placebo_ap_ratio_min": 0.6932,
+    "placebo_ap_ratio_max": 1.0986,
+    "placebo_spread_pct": 46.1,
+    "clean_ap_mean": 0.19662,
+    "clean_ap_range": [
+      0.18204,
+      0.20546
+    ],
+    "clean_ap_spread_pct": 11.91
+  },
+  "headline": {
+    "channels_separating_from_placebo": 2,
+    "channels_tested": 3,
+    "positive_control_separates": true
+  }
+}

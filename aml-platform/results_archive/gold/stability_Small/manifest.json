@@ -1,0 +1,76 @@
+{
+  "component": "model_stability",
+  "run_key": null,
+  "status": "ok",
+  "error": null,
+  "config": {
+    "features": "data/silver/features_Small",
+    "splits": "data/gold/splits_Small",
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "configs": {
+      "current": {
+        "learning_rate": 0.1,
+        "max_iter": 300,
+        "min_samples_leaf": 40,
+        "class_weight": "balanced"
+      },
+      "slow_long": {
+        "learning_rate": 0.05,
+        "max_iter": 600,
+        "min_samples_leaf": 40,
+        "class_weight": "balanced"
+      },
+      "slow_long_bigleaf": {
+        "learning_rate": 0.05,
+        "max_iter": 600,
+        "min_samples_leaf": 200,
+        "class_weight": "balanced"
+      },
+      "bigleaf": {
+        "learning_rate": 0.1,
+        "max_iter": 300,
+        "min_samples_leaf": 200,
+        "class_weight": "balanced"
+      },
+      "unweighted": {
+        "learning_rate": 0.1,
+        "max_iter": 300,
+        "min_samples_leaf": 40,
+        "class_weight": null
+      }
+    },
+    "sample": 1.0,
+    "stability_version": "1.0.0"
+  },
+  "config_hash": "a209a30572fe39ef3e45da5451e3f352656ee49d96d8ae8a25a7cd08552f656f",
+  "code_git_sha": "aa77d35810c04ea7c0c7117cbf9b7e42984e5335",
+  "wall_clock_sec": 2052.798,
+  "metrics": {
+    "n_configs": 5,
+    "n_seeds": 8,
+    "n_fits": 40,
+    "train_rows": 2284182,
+    "test_rows": 2793197,
+    "recommended_config": "bigleaf",
+    "incumbent_spread_pct": 9.79,
+    "recommended_spread_pct": 6.91,
+    "recommended_ensemble_ap": 0.21609,
+    "recommended_ensemble_eff50": 0.73473,
+    "halved_incumbent_spread": false,
+    "reason": "NO config halved the incumbent's 9.79% spread. Least-unstable is bigleaf at 6.91%. Report ensembles with ranges and do not claim a point value."
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-24T14:24:35Z"
+}

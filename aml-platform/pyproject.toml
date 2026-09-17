@@ -1,0 +1,128 @@
+[project]
+name = "aml-evaluation-harness"
+version = "0.1.0"
+# ONE NAME. The repository was `aml-evaluation-harness`, the package
+# `aml-platform`, the README "Alert-Budget-Aware Evaluation", and this field
+# still said "DriftGraph" -- a name dropped months earlier. Four names for one
+# thing, and the one in the package metadata was the oldest.
+#
+# It is a research and evaluation harness, not a platform. Nothing here serves
+# traffic, and calling it a platform oversells it in the direction this project
+# is specifically trying not to.
+description = "Alert-budget-aware evaluation harness for AML transaction monitoring"
+readme = "README.md"
+license = "MIT"
+# PEP 639 form. This used to live under [tool.setuptools], which setuptools
+# deprecated with a removal date of 2027-02-18 -- a build warning today and a
+# wheel with no licence file the day it is enforced. The subproject packages on
+# its own, so "the licence is one directory up" is not an answer.
+license-files = ["LICENSE", "DATA_LICENSE.md"]
+authors = [{ name = "Nirmal Kumar Thirupallikrishnan" }]
+keywords = ["anti-money-laundering", "evaluation", "benchmark", "class-imbalance"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+# 3.11 was advertised and never tested. CI and the container both pin 3.12.3;
+# claiming a range nothing verifies is the same defect as an unsupported
+# number, so the claim is narrowed to what is actually exercised.
+# UPPER-BOUNDED. ">=3.12" claims every future Python 3.x, while CI and the
+# container test exactly 3.12.3. Narrowed to what is actually exercised; widen
+# it by adding a version to the test matrix, not by editing this line.
+# Production evidence is Linux/amd64; development also runs arm64 macOS.
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "lightgbm>=4.0",
+    "duckdb>=1.1",
+    "pandas>=2.2",
+    "pyarrow>=17",
+    "numpy>=1.26",
+    "scikit-learn>=1.5",
+    "joblib>=1.4",
+    "scipy>=1.13",
+]
+
+[project.optional-dependencies]
+# fsspec is in dev, not in the core deps, so the remote code path in aml.io can
+# be tested offline against an in-memory filesystem. Nothing in src/ imports it
+# unless a path is actually a URI.
+dev = ["pytest>=8", "ruff>=0.6", "fsspec>=2024.6"]
+
+# Only needed by someone pointing the pipeline at abfss:// paths.
+# DefaultAzureCredential means no connection string and no secret: locally it
+# picks up `az login`, in Azure ML it picks up the compute's managed identity.
+azure = ["fsspec>=2024.6", "adlfs>=2024.7", "azure-identity>=1.17"]
+
+[project.urls]
+Homepage = "https://github.com/NirmalKumar31/aml-evaluation-harness"
+Repository = "https://github.com/NirmalKumar31/aml-evaluation-harness"
+Issues = "https://github.com/NirmalKumar31/aml-evaluation-harness/issues"
+
+[project.scripts]
+aml = "aml.cli:main"
+
+[build-system]
+requires = ["setuptools>=77"]  # PEP 639 license-files under [project]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+# The rule set is PINNED here on purpose.
+#
+# Ruff's implicit defaults widen between releases. With `ruff>=0.6` in dev, a
+# fresh CI container installs whatever is newest and lints by rules nobody chose
+# -- so the same commit can pass locally and fail in CI, or vice versa, for
+# reasons unrelated to the code. Observed on 2026-08-24: ruff 0.16.2 flagged 36
+# findings that ruff 0.6 did not.
+#
+# Selecting explicitly makes lint behaviour a project decision rather than a
+# side effect of install timing.
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes -- unused imports/names, the ones that catch real bugs
+    "I",      # import sorting
+    "B",      # flake8-bugbear -- likely-bug patterns
+    "C4",     # comprehension simplifications
+    "UP",     # pyupgrade
+    "RUF",    # ruff's own lints
+    "BLE",    # blind excepts must be justified
+    "SIM",    # simplifications
+]
+ignore = [
+    # dict(a=1) instead of {"a": 1}. In the test fixtures the keyword form reads
+    # far better for wide transaction records, and there is no correctness
+    # difference. Not worth churning 20 call sites.
+    "C408",
+    # Unused variable from tuple unpacking, e.g. `m, tmp = result` in tests that
+    # only need `tmp`. Renaming to `_m` everywhere adds noise without adding
+    # safety, and F841 still catches genuinely unused assignments.
+    "RUF059",
+    # Line length. Most violations are embedded SQL, where breaking the string
+    # to satisfy a column limit makes the query harder to read than the long
+    # line it replaces. E501 is style; the queries are the substance.
+    "E501",
+    # Assigning a lambda to a local, e.g. `q = lambda n: duckdb.sql(...)` as a
+    # one-line query helper inside a test. A def would be three lines to say
+    # the same thing.
+    "E731",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests deliberately reach into private helpers (io._remote_content_tag,
+# sweep._permute, stability._recommend) because those hold the decision rules
+# that the project's conclusions rest on. Testing them through a public wrapper
+# only would leave the actual logic unpinned.
+#
+# E402: `pytest.importorskip("duckdb")` MUST run before the imports it guards,
+# so those imports legitimately sit below module-level code.
+"tests/**" = ["SLF001", "E402"]

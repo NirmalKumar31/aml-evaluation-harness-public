@@ -1,0 +1,28 @@
+{
+  "component": "normalize_schema",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "src": "data/HI-Small_Trans.csv",
+    "dest": "data/bronze/txns",
+    "schema_version": "1.0.0"
+  },
+  "config_hash": "26a8d062f759d3900909e6e85d323cffddc882fa366a7103ce208e272273f606",
+  "code_git_sha": "e222cdc3c2421ce2f01878e53fbce85eb52b8c07",
+  "wall_clock_sec": 1.397,
+  "metrics": {
+    "input_sha256": "b19d39f515523373f991b689c07e11e7b0b95c17a2c27a87d91584ae16c5b040",
+    "rows": 5078345,
+    "positives": 5177,
+    "prevalence_pct": 0.1019,
+    "min_event_time": "2022-09-01 00:00:00",
+    "max_event_time": "2022-09-18 16:18:00",
+    "days": 18,
+    "distinct_senders": 496999
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-11T18:59:00Z"
+}

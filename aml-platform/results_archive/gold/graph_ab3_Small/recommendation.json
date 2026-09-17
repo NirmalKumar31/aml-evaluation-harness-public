@@ -1,0 +1,9 @@
+{
+  "recommended_config": "current",
+  "incumbent_spread_pct": 6.31,
+  "recommended_spread_pct": 6.31,
+  "recommended_ensemble_ap": 0.19026,
+  "recommended_ensemble_eff50": 0.77138,
+  "halved_incumbent_spread": false,
+  "reason": "NO config halved the incumbent's 6.31% spread. Least-unstable is current at 6.31%. Report ensembles with ranges and do not claim a point value."
+}

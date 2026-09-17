@@ -1,0 +1,30 @@
+{
+  "component": "plant_leak[future_counterparty]",
+  "run_key": "df8638b13a53fee8",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "labeled": "data/gold/reconcile_Small/txns_labeled",
+    "dest": "data/gold/leak_Small/future_counterparty",
+    "kind": "future_counterparty",
+    "plant_version": "1.1.0"
+  },
+  "config_hash": "3490b29f1269fa5b09a3bfeeaa1e0f287f91f16c731888db1cfd73954adc571d",
+  "code_git_sha": "3548fc3f83fe67acac1833ec95bf9d902818e57b",
+  "wall_clock_sec": 1.158,
+  "metrics": {
+    "kind": "future_counterparty",
+    "rows": 5078345,
+    "leak_columns": [
+      "s_secs_until_next_cp",
+      "s_n_future_with_cp",
+      "r_secs_until_next_cp",
+      "r_n_future_with_cp"
+    ]
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-22T14:45:45Z"
+}

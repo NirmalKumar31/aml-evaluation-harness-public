@@ -1,0 +1,60 @@
+cff-version: 1.2.0
+title: >-
+  Alert-Budget-Aware Evaluation for Transaction Monitoring:
+  an evaluation harness for AML models on IBM AMLworld
+message: >-
+  If you use this software or its findings, please cite it, and cite the
+  AMLworld dataset separately — it is a distinct artifact under a different
+  licence and is not redistributed here.
+type: software
+authors:
+  - family-names: Thirupallikrishnan
+    given-names: Nirmal Kumar
+repository-code: "https://github.com/NirmalKumar31/aml-evaluation-harness"
+license: MIT
+# No `version:` or `date-released:` until a tag and a GitHub Release
+# exist. Declaring 0.1.0 released on a private repository with no tag
+# is release metadata describing a release that never happened.
+keywords:
+  - anti-money-laundering
+  - evaluation methodology
+  - alert budget
+  - class imbalance
+  - baseline strength
+abstract: >-
+  A measurement harness for anti-money-laundering transaction monitoring on the
+  IBM AMLworld synthetic benchmark. It reports detection under a fixed daily
+  review budget on an (account, calendar-day) alert unit, against explicit
+  nulls and ceilings, using a ring-participant-disjoint temporal split. Its
+  headline result is about the benchmark rather than about a model: on
+  HI-Medium a 32-feature logistic regression reaches precision@50 = 0.5706 at
+  an operationally motivated alert-budget operating point, against an
+  eight-seed gradient-boosted mean of 0.8248 with observed range 0.5914-0.8981.
+  A strong linear baseline on this representation bounds what a headline score
+  from this benchmark demonstrates about a method.
+references:
+  - type: article
+    title: >-
+      Realistic Synthetic Financial Transactions for Anti-Money Laundering
+      Models
+    authors:
+      - family-names: Altman
+        given-names: Erik
+      - family-names: Blanuša
+        given-names: Jovan
+      - family-names: von Niederhäusern
+        given-names: Luc
+      - family-names: Egressy
+        given-names: Béni
+      - family-names: Anghel
+        given-names: Andreea
+      - family-names: Atasu
+        given-names: Kubilay
+    year: 2023
+    collection-title: >-
+      Advances in Neural Information Processing Systems 36
+      (Datasets and Benchmarks Track)
+    url: "https://arxiv.org/abs/2306.16424"
+    notes: >-
+      The AMLworld dataset. Published by IBM under CDLA-Sharing-1.0 and not
+      redistributed with this repository.

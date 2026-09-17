@@ -1,0 +1,40 @@
+{
+  "component": "splice_drift",
+  "run_key": "6af7032d528e2011",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "labeled": "data/gold/reconcile_Medium/txns_labeled",
+    "drift": "data/gold/drift_Medium/m1.0",
+    "dest": "data/gold/drifted_Medium/m1.0",
+    "seed": 0,
+    "splice_spec_version": "3.0.0"
+  },
+  "config_hash": "b9a26518d6e79b1adaf137b0e2f81210e1bfd5668ee3722a357a2ea87b44ffc2",
+  "code_git_sha": "62a3b032f8161195adc8f56f64e30cc7c5f8a596",
+  "wall_clock_sec": 10.881,
+  "metrics": {
+    "rows": 31886776,
+    "positives": 23768,
+    "ring_instances": 2756,
+    "prevalence_pct": 0.0745,
+    "min_event_time": "2022-09-01 00:00:00",
+    "max_event_time": "2022-10-01 11:17:12.603554",
+    "days": 31,
+    "original_rows": 31898238,
+    "original_positives": 35230,
+    "negatives_kept": 31863008,
+    "positives_with_no_ring": 0,
+    "laundering_accounts": 28517,
+    "laundering_accounts_also_in_background": 28515,
+    "accounts_shared_between_instances": 0,
+    "synthetic_accounts_mapped": 28515,
+    "real_accounts_available": 2076752,
+    "note": "negatives are REAL and untouched; laundering content is REAL (verbatim IBM rings); ring members are mapped onto REAL background accounts; only WHICH shape appears WHEN is induced"
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-19T19:38:19Z"
+}

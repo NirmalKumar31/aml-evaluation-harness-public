@@ -1,0 +1,60 @@
+# External links, checked on a schedule and never blocking a push.
+#
+# scripts/check_links.py deliberately does not fetch: a deterministic gate must
+# not go red because someone else's server had a bad afternoon. But "we never
+# check them" is how a README ends up pointing at a 404 -- and an audit found
+# exactly that, with the project's own URL returning 404 to anonymous visitors
+# because the repository is private.
+#
+# So: a separate, weekly, non-blocking job. It reports; it does not gate.
+name: links
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'        # Mondays, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  external:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Collect external links
+        id: collect
+        run: |
+          python3 - <<'PY' | tee links.txt
+          import re, pathlib
+          seen = set()
+          for f in pathlib.Path(".").rglob("*.md"):
+              if any(p in f.parts for p in (".git", ".venv", "node_modules")):
+                  continue
+              for m in re.finditer(r"https?://[^\s)\]>\"'`]+", f.read_text(errors="replace")):
+                  u = m.group(0).rstrip(".,;")
+                  if u not in seen:
+                      seen.add(u)
+                      print(u)
+          PY
+          echo "found $(wc -l < links.txt) distinct external link(s)"
+
+      # ANONYMOUS, which is the whole point: the maintainer's browser is signed
+      # in and sees a working link where a reader sees 404.
+      - name: Fetch each one, signed out
+        run: |
+          fail=0
+          while read -r url; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 20 \
+                     --retry 2 --retry-delay 3 "$url" || echo "000")
+            case "$code" in
+              2*|3*) printf '  %-6s %s\n' "$code" "$url" ;;
+              403|429) printf '  %-6s %s   (bot-blocked, not treated as broken)\n' "$code" "$url" ;;
+              *) printf '  %-6s %s   <- BROKEN\n' "$code" "$url"; fail=$((fail+1)) ;;
+            esac
+          done < links.txt
+          echo "$fail link(s) did not respond"
+          # Reported, not enforced. See the header.
+          exit 0

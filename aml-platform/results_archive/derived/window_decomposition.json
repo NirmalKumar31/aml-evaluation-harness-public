@@ -1,0 +1,630 @@
+{
+ "_comment": "Per-day transaction volume and laundering prevalence across the test window, and the decomposition of each replay bundle's alerts and true positives by window segment. Every budget metric in this project is a per-day top-k statistic, so both are required to read one. The segment boundary is data-driven: the first day whose TRANSACTION count falls below 1% of the window median, read from the rung's own volume profile. An earlier version of this string described a positive-count rule the code had already abandoned for understating the effect -- and the publication gate passed it, because the gate checks numbers and not prose. Where the raw file is absent the positive-count fallback is used and `segment_boundary_source` says so.",
+ "volume_profile": {
+  "Medium": {
+   "days": 28,
+   "transactions_total": 31898238,
+   "laundering_total": 35230,
+   "median_transactions_per_day": 830375.0,
+   "collapse_fraction": 0.01,
+   "first_thin_day": "2022-09-17 00:00:00",
+   "per_day": [
+    {
+     "day": "2022-09-01 00:00:00",
+     "transactions": 4465985,
+     "laundering": 1056,
+     "prevalence": 0.000236
+    },
+    {
+     "day": "2022-09-02 00:00:00",
+     "transactions": 3021258,
+     "laundering": 1331,
+     "prevalence": 0.000441
+    },
+    {
+     "day": "2022-09-03 00:00:00",
+     "transactions": 828958,
+     "laundering": 1373,
+     "prevalence": 0.001656
+    },
+    {
+     "day": "2022-09-04 00:00:00",
+     "transactions": 830607,
+     "laundering": 1549,
+     "prevalence": 0.001865
+    },
+    {
+     "day": "2022-09-05 00:00:00",
+     "transactions": 1928599,
+     "laundering": 1863,
+     "prevalence": 0.000966
+    },
+    {
+     "day": "2022-09-06 00:00:00",
+     "transactions": 1929090,
+     "laundering": 2041,
+     "prevalence": 0.001058
+    },
+    {
+     "day": "2022-09-07 00:00:00",
+     "transactions": 1931015,
+     "laundering": 2147,
+     "prevalence": 0.001112
+    },
+    {
+     "day": "2022-09-08 00:00:00",
+     "transactions": 1930610,
+     "laundering": 2154,
+     "prevalence": 0.001116
+    },
+    {
+     "day": "2022-09-09 00:00:00",
+     "transactions": 2621004,
+     "laundering": 2199,
+     "prevalence": 0.000839
+    },
+    {
+     "day": "2022-09-10 00:00:00",
+     "transactions": 831874,
+     "laundering": 2081,
+     "prevalence": 0.002502
+    },
+    {
+     "day": "2022-09-11 00:00:00",
+     "transactions": 830143,
+     "laundering": 1966,
+     "prevalence": 0.002368
+    },
+    {
+     "day": "2022-09-12 00:00:00",
+     "transactions": 1930240,
+     "laundering": 2179,
+     "prevalence": 0.001129
+    },
+    {
+     "day": "2022-09-13 00:00:00",
+     "transactions": 1928626,
+     "laundering": 2275,
+     "prevalence": 0.00118
+    },
+    {
+     "day": "2022-09-14 00:00:00",
+     "transactions": 1930957,
+     "laundering": 2263,
+     "prevalence": 0.001172
+    },
+    {
+     "day": "2022-09-15 00:00:00",
+     "transactions": 1930419,
+     "laundering": 2253,
+     "prevalence": 0.001167
+    },
+    {
+     "day": "2022-09-16 00:00:00",
+     "transactions": 3021866,
+     "laundering": 2416,
+     "prevalence": 0.0008
+    },
+    {
+     "day": "2022-09-17 00:00:00",
+     "transactions": 2020,
+     "laundering": 1199,
+     "prevalence": 0.593564
+    },
+    {
+     "day": "2022-09-18 00:00:00",
+     "transactions": 1591,
+     "laundering": 916,
+     "prevalence": 0.575739
+    },
+    {
+     "day": "2022-09-19 00:00:00",
+     "transactions": 1195,
+     "laundering": 695,
+     "prevalence": 0.58159
+    },
+    {
+     "day": "2022-09-20 00:00:00",
+     "transactions": 855,
+     "laundering": 492,
+     "prevalence": 0.575439
+    },
+    {
+     "day": "2022-09-21 00:00:00",
+     "transactions": 586,
+     "laundering": 336,
+     "prevalence": 0.573379
+    },
+    {
+     "day": "2022-09-22 00:00:00",
+     "transactions": 309,
+     "laundering": 184,
+     "prevalence": 0.595469
+    },
+    {
+     "day": "2022-09-23 00:00:00",
+     "transactions": 134,
+     "laundering": 84,
+     "prevalence": 0.626866
+    },
+    {
+     "day": "2022-09-24 00:00:00",
+     "transactions": 104,
+     "laundering": 65,
+     "prevalence": 0.625
+    },
+    {
+     "day": "2022-09-25 00:00:00",
+     "transactions": 102,
+     "laundering": 59,
+     "prevalence": 0.578431
+    },
+    {
+     "day": "2022-09-26 00:00:00",
+     "transactions": 59,
+     "laundering": 37,
+     "prevalence": 0.627119
+    },
+    {
+     "day": "2022-09-27 00:00:00",
+     "transactions": 25,
+     "laundering": 14,
+     "prevalence": 0.56
+    },
+    {
+     "day": "2022-09-28 00:00:00",
+     "transactions": 7,
+     "laundering": 3,
+     "prevalence": 0.428571
+    }
+   ]
+  },
+  "Small": {
+   "days": 18,
+   "transactions_total": 5078345,
+   "laundering_total": 5177,
+   "median_transactions_per_day": 207406.0,
+   "collapse_fraction": 0.01,
+   "first_thin_day": "2022-09-11 00:00:00",
+   "per_day": [
+    {
+     "day": "2022-09-01 00:00:00",
+     "transactions": 1114921,
+     "laundering": 322,
+     "prevalence": 0.000289
+    },
+    {
+     "day": "2022-09-02 00:00:00",
+     "transactions": 754449,
+     "laundering": 408,
+     "prevalence": 0.000541
+    },
+    {
+     "day": "2022-09-03 00:00:00",
+     "transactions": 207382,
+     "laundering": 391,
+     "prevalence": 0.001885
+    },
+    {
+     "day": "2022-09-04 00:00:00",
+     "transactions": 207430,
+     "laundering": 407,
+     "prevalence": 0.001962
+    },
+    {
+     "day": "2022-09-05 00:00:00",
+     "transactions": 482650,
+     "laundering": 471,
+     "prevalence": 0.000976
+    },
+    {
+     "day": "2022-09-06 00:00:00",
+     "transactions": 482089,
+     "laundering": 531,
+     "prevalence": 0.001101
+    },
+    {
+     "day": "2022-09-07 00:00:00",
+     "transactions": 482751,
+     "laundering": 497,
+     "prevalence": 0.00103
+    },
+    {
+     "day": "2022-09-08 00:00:00",
+     "transactions": 482773,
+     "laundering": 539,
+     "prevalence": 0.001116
+    },
+    {
+     "day": "2022-09-09 00:00:00",
+     "transactions": 654467,
+     "laundering": 514,
+     "prevalence": 0.000785
+    },
+    {
+     "day": "2022-09-10 00:00:00",
+     "transactions": 208325,
+     "laundering": 442,
+     "prevalence": 0.002122
+    },
+    {
+     "day": "2022-09-11 00:00:00",
+     "transactions": 396,
+     "laundering": 232,
+     "prevalence": 0.585859
+    },
+    {
+     "day": "2022-09-12 00:00:00",
+     "transactions": 281,
+     "laundering": 170,
+     "prevalence": 0.604982
+    },
+    {
+     "day": "2022-09-13 00:00:00",
+     "transactions": 184,
+     "laundering": 106,
+     "prevalence": 0.576087
+    },
+    {
+     "day": "2022-09-14 00:00:00",
+     "transactions": 121,
+     "laundering": 70,
+     "prevalence": 0.578512
+    },
+    {
+     "day": "2022-09-15 00:00:00",
+     "transactions": 46,
+     "laundering": 28,
+     "prevalence": 0.608696
+    },
+    {
+     "day": "2022-09-16 00:00:00",
+     "transactions": 46,
+     "laundering": 26,
+     "prevalence": 0.565217
+    },
+    {
+     "day": "2022-09-17 00:00:00",
+     "transactions": 23,
+     "laundering": 15,
+     "prevalence": 0.652174
+    },
+    {
+     "day": "2022-09-18 00:00:00",
+     "transactions": 11,
+     "laundering": 8,
+     "prevalence": 0.727273
+    }
+   ]
+  }
+ },
+ "bundle_decomposition": {
+  "large_lgbm_s0": {
+   "segment_boundary_index": 31,
+   "segment_boundary_day": "2022-11-07",
+   "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
+   "head_days": 31,
+   "tail_days": 66,
+   "positive_account_days_head": 57959,
+   "positive_account_days_tail": 3739,
+   "alerts_head@50": 1550,
+   "alerts_tail@50": 2567,
+   "true_positives_head@50": 376,
+   "true_positives_tail@50": 1389,
+   "true_positive_share_tail@50": 0.78697,
+   "ceiling_count_head@50": 1550,
+   "ceiling_count_tail@50": 1639,
+   "ceiling_share_tail@50": 0.51395,
+   "precision_head@50": 0.24258,
+   "precision_tail@50": 0.5411,
+   "precision_pooled@50": 0.42871,
+   "alerts_head@200": 6200,
+   "alerts_tail@200": 7341,
+   "true_positives_head@200": 2470,
+   "true_positives_tail@200": 3216,
+   "true_positive_share_tail@200": 0.5656,
+   "ceiling_count_head@200": 6200,
+   "ceiling_count_tail@200": 3698,
+   "ceiling_share_tail@200": 0.37361,
+   "precision_head@200": 0.39839,
+   "precision_tail@200": 0.43809,
+   "precision_pooled@200": 0.41991
+  },
+  "large_lgbm_s1": {
+   "segment_boundary_index": 31,
+   "segment_boundary_day": "2022-11-07",
+   "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
+   "head_days": 31,
+   "tail_days": 66,
+   "positive_account_days_head": 57959,
+   "positive_account_days_tail": 3739,
+   "alerts_head@50": 1550,
+   "alerts_tail@50": 2567,
+   "true_positives_head@50": 220,
+   "true_positives_tail@50": 1384,
+   "true_positive_share_tail@50": 0.86284,
+   "ceiling_count_head@50": 1550,
+   "ceiling_count_tail@50": 1639,
+   "ceiling_share_tail@50": 0.51395,
+   "precision_head@50": 0.14194,
+   "precision_tail@50": 0.53915,
+   "precision_pooled@50": 0.3896,
+   "alerts_head@200": 6200,
+   "alerts_tail@200": 7341,
+   "true_positives_head@200": 2160,
+   "true_positives_tail@200": 3198,
+   "true_positive_share_tail@200": 0.59686,
+   "ceiling_count_head@200": 6200,
+   "ceiling_count_tail@200": 3698,
+   "ceiling_share_tail@200": 0.37361,
+   "precision_head@200": 0.34839,
+   "precision_tail@200": 0.43564,
+   "precision_pooled@200": 0.39569
+  },
+  "large_lgbm_s2": {
+   "segment_boundary_index": 31,
+   "segment_boundary_day": "2022-11-07",
+   "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
+   "head_days": 31,
+   "tail_days": 66,
+   "positive_account_days_head": 57959,
+   "positive_account_days_tail": 3739,
+   "alerts_head@50": 1550,
+   "alerts_tail@50": 2567,
+   "true_positives_head@50": 686,
+   "true_positives_tail@50": 1385,
+   "true_positive_share_tail@50": 0.66876,
+   "ceiling_count_head@50": 1550,
+   "ceiling_count_tail@50": 1639,
+   "ceiling_share_tail@50": 0.51395,
+   "precision_head@50": 0.44258,
+   "precision_tail@50": 0.53954,
+   "precision_pooled@50": 0.50304,
+   "alerts_head@200": 6200,
+   "alerts_tail@200": 7341,
+   "true_positives_head@200": 2752,
+   "true_positives_tail@200": 3191,
+   "true_positive_share_tail@200": 0.53693,
+   "ceiling_count_head@200": 6200,
+   "ceiling_count_tail@200": 3698,
+   "ceiling_share_tail@200": 0.37361,
+   "precision_head@200": 0.44387,
+   "precision_tail@200": 0.43468,
+   "precision_pooled@200": 0.43889
+  },
+  "large_sorted_lgbm_s0": {
+   "segment_boundary_index": 31,
+   "segment_boundary_day": "2022-11-07",
+   "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
+   "head_days": 31,
+   "tail_days": 66,
+   "positive_account_days_head": 57959,
+   "positive_account_days_tail": 3739,
+   "alerts_head@50": 1550,
+   "alerts_tail@50": 2567,
+   "true_positives_head@50": 622,
+   "true_positives_tail@50": 1376,
+   "true_positive_share_tail@50": 0.68869,
+   "ceiling_count_head@50": 1550,
+   "ceiling_count_tail@50": 1639,
+   "ceiling_share_tail@50": 0.51395,
+   "precision_head@50": 0.40129,
+   "precision_tail@50": 0.53603,
+   "precision_pooled@50": 0.4853,
+   "alerts_head@200": 6200,
+   "alerts_tail@200": 7341,
+   "true_positives_head@200": 2685,
+   "true_positives_tail@200": 3189,
+   "true_positive_share_tail@200": 0.5429,
+   "ceiling_count_head@200": 6200,
+   "ceiling_count_tail@200": 3698,
+   "ceiling_share_tail@200": 0.37361,
+   "precision_head@200": 0.43306,
+   "precision_tail@200": 0.43441,
+   "precision_pooled@200": 0.43379
+  },
+  "large_sorted_lgbm_s1": {
+   "segment_boundary_index": 31,
+   "segment_boundary_day": "2022-11-07",
+   "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
+   "head_days": 31,
+   "tail_days": 66,
+   "positive_account_days_head": 57959,
+   "positive_account_days_tail": 3739,
+   "alerts_head@50": 1550,
+   "alerts_tail@50": 2567,
+   "true_positives_head@50": 87,
+   "true_positives_tail@50": 1378,
+   "true_positive_share_tail@50": 0.94061,
+   "ceiling_count_head@50": 1550,
+   "ceiling_count_tail@50": 1639,
+   "ceiling_share_tail@50": 0.51395,
+   "precision_head@50": 0.05613,
+   "precision_tail@50": 0.53681,
+   "precision_pooled@50": 0.35584,
+   "alerts_head@200": 6200,
+   "alerts_tail@200": 7341,
+   "true_positives_head@200": 1639,
+   "true_positives_tail@200": 3205,
+   "true_positive_share_tail@200": 0.66164,
+   "ceiling_count_head@200": 6200,
+   "ceiling_count_tail@200": 3698,
+   "ceiling_share_tail@200": 0.37361,
+   "precision_head@200": 0.26435,
+   "precision_tail@200": 0.43659,
+   "precision_pooled@200": 0.35773
+  },
+  "large_sorted_lgbm_s2": {
+   "segment_boundary_index": 31,
+   "segment_boundary_day": "2022-11-07",
+   "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
+   "head_days": 31,
+   "tail_days": 66,
+   "positive_account_days_head": 57959,
+   "positive_account_days_tail": 3739,
+   "alerts_head@50": 1550,
+   "alerts_tail@50": 2567,
+   "true_positives_head@50": 455,
+   "true_positives_tail@50": 1379,
+   "true_positive_share_tail@50": 0.75191,
+   "ceiling_count_head@50": 1550,
+   "ceiling_count_tail@50": 1639,
+   "ceiling_share_tail@50": 0.51395,
+   "precision_head@50": 0.29355,
+   "precision_tail@50": 0.5372,
+   "precision_pooled@50": 0.44547,
+   "alerts_head@200": 6200,
+   "alerts_tail@200": 7341,
+   "true_positives_head@200": 2348,
+   "true_positives_tail@200": 3194,
+   "true_positive_share_tail@200": 0.57633,
+   "ceiling_count_head@200": 6200,
+   "ceiling_count_tail@200": 3698,
+   "ceiling_share_tail@200": 0.37361,
+   "precision_head@200": 0.37871,
+   "precision_tail@200": 0.43509,
+   "precision_pooled@200": 0.40928
+  },
+  "medium_baseline_s0": {
+   "segment_boundary_index": 7,
+   "segment_boundary_day": "2022-09-17",
+   "segment_boundary_source": "HI-Medium transaction-volume collapse",
+   "head_days": 7,
+   "tail_days": 12,
+   "positive_account_days_head": 14748,
+   "positive_account_days_tail": 3382,
+   "alerts_head@50": 350,
+   "alerts_tail@50": 514,
+   "true_positives_head@50": 15,
+   "true_positives_tail@50": 478,
+   "true_positive_share_tail@50": 0.96957,
+   "ceiling_count_head@50": 350,
+   "ceiling_count_tail@50": 508,
+   "ceiling_share_tail@50": 0.59207,
+   "precision_head@50": 0.04286,
+   "precision_tail@50": 0.92996,
+   "precision_pooled@50": 0.5706,
+   "alerts_head@200": 1400,
+   "alerts_tail@200": 1485,
+   "true_positives_head@200": 67,
+   "true_positives_tail@200": 1330,
+   "true_positive_share_tail@200": 0.95204,
+   "ceiling_count_head@200": 1400,
+   "ceiling_count_tail@200": 1408,
+   "ceiling_share_tail@200": 0.50142,
+   "precision_head@200": 0.04786,
+   "precision_tail@200": 0.89562,
+   "precision_pooled@200": 0.48423
+  },
+  "medium_gbdt_s0": {
+   "segment_boundary_index": 7,
+   "segment_boundary_day": "2022-09-17",
+   "segment_boundary_source": "HI-Medium transaction-volume collapse",
+   "head_days": 7,
+   "tail_days": 12,
+   "positive_account_days_head": 14748,
+   "positive_account_days_tail": 3382,
+   "alerts_head@50": 350,
+   "alerts_tail@50": 514,
+   "true_positives_head@50": 265,
+   "true_positives_tail@50": 496,
+   "true_positive_share_tail@50": 0.65177,
+   "ceiling_count_head@50": 350,
+   "ceiling_count_tail@50": 508,
+   "ceiling_share_tail@50": 0.59207,
+   "precision_head@50": 0.75714,
+   "precision_tail@50": 0.96498,
+   "precision_pooled@50": 0.88079,
+   "alerts_head@200": 1400,
+   "alerts_tail@200": 1485,
+   "true_positives_head@200": 917,
+   "true_positives_tail@200": 1396,
+   "true_positive_share_tail@200": 0.60355,
+   "ceiling_count_head@200": 1400,
+   "ceiling_count_tail@200": 1408,
+   "ceiling_share_tail@200": 0.50142,
+   "precision_head@200": 0.655,
+   "precision_tail@200": 0.94007,
+   "precision_pooled@200": 0.80173
+  },
+  "small_gbdt_s0": {
+   "segment_boundary_index": 6,
+   "segment_boundary_day": "2022-09-11",
+   "segment_boundary_source": "HI-Small transaction-volume collapse",
+   "head_days": 6,
+   "tail_days": 8,
+   "positive_account_days_head": 3561,
+   "positive_account_days_tail": 747,
+   "alerts_head@50": 300,
+   "alerts_tail@50": 277,
+   "true_positives_head@50": 147,
+   "true_positives_tail@50": 271,
+   "true_positive_share_tail@50": 0.64833,
+   "ceiling_count_head@50": 300,
+   "ceiling_count_tail@50": 273,
+   "ceiling_share_tail@50": 0.47644,
+   "precision_head@50": 0.49,
+   "precision_tail@50": 0.97834,
+   "precision_pooled@50": 0.72444,
+   "alerts_head@200": 1200,
+   "alerts_tail@200": 686,
+   "true_positives_head@200": 407,
+   "true_positives_tail@200": 667,
+   "true_positive_share_tail@200": 0.62104,
+   "ceiling_count_head@200": 1200,
+   "ceiling_count_tail@200": 673,
+   "ceiling_share_tail@200": 0.35932,
+   "precision_head@200": 0.33917,
+   "precision_tail@200": 0.9723,
+   "precision_pooled@200": 0.56946
+  }
+ },
+ "code_git_sha": "23d70e6e0c3da1672e3e2c335ea98244b1fc919d",
+ "generator_script": "aml-platform/scripts/window_volume.py",
+ "generator_sha256": "a24c45726044608d4de60d371b915feffbe9c49cd5b84cfccf064f0f4899c3bb",
+ "generator_matches_commit": true,
+ "code_tree_sha256": "0a4c4323ad9337c28efb35874fba22cf0f4dc8b85fb77ab2650596ad49c1f4f2",
+ "code_tree_matches_commit": true,
+ "provenance_scope": [
+  "aml-platform/src",
+  "aml-platform/scripts"
+ ],
+ "scope_clean": true,
+ "generated_at": "2026-09-16T20:57:31Z",
+ "python_version": "3.12.3",
+ "platform": "macOS-26.5.2-arm64-arm-64bit",
+ "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
+ "status": "ok",
+ "inputs": [
+  {
+   "path": "aml-platform/data/HI-Medium_Trans.csv",
+   "bytes": 3031783420,
+   "kind": "file",
+   "sha256": null,
+   "sha256_skipped": "larger than 67108864 bytes"
+  },
+  {
+   "path": "aml-platform/data/HI-Small_Trans.csv",
+   "bytes": 475664283,
+   "kind": "file",
+   "sha256": null,
+   "sha256_skipped": "larger than 67108864 bytes"
+  },
+  {
+   "path": "aml-platform/results_archive/replay",
+   "kind": "directory",
+   "n_files": 54,
+   "bytes": 9252612,
+   "listing_sha256": "a5e545c2c8e1f2f6878b3efcbd9b0b24f63563e82578990b8fed5af69cec3d2b",
+   "content_sha256": "d8b805b11e710a44c1e419257ebefe78c6d0e90575652b9e1254ba0419cf6b5f",
+   "identity": "content (every file hashed)"
+  }
+ ],
+ "parameters": {
+  "variants": [
+   "Medium",
+   "Small"
+  ],
+  "collapse_fraction": 0.01
+ }
+}

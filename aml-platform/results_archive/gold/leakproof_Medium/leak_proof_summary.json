@@ -1,0 +1,34 @@
+{
+  "ladder": [
+    {
+      "kind": "reversed_window",
+      "clean_efficiency@50": 0.7972027972027972,
+      "leaky_efficiency@50": 0.9009324009324009,
+      "error_reduction@50": 0.5114942528735631,
+      "average_precision_ratio": 1.13,
+      "detected": true,
+      "signal": "error -51%"
+    },
+    {
+      "kind": "future_counterparty",
+      "clean_efficiency@50": 0.7972027972027972,
+      "leaky_efficiency@50": 0.9219114219114218,
+      "error_reduction@50": 0.6149425287356318,
+      "average_precision_ratio": 1.198,
+      "detected": true,
+      "signal": "error -61%"
+    },
+    {
+      "kind": "target",
+      "clean_efficiency@50": 0.7972027972027972,
+      "leaky_efficiency@50": 0.958041958041958,
+      "error_reduction@50": 0.793103448275862,
+      "average_precision_ratio": 2.839,
+      "detected": true,
+      "signal": "AP x2.84 and error -79%"
+    }
+  ],
+  "positive_control": "target",
+  "positive_control_detected": true,
+  "harness_can_detect_leakage": true
+}

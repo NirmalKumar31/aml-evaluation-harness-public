@@ -1,0 +1,46 @@
+{
+ "code_git_sha": "830f118550a7a671025556928bbb483bca7f211a",
+ "generator_script": "aml-platform/scripts/categorical_ablation.py",
+ "generator_sha256": "c1ca400ff8d7a8f3f285f4a04ab3f76c191374762d4adaa169ded258c297af4f",
+ "status": "ok",
+ "seed": 0,
+ "n_train": 19487126,
+ "n_test": 12402530,
+ "categorical_features": [
+  "payment_format_code",
+  "payment_currency_code"
+ ],
+ "arms": {
+  "full": {
+   "average_precision__txn": 0.0202288410514129,
+   "precision@50": 0.5706018518518519,
+   "recall@50": 0.02719249862107005,
+   "recall_efficiency@50": 0.5745920745920745,
+   "ring_recall@200": 0.44045368620037806
+  },
+  "no_categorical": {
+   "average_precision__txn": 0.010222475305053724,
+   "precision@50": 0.5763888888888888,
+   "recall@50": 0.027468284611141754,
+   "recall_efficiency@50": 0.5804195804195804,
+   "ring_recall@200": 0.4499054820415879
+  },
+  "onehot": {
+   "average_precision__txn": 0.021359968304394336,
+   "precision@50": 0.5763888888888888,
+   "recall@50": 0.027468284611141754,
+   "recall_efficiency@50": 0.5804195804195804,
+   "ring_recall@200": 0.45368620037807184
+  }
+ },
+ "onehot_vocabulary_sizes": {
+  "payment_format_code": 7,
+  "payment_currency_code": 15
+ },
+ "wall_clock_sec": 514.9,
+ "ap_ratio_full_over_no_categorical": 1.9788593709208855,
+ "ap_ratio_full_over_onehot": 0.9470445256817758,
+ "generator_matches_commit": true,
+ "metadata_migrated_at": "2026-09-14T20:14:18Z",
+ "metadata_migration_note": "code_git_sha was recorded as the 12-character abbreviation '830f118550a7', because the image build injected AML_GIT_SHA in short form and the container has no repository to expand it against. Expanded here to the full commit it uniquely resolves to, and the generator bytes at that commit were verified to hash to the recorded generator_sha256 before rewriting. The experiment itself ran on the cloud VM against HI-Medium features that are not present on this machine; it was NOT re-run."
+}
