@@ -91,7 +91,7 @@ jobs:
       - name: Compute a lowercase image name
         run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/aml-platform" >> "$GITHUB_ENV"
 
-      - uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
+      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
       # Not on pull requests: a fork PR must never receive a token that can
       # write packages, and the PR path does not push.
