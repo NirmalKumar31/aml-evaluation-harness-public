@@ -1,7 +1,7 @@
 {
- "code_git_sha": "ace21577081472bbfffb4f56a6352d10d9b2e2af",
+ "code_git_sha": "d33715d137f648fade5a7ea71838519edb2aa7f2",
  "generator_script": "aml-platform/scripts/categorical_ablation.py",
- "generator_sha256": "cb8e4e81ad105265b35849f252a91ea36d46bbb414b69bfb9c44b5e67899e552",
+ "generator_sha256": "622fb64cd412843613ee0628e77ab42a32298efc7b4055f19129f63d723b7f6a",
  "generator_matches_commit": true,
  "code_tree_sha256": "0bb75f20e3948e7be78a23c117048b797537faf6b1834d39a4e5530f580a478f",
  "code_tree_matches_commit": true,
@@ -10,7 +10,7 @@
   "aml-platform/scripts"
  ],
  "scope_clean": true,
- "generated_at": "2026-09-17T00:23:52Z",
+ "generated_at": "2026-09-17T04:31:18Z",
  "python_version": "3.12.3",
  "platform": "macOS-26.5.2-arm64-arm-64bit",
  "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
@@ -38,7 +38,8 @@
  "parameters": {
   "features": "data/silver/features_Small",
   "splits": "data/gold/infl_splits_ring-aware_Small",
-  "seed": 0
+  "seed": 0,
+  "thin_from": "2022-09-11"
  },
  "seed": 0,
  "n_train": 2284182,
@@ -53,29 +54,107 @@
    "precision@50": 0.511265164644714,
    "recall@50": 0.06847725162488394,
    "recall_efficiency@50": 0.5148342059336825,
-   "ring_recall@200": 0.5486111111111112
+   "ring_recall@200": 0.5486111111111112,
+   "by_segment": {
+    "precision@50": 0.401,
+    "alerts@50": 601,
+    "precision_null@50": 0.26743,
+    "precision_lift@50": 1.4995,
+    "precision@50_head": 0.01333,
+    "alerts@50_head": 300,
+    "precision_null@50_head": 0.00088,
+    "precision_lift@50_head": 15.204,
+    "precision@50_tail": 0.78738,
+    "alerts@50_tail": 301,
+    "precision_null@50_tail": 0.53309,
+    "precision_lift@50_tail": 1.477,
+    "precision@200": 0.27195,
+    "alerts@200": 1982,
+    "precision_null@200": 0.21305,
+    "precision_lift@200": 1.2764,
+    "precision@200_head": 0.02,
+    "alerts@200_head": 1200,
+    "precision_null@200_head": 0.00088,
+    "precision_lift@200_head": 22.8116,
+    "precision@200_tail": 0.65857,
+    "alerts@200_tail": 782,
+    "precision_null@200_tail": 0.53864,
+    "precision_lift@200_tail": 1.2227
+   }
   },
   "no_categorical": {
    "average_precision__txn": 0.010864755834504868,
    "precision@50": 0.49740034662045063,
    "recall@50": 0.06662024141132776,
    "recall_efficiency@50": 0.5008726003490401,
-   "ring_recall@200": 0.5555555555555556
+   "ring_recall@200": 0.5555555555555556,
+   "by_segment": {
+    "precision@50": 0.40765,
+    "alerts@50": 601,
+    "precision_null@50": 0.26743,
+    "precision_lift@50": 1.5244,
+    "precision@50_head": 0.03,
+    "alerts@50_head": 300,
+    "precision_null@50_head": 0.00088,
+    "precision_lift@50_head": 34.2174,
+    "precision@50_tail": 0.78405,
+    "alerts@50_tail": 301,
+    "precision_null@50_tail": 0.53309,
+    "precision_lift@50_tail": 1.4708,
+    "precision@200": 0.27699,
+    "alerts@200": 1982,
+    "precision_null@200": 0.21305,
+    "precision_lift@200": 1.3001,
+    "precision@200_head": 0.02667,
+    "alerts@200_head": 1200,
+    "precision_null@200_head": 0.00088,
+    "precision_lift@200_head": 30.4193,
+    "precision@200_tail": 0.66113,
+    "alerts@200_tail": 782,
+    "precision_null@200_tail": 0.53864,
+    "precision_lift@200_tail": 1.2274
+   }
   },
   "onehot": {
    "average_precision__txn": 0.012788008886051817,
    "precision@50": 0.5251299826689775,
    "recall@50": 0.07033426183844012,
    "recall_efficiency@50": 0.5287958115183247,
-   "ring_recall@200": 0.5347222222222222
+   "ring_recall@200": 0.5347222222222222,
+   "by_segment": {
+    "precision@50": 0.39601,
+    "alerts@50": 601,
+    "precision_null@50": 0.26743,
+    "precision_lift@50": 1.4808,
+    "precision@50_head": 0.01667,
+    "alerts@50_head": 300,
+    "precision_null@50_head": 0.00088,
+    "precision_lift@50_head": 19.0135,
+    "precision@50_tail": 0.77409,
+    "alerts@50_tail": 301,
+    "precision_null@50_tail": 0.53309,
+    "precision_lift@50_tail": 1.4521,
+    "precision@200": 0.27195,
+    "alerts@200": 1982,
+    "precision_null@200": 0.21305,
+    "precision_lift@200": 1.2764,
+    "precision@200_head": 0.01917,
+    "alerts@200_head": 1200,
+    "precision_null@200_head": 0.00088,
+    "precision_lift@200_head": 21.8649,
+    "precision@200_tail": 0.65985,
+    "alerts@200_tail": 782,
+    "precision_null@200_tail": 0.53864,
+    "precision_lift@200_tail": 1.225
+   }
   }
  },
  "onehot_vocabulary_sizes": {
   "payment_format_code": 7,
   "payment_currency_code": 15
  },
- "by_segment_note": "NOT COMPUTED: pass --thin-from <YYYY-MM-DD> (the rung's transaction-volume collapse, from window_decomposition.json). Without it the arms are only comparable on pooled levels, which this window does not support.",
- "wall_clock_sec": 56.5,
+ "thin_from": "2022-09-11",
+ "wall_clock_sec": 62.1,
  "ap_ratio_full_over_no_categorical": 1.1008537224113026,
  "ap_ratio_full_over_onehot": 0.9352907876495308
 }

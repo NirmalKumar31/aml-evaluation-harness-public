@@ -18,10 +18,10 @@ generator, never validated against real transactions.
    construction.
 2. **A null must be computed on the evaluated population, and conditioned on
    the right thing.** Getting that wrong reversed one published conclusion's
-   sign and manufactured another finding outright.
+   sign, and left a second claim resting on an H0 the data falsifies.
 3. **A non-binding day biases a *lift* toward 1 and a *spread* upward.** Same
-   defect, opposite directions — it understated this project's headline and
-   invented its per-typology one.
+   defect, opposite directions — it understated this project's headline, and
+   inflates any spread statistic whose maximum sits on the affected group.
 4. **A metric can be traceable, reproducible and still measure the wrong
    thing.** The per-structure "difficulty" result published here was withdrawn
    after its null was shown to be false — and the replacement was withdrawn
@@ -185,7 +185,7 @@ exchangeability assumption, not causal effects.
 cd aml-platform
 make setup          # venv + locked dependencies
 make demo           # generates a corpus, runs every stage, ~30 seconds
-make test           # 415 tests collected; pass and skip counts vary by
+make test           # 416 tests collected; pass and skip counts vary by
                     # environment (data-dependent contract tests)
 ```
 
@@ -201,8 +201,34 @@ make all VARIANT=Small CUT=2022-09-05
 
 ## Checking a published number yourself
 
-Nine committed **replay bundles** — about 9 MB, no dataset download —
-recompute every published budget metric:
+⚠️ **Read this first if you are on the public snapshot.** The nine **replay
+bundles** — about 9 MB, 526,355 rows, enough to recompute every published
+budget metric with no dataset download — live in the **private development
+archive** and are **NOT redistributed here**. Their CDLA status is unreviewed
+(see [`DATA_LICENSE.md`](DATA_LICENSE.md)), so they are withheld rather than
+published on an assumption.
+
+What ships in their place is
+`aml-platform/results_archive/replay_inventory.json`: the bundle names, file
+names, row counts and per-file sha256, so you can see exactly what is missing
+and verify a regenerated copy against it.
+
+**So in this snapshot, no-data replay verification is not available.** The
+commands below need the bundles; without them they **skip**, and say so:
+**10 skips** reading `replay bundle not archived in this checkout` and **3**
+reading `no replay bundles in this checkout`. Those are documented skips, not
+passes — the suite reports **385 passed / 31 skipped** in this snapshot
+against **399 / 17** in the development archive, and every one of the 31 names
+the input it is missing.
+
+To get them, obtain AMLworld from its official source and regenerate:
+
+```bash
+# once the dataset is in place and `make verify-data` agrees with the pin
+python scripts/make_replay_bundle.py --features … --splits … --scores … --dest …
+```
+
+With the bundles present, this is the check:
 
 ```bash
 pytest -q -k replay
@@ -321,7 +347,9 @@ aml-platform/
                     ENGINEERING_NOTES · RELEASE_CHECKLIST · SAST_TRIAGE
   docs/archive/     ⚠️ SUPERSEDED and segregated on purpose; excluded from the
                     publication check
-  results_archive/  manifests, derived artifacts, replay bundles
+  results_archive/  manifests, derived artifacts, and replay_inventory.json.
+                    The replay bundles themselves are in the private
+                    development archive only -- withheld here, see above
   infra/            Bicep: VM, disks, network, storage, identity
 ```
 

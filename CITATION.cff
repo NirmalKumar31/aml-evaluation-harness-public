@@ -12,11 +12,12 @@ authors:
     given-names: Nirmal Kumar
 repository-code: "https://github.com/NirmalKumar31/aml-evaluation-harness-public"
 license: MIT
-# Stamped only after v0.1.0 was tagged and released here, with ci, gates
-# and image green on that exact commit. Until then this carried no version,
-# because release metadata describing a release that never happened is the
-# same defect as a published number with no artifact behind it.
-version: 0.1.0
+# Stamped in the PUBLIC SNAPSHOT only. The development repository carries no
+# version, because a test there refuses release metadata while that history
+# has no tag -- describing a release that never happened is the same defect as
+# a published number with no artifact behind it. This snapshot IS the release,
+# so the stamp belongs here and ships inside the tag it names.
+version: 0.1.1
 date-released: '2026-09-17'
 keywords:
   - anti-money-laundering

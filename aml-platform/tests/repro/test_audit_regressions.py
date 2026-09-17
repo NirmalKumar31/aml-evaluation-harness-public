@@ -5741,3 +5741,61 @@ def test_a_pin_entry_with_annotation_still_verifies():
     assert got != want, (
         "the records differ by annotation alone -- which is precisely why a "
         "whole-record comparison reported a false mismatch")
+
+
+def test_the_segmented_ablation_path_actually_runs():
+    """`--thin-from` crashed on its first line and no test executed it.
+
+    `segment_metrics` chose the pooled branch with `m is slice(None)`, which
+    compares the IDENTITY of two separately constructed slice objects and is
+    therefore always False -- so the pooled case fell through to
+    `top & slice(None)`, a TypeError. The segmented numbers the encoding
+    question needs were never produced, on either the laptop or the cloud VM,
+    and nothing noticed because no test called the function.
+
+    It also advertised "plus the random null" and computed none, and the
+    caller formatted the nested `by_segment` dict with `:.5f`.
+
+    This exercises the real function on a frame whose answer is known: two
+    head days at prevalence 0.5 and two tail days at prevalence 1.0, with a
+    perfect ranker, so every precision is 1.0 and the null is the
+    slot-weighted prevalence of each segment.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+    import datetime as _dt
+
+    import categorical_ablation as ca
+    days = ([_dt.date(2022, 9, 15)] * 4 + [_dt.date(2022, 9, 16)] * 4
+            + [_dt.date(2022, 9, 18)] * 2 + [_dt.date(2022, 9, 19)] * 2)
+    te = pd.DataFrame({
+        "event_date": pd.to_datetime(days),
+        # head days: half positive. tail days: all positive.
+        "is_laundering": [1, 1, 0, 0] * 2 + [1, 1] + [1, 1],
+    })
+    # A perfect ranker: positives score highest within each day.
+    scores = np.array([0.9, 0.8, 0.2, 0.1] * 2 + [0.9, 0.8] + [0.9, 0.8])
+
+    out = ca.segment_metrics(te, scores, budgets=(2,), thin_from=_dt.date(2022, 9, 17))
+
+    # It runs at all -- this is the regression.
+    assert out, "segment_metrics returned nothing"
+    for key in ("precision@2", "precision@2_head", "precision@2_tail"):
+        assert key in out, f"{key} missing; the pooled/segment split did not run"
+    # A perfect ranker at k=2 takes both positives on every day.
+    assert out["precision@2"] == 1.0
+    assert out["precision@2_head"] == 1.0
+    assert out["precision@2_tail"] == 1.0
+    assert out["alerts@2"] == 8 and out["alerts@2_head"] == 4
+    assert out["alerts@2_tail"] == 4
+
+    # AND THE NULL IT PROMISES. Head days hold 4 account-days at prevalence
+    # 0.5, so a random ranker filling 2 slots expects 0.5; tail days are all
+    # positive, so it expects 1.0.
+    assert "precision_null@2_head" in out, "the promised random null is absent"
+    assert abs(out["precision_null@2_head"] - 0.5) < 1e-9
+    assert abs(out["precision_null@2_tail"] - 1.0) < 1e-9
+    # The pooled null sits between them, which is the whole point: a pooled
+    # level cannot separate the encoding question from the window.
+    assert 0.5 < out["precision_null@2"] < 1.0
+    assert abs(out["precision_lift@2_head"] - 2.0) < 1e-4
+    assert abs(out["precision_lift@2_tail"] - 1.0) < 1e-4

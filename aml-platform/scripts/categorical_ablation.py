@@ -33,35 +33,70 @@ CATEGORICAL = ["payment_format_code", "payment_currency_code"]
 
 
 def segment_metrics(te, scores, budgets, thin_from) -> dict:
-    """Per-arm precision@k split by window segment, plus the random null.
+    """Per-arm precision@k split by window segment, WITH a random-ranker null.
 
     WITHOUT THIS A RERUN RE-ANSWERS A RETRACTED QUESTION. The arms were
     compared on POOLED `precision@50`, and a pooled budget level on this window
-    is 0.95x a random ranker (`docs/LIMITATIONS.md` §1) -- so three arms
-    agreeing to 1% agreed about the window, not about the encoding. The
-    encoding question needs the volume segment and a null.
+    beats a uniformly random ranker by only 1.16x-1.26x
+    (`docs/LIMITATIONS.md` section 1) -- so three arms agreeing to 1% agreed
+    about the window, not about the encoding. The encoding question needs the
+    volume segment and a null on that segment.
 
-    The HI-Medium features exist only on the cloud VM, so a rerun there is the
-    one chance to get this; discarding the scores, as this script did for two
-    of three arms, would waste it.
+    THREE DEFECTS THIS FUNCTION SHIPPED WITH, none of which any test executed:
+
+      1. `m is slice(None)` compared the IDENTITY of two separately
+         constructed slice objects, so it was always False and the pooled
+         branch fell through to `top & slice(None)` -- a TypeError on the
+         first call. The whole `--thin-from` path crashed, which is why the
+         segmented numbers were never produced.
+      2. The docstring cited `0.95x a random ranker`, a figure withdrawn when
+         the null was recomputed on the evaluated split.
+      3. It promised "plus the random null" in its own first line and computed
+         no null at all.
+
+    The null here is the slot-weighted mean of daily prevalence, restricted to
+    the same segment -- the value a uniformly random ranker attains -- so each
+    arm's level is reported against what chance gives on that segment rather
+    than against 1.0 or against the pooled figure.
     """
     import pandas as pd
 
     day = pd.to_datetime(te.event_date).dt.date.to_numpy()
     y = te.is_laundering.to_numpy()
     head = day < thin_from
-    out = {}
+    # `None` as the sentinel for "no mask". A slice object cannot be used here
+    # -- see defect 1 above.
+    segments = (("", None), ("_head", head), ("_tail", ~head))
+    out: dict = {}
     for b in budgets:
         r = (pd.DataFrame({"d": day, "s": scores})
              .groupby("d")["s"].rank(ascending=False, method="first").to_numpy())
         top = r <= b
-        for lab, m in (("", slice(None)), ("_head", head), ("_tail", ~head)):
-            sel = top & (np.ones_like(top) if m is slice(None) else m)
+        for lab, m in segments:
+            sel = top if m is None else (top & m)
             n = int(sel.sum())
             if not n:
                 continue
             out[f"precision@{b}{lab}"] = round(float(y[sel].mean()), 5)
             out[f"alerts@{b}{lab}"] = n
+
+            # THE NULL, on the same segment and the same slots.
+            #
+            # A uniformly random ranker fills each day's k slots from that
+            # day's population, so its expected precision is the slot-weighted
+            # mean of daily prevalence. Computed per day and weighted by the
+            # slots the day actually contributes, which is what makes it
+            # comparable to the level above.
+            keep = np.ones_like(day, dtype=bool) if m is None else m
+            frame = pd.DataFrame({"d": day[keep], "y": y[keep]})
+            per_day = frame.groupby("d")["y"].agg(["size", "mean"])
+            slots = np.minimum(per_day["size"].to_numpy(), b)
+            if slots.sum():
+                null = float((slots * per_day["mean"].to_numpy()).sum()
+                             / slots.sum())
+                out[f"precision_null@{b}{lab}"] = round(null, 5)
+                out[f"precision_lift@{b}{lab}"] = (
+                    round(out[f"precision@{b}{lab}"] / null, 4) if null else None)
     return out
 
 
@@ -119,8 +154,13 @@ def main(argv=None) -> int:
     out = {**generator_provenance(
                __file__,
                inputs=[Path(a.features), Path(a.splits)],
+               # `thin_from` DECIDES WHETHER THE SEGMENTED RESULT EXISTS, so
+               # it belongs in the recorded parameters. It was omitted, so an
+               # artifact with `by_segment` and one without were
+               # indistinguishable from their provenance alone.
                parameters={"features": a.features, "splits": a.splits,
-                           "seed": a.seed}), "seed": a.seed,
+                           "seed": a.seed, "thin_from": a.thin_from}),
+           "seed": a.seed,
            "n_train": len(ytr), "n_test": len(te),
            "categorical_features": CATEGORICAL, "arms": {}}
 
@@ -183,7 +223,17 @@ def main(argv=None) -> int:
     d.write_text(json.dumps(out, indent=1))
     print(json.dumps({k: v for k, v in out.items() if k != "arms"}, indent=1))
     for name, arm in out["arms"].items():
-        print(f"  {name:16s} " + "  ".join(f"{k}={v:.5f}" for k, v in arm.items()))
+        # SCALARS ONLY. `by_segment` is a nested dict and this formatted every
+        # value with `:.5f`, so the segmented path would have raised a
+        # TypeError here even after the crash above was fixed.
+        flat = {k: v for k, v in arm.items() if isinstance(v, (int, float))}
+        print(f"  {name:16s} " + "  ".join(f"{k}={v:.5f}" for k, v in flat.items()))
+        seg = arm.get("by_segment")
+        if seg:
+            for k in sorted(seg):
+                v = seg[k]
+                print(f"      {k:26s} {v:.5f}" if isinstance(v, (int, float))
+                      else f"      {k:26s} {v}")
     return 0
 
 

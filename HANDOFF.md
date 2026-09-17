@@ -22,10 +22,11 @@ Every technical blocker any of them raised is closed; what is left needs a
 person rather than a commit, and is listed at the bottom.
 
 ```text
-repo      github.com/NirmalKumar31/aml-evaluation-harness   [PRIVATE]
+repo      github.com/NirmalKumar31/aml-evaluation-harness-public   [PUBLIC, v0.1.0]
+          github.com/NirmalKumar31/aml-evaluation-harness   [PRIVATE, dev archive]
 branch    main · ci + gates verified locally at this commit;
           the image job runs only in CI
-tests     415 collected · lint clean   (generated: results_archive/derived/release_facts.json)
+tests     416 collected · lint clean   (generated: results_archive/derived/release_facts.json)
 numbers   every published value traces to an artifact, from a canonical
           lineage, and is not on the retraction registry. The COUNT is not
           restated here -- it moves whenever a document does, and it was
@@ -105,8 +106,11 @@ found all of them; each was verified here before being acted on.
 **One claim that was challenged and held.** The hashed categorical encoding was
 suspected of flattering the linear baseline. Measured on HI-Medium:
 ⛔ these are POOLED levels on the two-regime window (1.16x-1.26x a random ranker), so they cannot settle the encoding question — `precision@50` is 0.5706 hashed, 0.5764 without the categoricals, 0.5764
-one-hot — a 1% range with the hashed arm *lowest*. The headline does not depend
-on the encoding.
+one-hot — a 1% range with the hashed arm *lowest*. **Encoding dependence of
+the volume-segment headline remains unresolved** on the pooled numbers: a
+pooled level on this window is only 1.16x-1.26x chance, so three arms agreeing
+to 1% agree about the window. The segmented rerun with a per-segment null is
+what answers it; see `docs/LIMITATIONS.md`.
 
 **Three lessons that generalise.**
 
@@ -233,6 +237,42 @@ sequence, including a failure table that is the most useful part of it.
 
 ---
 
+## The public release, 2026-09-17
+
+`https://github.com/NirmalKumar31/aml-evaluation-harness-public` · tag
+**v0.1.0** (signed) at commit `fa50490`, with ci + gates + image green on that
+exact SHA. `main` is protected: the three checks are required, force-push and
+deletion are blocked, admin enforcement is on. Dependabot alerts, automated
+security fixes, secret scanning with push protection, and private
+vulnerability reporting are all enabled.
+
+It is a CLEAN SNAPSHOT with two commits of history, not this repository. The
+nine row-level replay bundles are withheld while the CDLA question is open;
+`results_archive/replay_inventory.json` ships in their place. Verified from a
+clean clone: 384 passed, 31 skipped, `make release-check` green, packaging and
+Bicep green, full-history gitleaks clean, 53 bandit findings matching the
+baseline.
+
+**Deferred deliberately, with reasons:**
+
+- **Six Dependabot PRs on THIS repository**, all deferred. Five are major
+  bumps of GitHub Actions (checkout 4→7, setup-python 5→7, buildx 3→4,
+  build-push 6→7, login 3→4) and touch CI only, not the released artifact;
+  this repo pins actions to commit SHAs on purpose, so a major bump needs its
+  own verification pass. The sixth (#8, python base image 3.12.3 → 3.12.14) is
+  the one with security relevance and should be taken first — it changes the
+  image base under a project that pins 3.12.3 in `check_python`, CI and the
+  image self-check, so it needs the whole chain re-verified.
+- **GHCR visibility: authentication required.** An anonymous manifest pull
+  returns 401. Changing it needs a token scope this session does not hold; the
+  image is built and tested in CI either way, and `docs/RUNBOOK_cloud.md`
+  documents the authenticated pull.
+- **The signed tag shows as Unverified** until the SSH signing key is
+  registered on the account (`gh auth refresh -s admin:ssh_signing_key`, then
+  add `~/.ssh/id_rsa.pub` as a *signing* key). The tag object is genuinely
+  SSH-signed; only GitHub's verification badge is missing.
+- **Kaggle token rotation** — still outstanding, still a person's job.
+
 ## Audit history
 
 Each round's Closed/Open remediation log lives in
@@ -274,7 +314,13 @@ Full list with commands: `aml-platform/docs/RELEASE_CHECKLIST.md`.
    taste question rather than a security one.
 3. **Tear down Azure?** Nothing needs the VM. $0.54/hr at list price for the
    whole resource group while it runs.
-4. **GHCR package visibility**, branch protection, and a signed tag.
+4. **GHCR package visibility.** Branch protection and the signed tag are
+   DONE on the public repository. The container package still requires
+   authentication: an anonymous manifest pull returns 401 for both the private
+   and the public namespace. Making it anonymously pullable needs a token
+   scope this work did not hold; until then `docs/RUNBOOK_cloud.md` documents
+   the authenticated pull, and CI builds and tests the image on every push
+   regardless.
 
 ### Open methodological items — documented, not fixed
 

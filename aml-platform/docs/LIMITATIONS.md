@@ -678,10 +678,40 @@ Three arms on HI-Medium, same split, same seed, logistic baseline
 | no categorical | 0.01022 | 0.57639 | 0.58042 | 0.44991 |
 | one-hot (train-only vocabulary + unseen) | 0.02136 | 0.57639 | 0.58042 | 0.45369 |
 
-**In this run, the headline number was untouched by the encoding.**
+**What the pooled arms do and do not settle.**
 pooled `precision@50` spans 0.5706 to 0.5764 — a 1% range on a quantity that is only 1.16x-1.26x chance — and the hashed arm is the
 *lowest* of the three, so on this evidence the hash is not flattering the
-linear baseline. If anything it costs a little.
+linear baseline **pooled**. But a pooled level cannot answer the question that
+matters, because it averages the volume days with the wind-down. The claim
+"the headline does not depend on the encoding" was asserted from these three
+pooled numbers for several rounds. **It is withdrawn, and the segmented
+measurement contradicts it.**
+
+#### On the volume days the encoding does matter, and not consistently
+
+`precision@50` on the head segment, against a random ranker on that same
+segment (`by_segment` in both ablation artifacts):
+
+| arm | HI-Medium lift | HI-Small lift |
+|---|---:|---:|
+| categoricals dropped | 26.135 | 34.2174 |
+| hashed into 1000 buckets | 33.5965 | 15.204 |
+| one-hot, train-only vocabulary | 37.3338 | 19.0135 |
+
+Two things follow, and only two. **The arms are not equivalent**: they span a
+43% relative range on HI-Medium where the pooled figures agreed to 1%, so the
+pooled agreement was agreement about the window, exactly as suspected. And
+**the direction does not replicate**: dropping the categoricals is the *worst*
+arm on HI-Medium and the *best* on HI-Small. One seed, one model family, two
+rungs that disagree — so this establishes that the encoding affects the
+volume-segment headline, and it does **not** establish which encoding to
+prefer.
+
+This is what the `--thin-from` path was for, and it could not produce it: the
+path crashed on its first line for as long as it existed (`m is slice(None)`,
+an identity comparison between two distinct slice objects) and no test ever
+called the function. Fixed, tested against a hand-computed frame, and rerun on
+the cloud VM.
 
 ⚠️ That is **evidence against** the hash-geometry concern; it does not close
 it. This paragraph said the concern "is answered: it is not", four paragraphs
@@ -700,10 +730,15 @@ The claim this supports is therefore the narrow one:
 pooled `precision@50 = 0.5706` (1.16x-1.26x a random ranker), and in this run that did not depend on how the two
 categorical columns are encoded.**
 
-⚠️ **This is a HISTORICAL result with partial provenance, and it should not be
-read as closing the encoding question.** `categorical_ablation_medium.json` was
-produced on the cloud VM against HI-Medium features that are not on the
-development machine. Its generator blob and full commit SHA verify, and that is
+⚠️ **Provenance is now complete; the encoding question is what remains
+open.** `categorical_ablation_medium.json` was regenerated on the cloud VM
+inside the release container and records a full 40-character commit, generator
+hash, package-tree hash, environment-lock hash, repo-relative input identities
+and parameters. `scope_clean` is null because a container has no git checkout.
+One caveat that "full provenance" should not paper over: the transformed
+feature inputs are identified by path and size, not by content hash — the RAW
+dataset files are strongly pinned, but the derived feature table is not. The
+older note said the generator blob and full commit SHA verify, and that is
 where its provenance stops: it carries **no package-tree hash, no declared
 inputs, no parameters, no environment identity and no clean-scope record** —
 all of which every other derived artifact here now has. There is therefore no

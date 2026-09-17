@@ -2,14 +2,17 @@
 
 ## Reporting a vulnerability
 
-> ⛔ **There is currently no working private disclosure route, and this file
-> will not pretend otherwise.** Two earlier versions did: the first pointed at
-> `Security → Report a vulnerability`, which returns 404 on a private
-> repository, and the second pointed at "the address on the GitHub profile that
-> owns this repository", which does not display one. Both read like a policy
-> and neither could carry a report. A security policy that names a channel
-> nobody can use is worse than one that names none, because it stops the
-> reporter looking further.
+**Private vulnerability reporting is enabled** on the public repository. Open
+<https://github.com/NirmalKumar31/aml-evaluation-harness-public/security/advisories/new> and GitHub will create a private advisory
+visible only to the maintainer.
+
+> Two earlier versions of this file named a channel that could not carry a
+> report: the first pointed at `Security → Report a vulnerability`, which
+> returns 404 on a private repository, and the second pointed at "the address
+> on the GitHub profile that owns this repository", which displays none. A
+> security policy naming an unusable channel is worse than one naming none,
+> because it stops the reporter looking further. The route above was verified
+> reachable while signed out before this text was written. <!-- historical -->
 
 **Before this repository is made public, exactly one of the following must be
 done**, and it is a blocking row in
