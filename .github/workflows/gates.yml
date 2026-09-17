@@ -84,7 +84,7 @@ jobs:
           tar -xzf /tmp/gitleaks.tgz -C /tmp gitleaks
           /tmp/gitleaks git --no-banner --redact --exit-code 1 .
 
-      # SAST, against a triaged baseline. New findings fail; the 51 known ones
+      # SAST, against a triaged baseline. New findings fail; the 53 known ones
       # are documented in aml-platform/docs/SAST_TRIAGE.md with an assessment
       # each. A baseline regenerated without a triage entry is a gate switched
       # off, so the two are meant to move together.
@@ -97,7 +97,7 @@ jobs:
       # which build day it runs is not a gate -- and installing an unpinned
       # tool is the very supply-chain habit the audit flagged elsewhere.
       #
-      # So: pin the version, and fail on HIGH. The 47 medium findings are all
+      # So: pin the version, and fail on HIGH. The 53 medium-and-above findings are all
       # f-string DuckDB SQL over operator-supplied paths, triaged one class at
       # a time in aml-platform/docs/SAST_TRIAGE.md, and counted here for
       # visibility rather than silently tolerated.
