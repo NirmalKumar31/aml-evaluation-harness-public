@@ -1,0 +1,59 @@
+{
+  "component": "drift_experiment[m=1.0]",
+  "run_key": null,
+  "status": "ok",
+  "error": null,
+  "config": {
+    "features": "data/silver/drifted_features_Medium/m1.0",
+    "drift": "data/gold/drift_Medium/m1.0",
+    "magnitude": 1.0,
+    "n_buckets": 4,
+    "train_buckets": 2,
+    "seed": 0,
+    "iters": 150,
+    "sample": 1.0,
+    "strategies": [
+      "frozen",
+      "naive_retrain",
+      "sliding_window",
+      "typology_replay"
+    ],
+    "experiment_version": "1.0.0"
+  },
+  "config_hash": "74fcabe26755d92f12d5bee0eabeffa16e5abee1f007a0e37ea1decbf7bfa107",
+  "code_git_sha": "62a3b032f8161195adc8f56f64e30cc7c5f8a596",
+  "wall_clock_sec": 1413.813,
+  "metrics": {
+    "magnitude": 1.0,
+    "cramers_v": 0.26639005863389237,
+    "eval_buckets": [
+      2,
+      3
+    ],
+    "frozen_efficiency_by_bucket": {
+      "2": 0.9841,
+      "3": 0.9844
+    },
+    "frozen_decay": -0.0003,
+    "recovery": {
+      "naive_retrain": {
+        "gain_at_last_bucket": -0.0031,
+        "fraction_of_decay_recovered": null
+      },
+      "sliding_window": {
+        "gain_at_last_bucket": -0.0062,
+        "fraction_of_decay_recovered": null
+      },
+      "typology_replay": {
+        "gain_at_last_bucket": -0.0031,
+        "fraction_of_decay_recovered": null
+      }
+    },
+    "drift_is": "INDUCED, not observed"
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-19T20:47:13Z"
+}

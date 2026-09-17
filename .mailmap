@@ -1,0 +1,18 @@
+# One person, two spellings. `git shortlog`, `git log --use-mailmap` and the
+# GitHub contributor list read this file, so history reads as one author
+# without rewriting a single commit.
+#
+# WHAT THIS DOES NOT DO: it does not change the email addresses recorded in the
+# commits. One of them is a machine-local hostname address
+# (`user@Nirmals-MacBook-Air.local`) and the other is institutional. Both stay
+# visible in `git log --format=%ae` and in the raw objects once this repository
+# is public.
+#
+# Replacing them means either adding a mapping line with a chosen public
+# address, or rewriting history with git-filter-repo before the first public
+# push. Both are the maintainer's decision, not a cleanup task -- see the
+# authorship row in aml-platform/docs/RELEASE_CHECKLIST.md. Only the second
+# actually removes the old addresses; a .mailmap line only changes what tools
+# display.
+Nirmal Kumar Thirupallikrishnan <thirupallikrishnan.n@northeastern.edu>
+Nirmal Kumar Thirupallikrishnan <nirmalkumar@Nirmals-MacBook-Air.local>

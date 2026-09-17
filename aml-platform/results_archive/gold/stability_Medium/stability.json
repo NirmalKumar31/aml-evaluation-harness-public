@@ -1,0 +1,224 @@
+{
+  "current": {
+    "config": {
+      "learning_rate": 0.1,
+      "max_iter": 300,
+      "max_depth": 8,
+      "min_samples_leaf": 40,
+      "class_weight": "balanced"
+    },
+    "per_seed": [
+      {
+        "average_precision": 0.282400339714525,
+        "recall_efficiency@50": 0.7995337995337995,
+        "precision@50": 0.7939814814814815,
+        "recall@50": 0.03783783783783784,
+        "ring_recall@200": 0.6937618147448015
+      },
+      {
+        "average_precision": 0.3006116570325478,
+        "recall_efficiency@50": 0.9044289044289043,
+        "precision@50": 0.8981481481481481,
+        "recall@50": 0.042801985659128516,
+        "ring_recall@200": 0.7088846880907372
+      },
+      {
+        "average_precision": 0.3038621341556846,
+        "recall_efficiency@50": 0.9009324009324009,
+        "precision@50": 0.8946759259259259,
+        "recall@50": 0.04263651406508549,
+        "ring_recall@200": 0.6918714555765595
+      },
+      {
+        "average_precision": 0.29650150840375705,
+        "recall_efficiency@50": 0.9020979020979021,
+        "precision@50": 0.8958333333333334,
+        "recall@50": 0.042691671263099834,
+        "ring_recall@200": 0.7069943289224953
+      },
+      {
+        "average_precision": 0.2546722855512772,
+        "recall_efficiency@50": 0.5955710955710956,
+        "precision@50": 0.5914351851851852,
+        "recall@50": 0.028185328185328186,
+        "ring_recall@200": 0.6030245746691871
+      },
+      {
+        "average_precision": 0.30146382791155607,
+        "recall_efficiency@50": 0.8356643356643355,
+        "precision@50": 0.8298611111111112,
+        "recall@50": 0.0395477109762824,
+        "ring_recall@200": 0.6899810964083176
+      },
+      {
+        "average_precision": 0.29190127096975477,
+        "recall_efficiency@50": 0.8496503496503496,
+        "precision@50": 0.84375,
+        "recall@50": 0.040209597352454496,
+        "ring_recall@200": 0.6786389413988658
+      },
+      {
+        "average_precision": 0.2935416995657309,
+        "recall_efficiency@50": 0.8566433566433567,
+        "precision@50": 0.8506944444444444,
+        "recall@50": 0.04054054054054054,
+        "ring_recall@200": 0.6786389413988658
+      }
+    ],
+    "stability": {
+      "average_precision": {
+        "mean": 0.29062,
+        "min": 0.25467,
+        "max": 0.30386,
+        "range": 0.04919,
+        "spread_pct": 16.93
+      },
+      "recall_efficiency@50": {
+        "mean": 0.83057,
+        "min": 0.59557,
+        "max": 0.90443,
+        "range": 0.30886,
+        "spread_pct": 37.19
+      },
+      "precision@50": {
+        "mean": 0.8248,
+        "min": 0.59144,
+        "max": 0.89815,
+        "range": 0.30671,
+        "spread_pct": 37.19
+      },
+      "recall@50": {
+        "mean": 0.03931,
+        "min": 0.02819,
+        "max": 0.0428,
+        "range": 0.01462,
+        "spread_pct": 37.19
+      },
+      "ring_recall@200": {
+        "mean": 0.68147,
+        "min": 0.60302,
+        "max": 0.70888,
+        "range": 0.10586,
+        "spread_pct": 15.53
+      }
+    },
+    "ensemble": {
+      "average_precision": 0.31493,
+      "recall_efficiency@50": 0.91259,
+      "precision@50": 0.90625,
+      "recall@50": 0.04319,
+      "ring_recall@200": 0.70699
+    }
+  },
+  "bigleaf": {
+    "config": {
+      "learning_rate": 0.1,
+      "max_iter": 300,
+      "max_depth": 8,
+      "min_samples_leaf": 200,
+      "class_weight": "balanced"
+    },
+    "per_seed": [
+      {
+        "average_precision": 0.2614106992902844,
+        "recall_efficiency@50": 0.7738927738927739,
+        "precision@50": 0.7685185185185185,
+        "recall@50": 0.03662437948152234,
+        "ring_recall@200": 0.6691871455576559
+      },
+      {
+        "average_precision": 0.25815845867390597,
+        "recall_efficiency@50": 0.6258741258741258,
+        "precision@50": 0.6215277777777778,
+        "recall@50": 0.02961941533370105,
+        "ring_recall@200": 0.6332703213610587
+      },
+      {
+        "average_precision": 0.30738314897415653,
+        "recall_efficiency@50": 0.9137529137529138,
+        "precision@50": 0.9074074074074074,
+        "recall@50": 0.043243243243243246,
+        "ring_recall@200": 0.6899810964083176
+      },
+      {
+        "average_precision": 0.28153232027892877,
+        "recall_efficiency@50": 0.8659673659673659,
+        "precision@50": 0.8599537037037037,
+        "recall@50": 0.040981798124655265,
+        "ring_recall@200": 0.6956521739130435
+      },
+      {
+        "average_precision": 0.31297304583390845,
+        "recall_efficiency@50": 0.8811188811188811,
+        "precision@50": 0.875,
+        "recall@50": 0.0416988416988417,
+        "ring_recall@200": 0.6994328922495274
+      },
+      {
+        "average_precision": 0.2519143488098825,
+        "recall_efficiency@50": 0.6130536130536131,
+        "precision@50": 0.6087962962962963,
+        "recall@50": 0.0290126861555433,
+        "ring_recall@200": 0.6219281663516069
+      },
+      {
+        "average_precision": 0.30338242307145363,
+        "recall_efficiency@50": 0.8916083916083914,
+        "precision@50": 0.8854166666666666,
+        "recall@50": 0.042195256480970764,
+        "ring_recall@200": 0.6786389413988658
+      },
+      {
+        "average_precision": 0.2751393935429416,
+        "recall_efficiency@50": 0.6526806526806527,
+        "precision@50": 0.6481481481481481,
+        "recall@50": 0.03088803088803089,
+        "ring_recall@200": 0.6408317580340265
+      }
+    ],
+    "stability": {
+      "average_precision": {
+        "mean": 0.28149,
+        "min": 0.25191,
+        "max": 0.31297,
+        "range": 0.06106,
+        "spread_pct": 21.69
+      },
+      "recall_efficiency@50": {
+        "mean": 0.77724,
+        "min": 0.61305,
+        "max": 0.91375,
+        "range": 0.3007,
+        "spread_pct": 38.69
+      },
+      "precision@50": {
+        "mean": 0.77185,
+        "min": 0.6088,
+        "max": 0.90741,
+        "range": 0.29861,
+        "spread_pct": 38.69
+      },
+      "recall@50": {
+        "mean": 0.03678,
+        "min": 0.02901,
+        "max": 0.04324,
+        "range": 0.01423,
+        "spread_pct": 38.69
+      },
+      "ring_recall@200": {
+        "mean": 0.66612,
+        "min": 0.62193,
+        "max": 0.69943,
+        "range": 0.0775,
+        "spread_pct": 11.64
+      }
+    },
+    "ensemble": {
+      "average_precision": 0.32151,
+      "recall_efficiency@50": 0.91026,
+      "precision@50": 0.90394,
+      "recall@50": 0.04308,
+      "ring_recall@200": 0.71456
+    }
+  }
+}

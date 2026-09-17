@@ -1,0 +1,16 @@
+# Test and lint tooling, pinned. Platform-independent version pins; the
+# container installs requirements-dev.linux-amd64.lock, which is this file with
+# a sha256 per wheel.
+#
+# SEPARATE FROM requirements.lock ON PURPOSE. `make lock` strips these, because
+# a production image should not ship a test runner. But "stripped from the
+# lock" had come to mean "unpinned everywhere": CI installed them through
+# `pip install -e ".[dev]"`, whose ranges let them float, and the image
+# installed whatever `pip install pytest` returned that morning. So the suite
+# that gates a paid cloud run was being executed by an unknown version of
+# pytest. Pinned here instead of unpinned nowhere.
+iniconfig==2.3.0
+pluggy==1.6.0
+Pygments==2.20.0
+pytest==9.1.1
+ruff==0.16.2

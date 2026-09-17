@@ -1,0 +1,32 @@
+{
+  "component": "plant_leak[reversed_window]",
+  "run_key": "a0b3641e433fe796",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "labeled": "data/gold/reconcile_Medium/txns_labeled",
+    "dest": "data/gold/leak_Medium/reversed_window",
+    "kind": "reversed_window",
+    "plant_version": "1.1.0"
+  },
+  "config_hash": "3727c85160756f31f6bfcbc1a2fc9035f72869fe10556ed34a5021dbc61f9eb6",
+  "code_git_sha": "23393ceff144e3ff633600b12b22a7b88a476bbc",
+  "wall_clock_sec": 18.22,
+  "metrics": {
+    "kind": "reversed_window",
+    "rows": 31898238,
+    "leak_columns": [
+      "s_n_next_1d",
+      "s_n_next_7d",
+      "s_max_amt_next_7d",
+      "r_n_next_1d",
+      "r_n_next_7d",
+      "r_max_amt_next_7d"
+    ]
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-20T20:46:19Z"
+}

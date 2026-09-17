@@ -1,0 +1,196 @@
+{
+  "component": "build_splits",
+  "run_key": "0bbd839098a093d2",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "patterns": "/scratch/medium/bronze/patterns",
+    "labeled": "/scratch/medium/gold/reconcile",
+    "cut_time": "2022-09-10",
+    "dest": "/scratch/medium/gold/splits",
+    "split_spec_version": "1.1.0",
+    "min_test_positives": 100,
+    "protocol": "ring-aware"
+  },
+  "config_hash": "233441a20551e55fc847da7eda0bdc511ab1f35b1d9d0facb1cad290ef89de00",
+  "code_git_sha": "35b2a7ca0a1d",
+  "wall_clock_sec": 12.977,
+  "metrics": {
+    "cut_time": "2022-09-10",
+    "train_rows": 19487126,
+    "train_positives": 15713,
+    "test_rows": 12402530,
+    "test_positives": 10935,
+    "train_rings": 1491,
+    "test_rings_before_drop": 1265,
+    "dropped_rings": 736,
+    "test_rings_kept": 529,
+    "overlap_accounts": 645,
+    "dropped_pct": 58.18,
+    "test_positive_account_days": 18130,
+    "test_total_account_days": 6204374,
+    "unlabeled_positive_acct_days_touching_train_rings": 135,
+    "unlabeled_handling": "A: disjointness applies to ring-participating accounts only",
+    "protocol": "ring-aware",
+    "straddling_ring_tail_rows_in_test": 0,
+    "assertions_passed": [
+      "accounts_disjoint",
+      "rings_disjoint",
+      "no_temporal_bleed",
+      "no_train_ring_tails_in_test"
+    ]
+  },
+  "outputs": [
+    {
+      "path": "dropped_rings.parquet",
+      "bytes": 3189,
+      "sha256": "b3271420b4c7eaf8a886b08ff5e37b3339b13da31830ac22247e227b1de3edf1"
+    },
+    {
+      "path": "test/event_date=2022-09-10/data_0.parquet",
+      "bytes": 38113506,
+      "sha256": "8948fdd4d173d5dfc7f2262bb2ca654befeb8ad0aedd656850af28d5acdd2b74"
+    },
+    {
+      "path": "test/event_date=2022-09-11/data_0.parquet",
+      "bytes": 38137018,
+      "sha256": "e073bd0305856232596ebe5fd43d559b1cd441d75be3db97bebe175038548f29"
+    },
+    {
+      "path": "test/event_date=2022-09-12/data_0.parquet",
+      "bytes": 85974404
+    },
+    {
+      "path": "test/event_date=2022-09-13/data_0.parquet",
+      "bytes": 85970895
+    },
+    {
+      "path": "test/event_date=2022-09-14/data_0.parquet",
+      "bytes": 86107037
+    },
+    {
+      "path": "test/event_date=2022-09-15/data_0.parquet",
+      "bytes": 86112247
+    },
+    {
+      "path": "test/event_date=2022-09-16/data_0.parquet",
+      "bytes": 140062529
+    },
+    {
+      "path": "test/event_date=2022-09-17/data_0.parquet",
+      "bytes": 95127,
+      "sha256": "8a54536f0182224c2d4f39a0be66564199863222756357dca64c1e5254ca926d"
+    },
+    {
+      "path": "test/event_date=2022-09-18/data_0.parquet",
+      "bytes": 76531,
+      "sha256": "8387ca27ee3d080e417d57d00be3ae140a305bc5e5a5f1ffb0e6fa521f631d77"
+    },
+    {
+      "path": "test/event_date=2022-09-19/data_0.parquet",
+      "bytes": 59870,
+      "sha256": "74396534c9571993e67ef387c887da532c8223a979a10d39929a93519864c589"
+    },
+    {
+      "path": "test/event_date=2022-09-20/data_0.parquet",
+      "bytes": 44120,
+      "sha256": "3975b093746e323b82b5b6d5a413c9559548d7a8aa72f90f0cbe5d995265e0f5"
+    },
+    {
+      "path": "test/event_date=2022-09-21/data_0.parquet",
+      "bytes": 31678,
+      "sha256": "5e2086d4e3101da3c869b85e5f322f11e7b2e786621658be56ee370c4d816fe3"
+    },
+    {
+      "path": "test/event_date=2022-09-22/data_0.parquet",
+      "bytes": 18152,
+      "sha256": "5986fd174a4faf2332f1417209cf9edb5dc10b99c49b052d48b12bd659e7bacf"
+    },
+    {
+      "path": "test/event_date=2022-09-23/data_0.parquet",
+      "bytes": 9517,
+      "sha256": "517c4d60f29822aafbb8608d53fb9a9f8af1d9d13a402131ec2f2452d0f60c02"
+    },
+    {
+      "path": "test/event_date=2022-09-24/data_0.parquet",
+      "bytes": 8240,
+      "sha256": "d2ce07456614c3607c2f2c6fa7d47e2e1e9bc815a84e0d831b58ec55801cbac1"
+    },
+    {
+      "path": "test/event_date=2022-09-25/data_0.parquet",
+      "bytes": 8113,
+      "sha256": "9b5c6fc31372d5c32bad353c205dfce15b330531549a76ac4f42158f922de691"
+    },
+    {
+      "path": "test/event_date=2022-09-26/data_0.parquet",
+      "bytes": 6102,
+      "sha256": "3a38dfe1ae9c6ff08be7918e03cf385625a2e327dea2b9c4391872ef71940584"
+    },
+    {
+      "path": "test/event_date=2022-09-27/data_0.parquet",
+      "bytes": 4170,
+      "sha256": "8cd91c8cf344cbc021d9b4463cb8a6d2e0b38c2ae5eddba9aba058e076e14de9"
+    },
+    {
+      "path": "test/event_date=2022-09-28/data_0.parquet",
+      "bytes": 3278,
+      "sha256": "65939092d1b2f4545a25a8c632a9b00bb06eb8137c93019057924d5aeccb5494"
+    },
+    {
+      "path": "test_rings.parquet",
+      "bytes": 2360,
+      "sha256": "c4aad5a764c049e5dc268394caedd692f1da37da01f50f544aea3b8ac2e13d27"
+    },
+    {
+      "path": "train/event_date=2022-09-01/data_0.parquet",
+      "bytes": 222877822
+    },
+    {
+      "path": "train/event_date=2022-09-02/data_0.parquet",
+      "bytes": 140059369
+    },
+    {
+      "path": "train/event_date=2022-09-03/data_0.parquet",
+      "bytes": 38109417,
+      "sha256": "e78d732674bdc6a427dd27c21a5afe0883d5f179f016750a4fb01bbc3dda6a82"
+    },
+    {
+      "path": "train/event_date=2022-09-04/data_0.parquet",
+      "bytes": 38191466,
+      "sha256": "6e3f6f5fc5c88d2936bce20ef8e8354fe470b205f21f7426369ab7dc7f844abd"
+    },
+    {
+      "path": "train/event_date=2022-09-05/data_0.parquet",
+      "bytes": 86045962
+    },
+    {
+      "path": "train/event_date=2022-09-06/data_0.parquet",
+      "bytes": 85996489
+    },
+    {
+      "path": "train/event_date=2022-09-07/data_0.parquet",
+      "bytes": 86155757
+    },
+    {
+      "path": "train/event_date=2022-09-08/data_0.parquet",
+      "bytes": 86147468
+    },
+    {
+      "path": "train/event_date=2022-09-09/data_0.parquet",
+      "bytes": 123151113
+    },
+    {
+      "path": "train_rings.parquet",
+      "bytes": 6950,
+      "sha256": "068a2b96495d4be2ce641d2abce3b466e580493701ab425a41a9e616279bef18"
+    }
+  ],
+  "output_hash_max_bytes": 67108864,
+  "stale_outputs_removed": [],
+  "code_tree_sha256": "11f533af87ac091ebdf5c8345f8065183c3db69ddd01cb6087e20fbd94a0e0a9",
+  "env": {
+    "python": "3.12.3",
+    "platform": "Linux-6.8.0-1064-azure-x86_64-with-glibc2.36"
+  },
+  "written_at": "2026-09-12T02:29:06Z"
+}

@@ -1,0 +1,96 @@
+{
+  "component": "leak_sweep",
+  "run_key": null,
+  "status": "ok",
+  "error": null,
+  "config": {
+    "features": "data/silver/features_Small",
+    "splits": "data/gold/infl_splits_ring-aware_Small",
+    "leak_root": "data/gold/leak_Small",
+    "kinds": [
+      "reversed_window",
+      "future_counterparty",
+      "target"
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "iters": 300,
+    "sample": 1.0,
+    "sweep_version": "2.0.0",
+    "feature_set": [
+      "log_amount_paid",
+      "log_amount_received",
+      "fx_ratio",
+      "currency_mismatch",
+      "amount_roundness",
+      "hour",
+      "dayofweek",
+      "is_weekend",
+      "is_self_transfer",
+      "is_cross_bank",
+      "payment_format_code",
+      "payment_currency_code",
+      "s_n_1d",
+      "s_n_7d",
+      "s_n_30d",
+      "s_mean_amt_7d",
+      "s_std_amt_7d",
+      "s_max_amt_30d",
+      "s_n_out_7d",
+      "s_secs_since_prev",
+      "s_secs_since_prev_cp",
+      "s_amt_vs_hist",
+      "r_n_1d",
+      "r_n_7d",
+      "r_n_30d",
+      "r_mean_amt_7d",
+      "r_std_amt_7d",
+      "r_max_amt_30d",
+      "r_n_out_7d",
+      "r_secs_since_prev",
+      "r_secs_since_prev_cp",
+      "r_amt_vs_hist"
+    ],
+    "n_features": 32,
+    "design": "paired within seed; placebo = leak columns permuted WITHIN (split side, day)",
+    "placebo_strata": "side|event_date",
+    "sweep_version_note": "2.0.0 changed the placebo from a global permutation to a stratified one; numbers are not comparable to 1.1.0"
+  },
+  "config_hash": "66f77265eb1ea7412b62bc04a1963710fc53e64cb754c3d3fe3ea098321140bd",
+  "code_git_sha": "8a5bcf730eadbdbe2580c469fad2888e8809809e",
+  "wall_clock_sec": 3040.449,
+  "metrics": {
+    "n_seeds": 5,
+    "n_fits": 35,
+    "train_rows": 2284182,
+    "test_rows": 2793197,
+    "channels_separating_from_placebo": 2,
+    "channels_tested": 3,
+    "positive_control_separates": true
+  },
+  "outputs": [
+    {
+      "path": "sweep_raw.json",
+      "bytes": 12306,
+      "sha256": "a5db63c754903a2d8c9de25f30862ef1489c3a825eb998dd7fdbc8b9f8c7e910"
+    },
+    {
+      "path": "sweep_summary.json",
+      "bytes": 1917,
+      "sha256": "8f4193372e55971057221d94ba664650e808de01540d9c5845e881e2406b42a5"
+    }
+  ],
+  "output_hash_max_bytes": 67108864,
+  "stale_outputs_removed": [],
+  "code_tree_sha256": "21d569f214410db51ea0346baa4e6d1290de9e52f8588b78e368c12a00547782",
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-09-14T02:03:20Z"
+}

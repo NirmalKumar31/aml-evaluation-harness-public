@@ -1,0 +1,94 @@
+{
+  "component": "prove_leak[target]",
+  "run_key": null,
+  "status": "ok",
+  "error": null,
+  "config": {
+    "features": "data/silver/features_Medium",
+    "splits": "data/gold/splits_Medium",
+    "leak": "data/gold/leak_Medium/target/leak.parquet",
+    "kind": "target",
+    "sample": 1.0,
+    "seed": 0,
+    "iters": 150,
+    "leak_columns": [
+      "s_account_ever_laundered",
+      "r_account_ever_laundered",
+      "s_account_laundering_rate",
+      "r_account_laundering_rate"
+    ]
+  },
+  "config_hash": "4790eefe31146d429eda33e3a7d233a80b1806dff42fe4e386a185687ecbf627",
+  "code_git_sha": "3548fc3f83fe67acac1833ec95bf9d902818e57b",
+  "wall_clock_sec": 294.531,
+  "metrics": {
+    "kind": "target",
+    "leak_columns": [
+      "s_account_ever_laundered",
+      "r_account_ever_laundered",
+      "s_account_laundering_rate",
+      "r_account_laundering_rate"
+    ],
+    "sample_fraction": 1.0,
+    "n_features_honest": 32,
+    "n_features_cheating": 36,
+    "train_rows": 19487126,
+    "test_rows": 12402530,
+    "clean": {
+      "average_precision": 0.266061390949129,
+      "recall@10": 0.007004964147821291,
+      "recall_ceiling@10": 0.010148924434638721,
+      "recall_efficiency@10": 0.6902173913043478,
+      "precision@10": 0.6902173913043478,
+      "ring_recall@10": 0.08695652173913043,
+      "recall@50": 0.03772752344180916,
+      "recall_ceiling@50": 0.04732487589630447,
+      "recall_efficiency@50": 0.7972027972027972,
+      "precision@50": 0.7916666666666666,
+      "ring_recall@50": 0.3383742911153119,
+      "recall@200": 0.12189740761169332,
+      "recall_ceiling@200": 0.15488141202426917,
+      "recall_efficiency@200": 0.787037037037037,
+      "precision@200": 0.7660311958405546,
+      "ring_recall@200": 0.6880907372400756
+    },
+    "leaky": {
+      "average_precision": 0.7552405362872111,
+      "recall@10": 0.009817981246552676,
+      "recall_ceiling@10": 0.010148924434638721,
+      "recall_efficiency@10": 0.967391304347826,
+      "precision@10": 0.967391304347826,
+      "ring_recall@10": 0.10775047258979206,
+      "recall@50": 0.045339216767788196,
+      "recall_ceiling@50": 0.04732487589630447,
+      "recall_efficiency@50": 0.958041958041958,
+      "precision@50": 0.9513888888888888,
+      "ring_recall@50": 0.30434782608695654,
+      "recall@200": 0.14853833425261997,
+      "recall_ceiling@200": 0.15488141202426917,
+      "recall_efficiency@200": 0.9590455840455842,
+      "precision@200": 0.9334488734835356,
+      "ring_recall@200": 0.6521739130434783
+    },
+    "efficiency_jump": {
+      "10": 0.27717391304347827,
+      "50": 0.16083916083916083,
+      "200": 0.17200854700854717
+    },
+    "error_reduction@50": 0.793103448275862,
+    "average_precision_clean": 0.266061390949129,
+    "average_precision_leaky": 0.7552405362872111,
+    "average_precision_ratio": 2.839,
+    "roc_auc_clean": 0.9828130943904456,
+    "roc_auc_leaky": 0.9788642145298639,
+    "min_ap_ratio": 1.5,
+    "min_error_reduction": 0.25,
+    "leak_detected": true,
+    "detection_signal": "AP x2.84 and error -79%"
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-20T21:03:29Z"
+}

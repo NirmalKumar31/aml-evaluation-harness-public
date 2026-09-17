@@ -1,0 +1,118 @@
+{
+  "component": "evaluate[baseline]",
+  "run_key": null,
+  "status": "ok",
+  "error": null,
+  "config": {
+    "features": "data/silver/features_Medium",
+    "splits": "data/gold/splits_Medium",
+    "scores": "data/gold/models_Medium/baseline_test_scores.parquet",
+    "model": "baseline",
+    "budgets": [
+      10,
+      25,
+      50,
+      100,
+      200,
+      500,
+      1000
+    ],
+    "bootstrap": 1000
+  },
+  "config_hash": "a3eeb75638f0c2e272d58679c6a36c8e0195e47b4b9e4626cf44455836c5e30f",
+  "code_git_sha": "3548fc3f83fe67acac1833ec95bf9d902818e57b",
+  "wall_clock_sec": 43.942,
+  "metrics": {
+    "n_account_days": 6204374,
+    "n_positive_account_days": 18130,
+    "average_precision": 0.020078002243009083,
+    "roc_auc_footnote_only": 0.9152022399607048,
+    "recall@10": 0.006067291781577496,
+    "recall_ceiling@10": 0.010148924434638721,
+    "recall_efficiency@10": 0.5978260869565217,
+    "precision@10": 0.5978260869565217,
+    "alerts_per_true_positive@10": 1.6727272727272726,
+    "ring_recall@10": 0.07372400756143667,
+    "recall@25": 0.01384445670159956,
+    "recall_ceiling@25": 0.024379481522338667,
+    "recall_efficiency@25": 0.5678733031674208,
+    "precision@25": 0.5640449438202247,
+    "alerts_per_true_positive@25": 1.7729083665338645,
+    "ring_recall@25": 0.1342155009451796,
+    "recall@50": 0.02719249862107005,
+    "recall_ceiling@50": 0.04732487589630447,
+    "recall_efficiency@50": 0.5745920745920745,
+    "precision@50": 0.5706018518518519,
+    "alerts_per_true_positive@50": 1.7525354969574036,
+    "ring_recall@50": 0.21928166351606806,
+    "recall@100": 0.04611141753998897,
+    "recall_ceiling@100": 0.08532818532818533,
+    "recall_efficiency@100": 0.5404007756948934,
+    "precision@100": 0.5264483627204031,
+    "alerts_per_true_positive@100": 1.8995215311004785,
+    "ring_recall@100": 0.32136105860113423,
+    "recall@200": 0.0770546056260342,
+    "recall_ceiling@200": 0.15488141202426917,
+    "recall_efficiency@200": 0.4975071225071225,
+    "precision@200": 0.48422876949740035,
+    "alerts_per_true_positive@200": 2.065139584824624,
+    "ring_recall@200": 0.44045368620037806,
+    "recall@500": 0.14704908990623278,
+    "recall_ceiling@500": 0.3375620518477661,
+    "recall_efficiency@500": 0.4356209150326798,
+    "precision@500": 0.41872153290403646,
+    "alerts_per_true_positive@500": 2.3882220555138787,
+    "ring_recall@500": 0.6181474480151229,
+    "recall@1000": 0.20353006067291782,
+    "recall_ceiling@1000": 0.5726420297848869,
+    "recall_efficiency@1000": 0.35542284723560014,
+    "precision@1000": 0.3300831916987208,
+    "alerts_per_true_positive@1000": 3.029539295392954,
+    "ring_recall@1000": 0.6994328922495274,
+    "typology_coverage_pct": 49.54,
+    "ci_lo": 0.02156909457679542,
+    "ci_hi": 0.032837647429373104,
+    "n_clusters": 9653,
+    "n_ring_clusters": 529,
+    "n_bootstrap": 1000,
+    "per_typology": {
+      "BIPARTITE": {
+        "n_rings": 61,
+        "ring_recall@50": 0.09836065573770492
+      },
+      "CYCLE": {
+        "n_rings": 78,
+        "ring_recall@50": 0.15384615384615385
+      },
+      "FAN-IN": {
+        "n_rings": 74,
+        "ring_recall@50": 0.02702702702702703
+      },
+      "FAN-OUT": {
+        "n_rings": 65,
+        "ring_recall@50": 0.2
+      },
+      "GATHER-SCATTER": {
+        "n_rings": 60,
+        "ring_recall@50": 0.7833333333333333
+      },
+      "RANDOM": {
+        "n_rings": 76,
+        "ring_recall@50": 0.14473684210526316
+      },
+      "SCATTER-GATHER": {
+        "n_rings": 60,
+        "ring_recall@50": 0.13333333333333333
+      },
+      "STACK": {
+        "n_rings": 55,
+        "ring_recall@50": 0.3090909090909091
+      }
+    }
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-20T21:08:33Z"
+}

@@ -1,0 +1,49 @@
+# data/ is 23 GB of CSV and Parquet. It lives in ADLS, not in the image.
+# Without this line the build context alone would be larger than the credit.
+data/
+
+# Results and archives. Reproduced by running the pipeline, never shipped.
+paper/archive/
+
+# scripts/ is NOT excluded, and that is a change.
+#
+# It used to be, on the reasoning that scripts are development tooling. But the
+# publication checker, the replay-bundle generator and the dataset verifier all
+# have to run against CLOUD data, in this image, on a machine with no checkout.
+# The first attempt to generate a replay bundle from the HI-Large scores failed
+# with "can't open file /app/scripts/make_replay_bundle.py". An image that can
+# run the pipeline but not the tooling that AUDITS the pipeline is half an
+# image. They are a few tens of kilobytes of Python.
+
+.venv/
+.git/
+.github/
+infra/
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Tests are deliberately NOT excluded: the image self-check is cheap, but being
+# able to run the suite inside the built container is how we confirm the cloud
+# environment behaves like the local one. That is Gate 4's whole purpose.
+
+.DS_Store
+*.log
+
+# results_archive/ IS shipped now, and that is a reversal.
+#
+# "Reproduced by the pipeline, not needed in the image" was true of the
+# pipeline and false of the AUDIT. The reproducibility tests recompute the
+# published budget metrics from the replay bundles and check every derived
+# artifact's provenance, and with the archive excluded they found nothing and
+# skipped -- 31 skips in the image against 17 on the host, and the difference
+# was the evidence. 13 MB.
+#
+# gold/ is the bulky part and carries the manifests the replay bundles are
+# verified against, so it stays; only the retired duplicates below are cut.
+results_archive/**/__pycache__/

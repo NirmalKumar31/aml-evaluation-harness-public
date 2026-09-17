@@ -1,0 +1,47 @@
+{
+  "component": "leak_sweep",
+  "run_key": null,
+  "status": "ok",
+  "error": null,
+  "config": {
+    "features": "data/silver/features_Small",
+    "splits": "data/gold/splits_Small",
+    "leak_root": "data/gold/leak_Small",
+    "kinds": [
+      "reversed_window",
+      "future_counterparty",
+      "target"
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "iters": 300,
+    "sample": 1.0,
+    "sweep_version": "1.0.0",
+    "design": "paired within seed; placebo = leak columns row-permuted"
+  },
+  "config_hash": "3db76f91645253cc9cfb8aa70fbf50591c09e2017b4d576501d7b67f4f55f603",
+  "code_git_sha": "3548fc3f83fe67acac1833ec95bf9d902818e57b",
+  "wall_clock_sec": 2182.04,
+  "metrics": {
+    "n_seeds": 8,
+    "n_fits": 56,
+    "train_rows": 2284182,
+    "test_rows": 2793197,
+    "channels_separating_from_placebo": 2,
+    "channels_tested": 3,
+    "positive_control_separates": true
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-22T22:06:16Z"
+}

@@ -1,0 +1,66 @@
+{
+  "component": "build_features",
+  "run_key": "87158125680dfbba",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "src": "data/gold/drifted_Medium/m0.0/txns_labeled",
+    "dest": "data/silver/drifted_features_Medium/m0.0",
+    "feature_spec_version": "1.0.0",
+    "windows": {
+      "1d": "1 DAY",
+      "7d": "7 DAY",
+      "30d": "30 DAY"
+    },
+    "n_features": 32
+  },
+  "config_hash": "99d13fd7f006e66faa24b62b36c9f44393c300bab22933a9f38b7c68660ab9e5",
+  "code_git_sha": "62a3b032f8161195adc8f56f64e30cc7c5f8a596",
+  "wall_clock_sec": 586.588,
+  "metrics": {
+    "rows": 31885923,
+    "positives": 22915,
+    "n_features": 32,
+    "features": [
+      "log_amount_paid",
+      "log_amount_received",
+      "fx_ratio",
+      "currency_mismatch",
+      "amount_roundness",
+      "hour",
+      "dayofweek",
+      "is_weekend",
+      "is_self_transfer",
+      "is_cross_bank",
+      "payment_format_code",
+      "payment_currency_code",
+      "s_n_1d",
+      "s_n_7d",
+      "s_n_30d",
+      "s_mean_amt_7d",
+      "s_std_amt_7d",
+      "s_max_amt_30d",
+      "s_n_out_7d",
+      "s_secs_since_prev",
+      "s_secs_since_prev_cp",
+      "s_amt_vs_hist",
+      "r_n_1d",
+      "r_n_7d",
+      "r_n_30d",
+      "r_mean_amt_7d",
+      "r_std_amt_7d",
+      "r_max_amt_30d",
+      "r_n_out_7d",
+      "r_secs_since_prev",
+      "r_secs_since_prev_cp",
+      "r_amt_vs_hist"
+    ],
+    "pct_sender_no_7d_history": 6.89,
+    "pct_sender_first_ever_txn": 5.52
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-19T19:31:50Z"
+}

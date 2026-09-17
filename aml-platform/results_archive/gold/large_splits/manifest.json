@@ -1,0 +1,45 @@
+{
+ "component": "build_splits",
+ "run_key": "1c1de34a05f081f4",
+ "status": "ok",
+ "error": null,
+ "config": {
+  "patterns": "/scratch/large/bronze/patterns",
+  "labeled": "/scratch/large/gold/reconcile",
+  "cut_time": "2022-10-07",
+  "dest": "/scratch/large/gold/splits",
+  "split_spec_version": "1.0.0",
+  "min_test_positives": 100
+ },
+ "config_hash": "aa3a0489e61beac0e1b032b9e3812f0fed9b325dc6d68de6f09813600de90fdb",
+ "code_git_sha": "unknown",
+ "wall_clock_sec": 68.3,
+ "metrics": {
+  "cut_time": "2022-10-07",
+  "train_rows": 124992128,
+  "train_positives": 127615,
+  "test_rows": 54647122,
+  "test_positives": 34952,
+  "train_rings": 11144,
+  "test_rings_before_drop": 5323,
+  "dropped_rings": 4655,
+  "test_rings_kept": 668,
+  "overlap_accounts": 7784,
+  "dropped_pct": 87.45,
+  "test_positive_account_days": 61698,
+  "test_total_account_days": 27809331,
+  "unlabeled_positive_acct_days_touching_train_rings": 4985,
+  "unlabeled_handling": "A: disjointness applies to ring-participating accounts only",
+  "assertions_passed": [
+   "accounts_disjoint",
+   "rings_disjoint",
+   "no_temporal_bleed",
+   "no_train_ring_tails_in_test"
+  ]
+ },
+ "env": {
+  "python": "3.12.3",
+  "platform": "Linux-6.8.0-1064-azure-x86_64-with-glibc2.36"
+ },
+ "written_at": "2026-09-10T04:58:04Z"
+}

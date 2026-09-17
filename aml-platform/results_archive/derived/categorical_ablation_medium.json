@@ -1,0 +1,86 @@
+{
+ "code_git_sha": "ad1c7769d601b9b230da5249c629b18e9e8f2803",
+ "generator_script": "aml-platform/scripts/categorical_ablation.py",
+ "generator_sha256": "cb8e4e81ad105265b35849f252a91ea36d46bbb414b69bfb9c44b5e67899e552",
+ "generator_matches_commit": null,
+ "code_tree_sha256": "0bb75f20e3948e7be78a23c117048b797537faf6b1834d39a4e5530f580a478f",
+ "code_tree_matches_commit": null,
+ "provenance_scope": [
+  "aml-platform/src",
+  "aml-platform/scripts"
+ ],
+ "scope_clean": null,
+ "generated_at": "2026-09-17T02:46:48Z",
+ "python_version": "3.12.3",
+ "platform": "Linux-6.8.0-1064-azure-x86_64-with-glibc2.36",
+ "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
+ "status": "ok",
+ "inputs": [
+  {
+   "path": "data/silver/features_Medium",
+   "kind": "directory",
+   "n_files": 29,
+   "bytes": 3634017205,
+   "listing_sha256": "7d335f631d8a277455ed57c486050b99ef847563a643449c4f08a4390d74f1f0",
+   "identity": "metadata (path and size), NOT content",
+   "identity_reason": "3634017205 bytes exceeds OUTPUT_HASH_MAX_BYTES=67108864"
+  },
+  {
+   "path": "data/gold/splits_Medium",
+   "kind": "directory",
+   "n_files": 32,
+   "bytes": 1467596004,
+   "listing_sha256": "ff026f2a5fb750600dc0cc23406869ccaadb083c6945b4653ba36416150e649a",
+   "identity": "metadata (path and size), NOT content",
+   "identity_reason": "1467596004 bytes exceeds OUTPUT_HASH_MAX_BYTES=67108864"
+  }
+ ],
+ "parameters": {
+  "features": "data/silver/features_Medium",
+  "splits": "data/gold/splits_Medium",
+  "seed": 0
+ },
+ "seed": 0,
+ "n_train": 19487126,
+ "n_test": 12402530,
+ "categorical_features": [
+  "payment_format_code",
+  "payment_currency_code"
+ ],
+ "arms": {
+  "full": {
+   "average_precision__txn": 0.0202288410514129,
+   "precision@50": 0.5706018518518519,
+   "recall@50": 0.02719249862107005,
+   "recall_efficiency@50": 0.5745920745920745,
+   "ring_recall@200": 0.44045368620037806
+  },
+  "no_categorical": {
+   "average_precision__txn": 0.010222475305053724,
+   "precision@50": 0.5763888888888888,
+   "recall@50": 0.027468284611141754,
+   "recall_efficiency@50": 0.5804195804195804,
+   "ring_recall@200": 0.4499054820415879
+  },
+  "onehot": {
+   "average_precision__txn": 0.021359968304394336,
+   "precision@50": 0.5763888888888888,
+   "recall@50": 0.027468284611141754,
+   "recall_efficiency@50": 0.5804195804195804,
+   "ring_recall@200": 0.45368620037807184
+  }
+ },
+ "onehot_vocabulary_sizes": {
+  "payment_format_code": 7,
+  "payment_currency_code": 15
+ },
+ "by_segment_note": "NOT COMPUTED: pass --thin-from <YYYY-MM-DD> (the rung's transaction-volume collapse, from window_decomposition.json). Without it the arms are only comparable on pooled levels, which this window does not support.",
+ "wall_clock_sec": 529.9,
+ "ap_ratio_full_over_no_categorical": 1.9788593709208855,
+ "ap_ratio_full_over_onehot": 0.9470445256817758,
+ "produced_on": {
+  "host": "Azure VM aml-vm (Standard_E4ds_v7, amd64)",
+  "environment": "the release container built from the recorded commit",
+  "scope_clean_note": "null because the container has no git checkout; the commit is injected via AML_GIT_SHA and the package tree hash is recorded independently, so the artifact is tied to a specific source tree either way"
+ }
+}

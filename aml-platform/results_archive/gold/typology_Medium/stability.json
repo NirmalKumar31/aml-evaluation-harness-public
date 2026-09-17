@@ -1,0 +1,341 @@
+{
+  "current": {
+    "config": {
+      "learning_rate": 0.1,
+      "max_iter": 300,
+      "max_depth": 8,
+      "min_samples_leaf": 40,
+      "class_weight": "balanced"
+    },
+    "per_seed": [
+      {
+        "average_precision": 0.282400339714525,
+        "recall_efficiency@50": 0.7995337995337995,
+        "precision@50": 0.7939814814814815,
+        "recall@50": 0.03783783783783784,
+        "ring_recall@200": 0.6937618147448015
+      },
+      {
+        "average_precision": 0.3006116570325478,
+        "recall_efficiency@50": 0.9044289044289043,
+        "precision@50": 0.8981481481481481,
+        "recall@50": 0.042801985659128516,
+        "ring_recall@200": 0.7088846880907372
+      },
+      {
+        "average_precision": 0.3038621341556846,
+        "recall_efficiency@50": 0.9009324009324009,
+        "precision@50": 0.8946759259259259,
+        "recall@50": 0.04263651406508549,
+        "ring_recall@200": 0.6918714555765595
+      },
+      {
+        "average_precision": 0.29650150840375705,
+        "recall_efficiency@50": 0.9020979020979021,
+        "precision@50": 0.8958333333333334,
+        "recall@50": 0.042691671263099834,
+        "ring_recall@200": 0.7069943289224953
+      },
+      {
+        "average_precision": 0.2546722855512772,
+        "recall_efficiency@50": 0.5955710955710956,
+        "precision@50": 0.5914351851851852,
+        "recall@50": 0.028185328185328186,
+        "ring_recall@200": 0.6030245746691871
+      },
+      {
+        "average_precision": 0.30146382791155607,
+        "recall_efficiency@50": 0.8356643356643355,
+        "precision@50": 0.8298611111111112,
+        "recall@50": 0.0395477109762824,
+        "ring_recall@200": 0.6899810964083176
+      },
+      {
+        "average_precision": 0.29190127096975477,
+        "recall_efficiency@50": 0.8496503496503496,
+        "precision@50": 0.84375,
+        "recall@50": 0.040209597352454496,
+        "ring_recall@200": 0.6786389413988658
+      },
+      {
+        "average_precision": 0.2935416995657309,
+        "recall_efficiency@50": 0.8566433566433567,
+        "precision@50": 0.8506944444444444,
+        "recall@50": 0.04054054054054054,
+        "ring_recall@200": 0.6786389413988658
+      }
+    ],
+    "stability": {
+      "average_precision": {
+        "mean": 0.29062,
+        "min": 0.25467,
+        "max": 0.30386,
+        "range": 0.04919,
+        "spread_pct": 16.93
+      },
+      "recall_efficiency@50": {
+        "mean": 0.83057,
+        "min": 0.59557,
+        "max": 0.90443,
+        "range": 0.30886,
+        "spread_pct": 37.19
+      },
+      "precision@50": {
+        "mean": 0.8248,
+        "min": 0.59144,
+        "max": 0.89815,
+        "range": 0.30671,
+        "spread_pct": 37.19
+      },
+      "recall@50": {
+        "mean": 0.03931,
+        "min": 0.02819,
+        "max": 0.0428,
+        "range": 0.01462,
+        "spread_pct": 37.19
+      },
+      "ring_recall@200": {
+        "mean": 0.68147,
+        "min": 0.60302,
+        "max": 0.70888,
+        "range": 0.10586,
+        "spread_pct": 15.53
+      }
+    },
+    "ensemble": {
+      "average_precision": 0.31493,
+      "recall_efficiency@50": 0.91259,
+      "precision@50": 0.90625,
+      "recall@50": 0.04319,
+      "ring_recall@200": 0.70699
+    },
+    "ensemble_size_curve": [
+      {
+        "n_seeds": 1,
+        "n_orderings": 12,
+        "average_precision": 0.29422,
+        "average_precision__min": 0.25467,
+        "average_precision__max": 0.30386,
+        "recall_efficiency@50": 0.84868,
+        "recall_efficiency@50__min": 0.59557,
+        "recall_efficiency@50__max": 0.90443,
+        "precision@50": 0.84279,
+        "precision@50__min": 0.59144,
+        "precision@50__max": 0.89815,
+        "recall@50": 0.04016,
+        "recall@50__min": 0.02819,
+        "recall@50__max": 0.0428,
+        "ring_recall@200": 0.68604,
+        "ring_recall@200__min": 0.60302,
+        "ring_recall@200__max": 0.70888
+      },
+      {
+        "n_seeds": 2,
+        "n_orderings": 12,
+        "average_precision": 0.30968,
+        "average_precision__min": 0.30446,
+        "average_precision__max": 0.31579,
+        "recall_efficiency@50": 0.90734,
+        "recall_efficiency@50__min": 0.87646,
+        "recall_efficiency@50__max": 0.91375,
+        "precision@50": 0.90104,
+        "precision@50__min": 0.87037,
+        "precision@50__max": 0.90741,
+        "recall@50": 0.04294,
+        "recall@50__min": 0.04148,
+        "recall@50__max": 0.04324,
+        "ring_recall@200": 0.70101,
+        "ring_recall@200__min": 0.68431,
+        "ring_recall@200__max": 0.71834
+      },
+      {
+        "n_seeds": 3,
+        "n_orderings": 12,
+        "average_precision": 0.31157,
+        "average_precision__min": 0.30873,
+        "average_precision__max": 0.31493,
+        "recall_efficiency@50": 0.91414,
+        "recall_efficiency@50__min": 0.90443,
+        "recall_efficiency@50__max": 0.92075,
+        "precision@50": 0.90779,
+        "precision@50__min": 0.89815,
+        "precision@50__max": 0.91435,
+        "recall@50": 0.04326,
+        "recall@50__min": 0.0428,
+        "recall@50__max": 0.04357,
+        "ring_recall@200": 0.70479,
+        "ring_recall@200__min": 0.69565,
+        "ring_recall@200__max": 0.71267
+      },
+      {
+        "n_seeds": 4,
+        "n_orderings": 12,
+        "average_precision": 0.31334,
+        "average_precision__min": 0.3106,
+        "average_precision__max": 0.31558,
+        "recall_efficiency@50": 0.91307,
+        "recall_efficiency@50__min": 0.90326,
+        "recall_efficiency@50__max": 0.92657,
+        "precision@50": 0.90673,
+        "precision@50__min": 0.89699,
+        "precision@50__max": 0.92014,
+        "recall@50": 0.04321,
+        "recall@50__min": 0.04275,
+        "recall@50__max": 0.04385,
+        "ring_recall@200": 0.70227,
+        "ring_recall@200__min": 0.69187,
+        "ring_recall@200__max": 0.71078
+      },
+      {
+        "n_seeds": 5,
+        "n_orderings": 12,
+        "average_precision": 0.31366,
+        "average_precision__min": 0.31126,
+        "average_precision__max": 0.3173,
+        "recall_efficiency@50": 0.91181,
+        "recall_efficiency@50__min": 0.90326,
+        "recall_efficiency@50__max": 0.92075,
+        "precision@50": 0.90548,
+        "precision@50__min": 0.89699,
+        "precision@50__max": 0.91435,
+        "recall@50": 0.04315,
+        "recall@50__min": 0.04275,
+        "recall@50__max": 0.04357,
+        "ring_recall@200": 0.70526,
+        "ring_recall@200__min": 0.69376,
+        "ring_recall@200__max": 0.71645
+      },
+      {
+        "n_seeds": 6,
+        "n_orderings": 12,
+        "average_precision": 0.31439,
+        "average_precision__min": 0.31293,
+        "average_precision__max": 0.31741,
+        "recall_efficiency@50": 0.91453,
+        "recall_efficiency@50__min": 0.90793,
+        "recall_efficiency@50__max": 0.92075,
+        "precision@50": 0.90818,
+        "precision@50__min": 0.90162,
+        "precision@50__max": 0.91435,
+        "recall@50": 0.04328,
+        "recall@50__min": 0.04297,
+        "recall@50__max": 0.04357,
+        "ring_recall@200": 0.70526,
+        "ring_recall@200__min": 0.70132,
+        "ring_recall@200__max": 0.71078
+      },
+      {
+        "n_seeds": 7,
+        "n_orderings": 12,
+        "average_precision": 0.31465,
+        "average_precision__min": 0.31343,
+        "average_precision__max": 0.3163,
+        "recall_efficiency@50": 0.91434,
+        "recall_efficiency@50__min": 0.91142,
+        "recall_efficiency@50__max": 0.91958,
+        "precision@50": 0.90799,
+        "precision@50__min": 0.90509,
+        "precision@50__max": 0.91319,
+        "recall@50": 0.04327,
+        "recall@50__min": 0.04313,
+        "recall@50__max": 0.04352,
+        "ring_recall@200": 0.70731,
+        "ring_recall@200__min": 0.70321,
+        "ring_recall@200__max": 0.71267
+      },
+      {
+        "n_seeds": 8,
+        "n_orderings": 12,
+        "average_precision": 0.31493,
+        "average_precision__min": 0.31493,
+        "average_precision__max": 0.31493,
+        "recall_efficiency@50": 0.91259,
+        "recall_efficiency@50__min": 0.91259,
+        "recall_efficiency@50__max": 0.91259,
+        "precision@50": 0.90625,
+        "precision@50__min": 0.90625,
+        "precision@50__max": 0.90625,
+        "recall@50": 0.04319,
+        "recall@50__min": 0.04319,
+        "recall@50__max": 0.04319,
+        "ring_recall@200": 0.70699,
+        "ring_recall@200__min": 0.70699,
+        "ring_recall@200__max": 0.70699
+      }
+    ],
+    "per_typology": {
+      "BIPARTITE": {
+        "n_rings": 61,
+        "per_seed_mean": 0.2623,
+        "per_seed_min": 0.0984,
+        "per_seed_max": 0.3279,
+        "n_seeds": 8,
+        "ensemble": 0.3115
+      },
+      "CYCLE": {
+        "n_rings": 78,
+        "per_seed_mean": 0.3381,
+        "per_seed_min": 0.2051,
+        "per_seed_max": 0.4231,
+        "n_seeds": 8,
+        "ensemble": 0.3462
+      },
+      "FAN-IN": {
+        "n_rings": 74,
+        "per_seed_mean": 0.1791,
+        "per_seed_min": 0.1081,
+        "per_seed_max": 0.2432,
+        "n_seeds": 8,
+        "ensemble": 0.2297
+      },
+      "FAN-OUT": {
+        "n_rings": 65,
+        "per_seed_mean": 0.2596,
+        "per_seed_min": 0.1846,
+        "per_seed_max": 0.3231,
+        "n_seeds": 8,
+        "ensemble": 0.3077
+      },
+      "GATHER-SCATTER": {
+        "n_rings": 60,
+        "per_seed_mean": 0.7208,
+        "per_seed_min": 0.6833,
+        "per_seed_max": 0.7833,
+        "n_seeds": 8,
+        "ensemble": 0.7
+      },
+      "RANDOM": {
+        "n_rings": 76,
+        "per_seed_mean": 0.2418,
+        "per_seed_min": 0.1053,
+        "per_seed_max": 0.3026,
+        "n_seeds": 8,
+        "ensemble": 0.25
+      },
+      "SCATTER-GATHER": {
+        "n_rings": 60,
+        "per_seed_mean": 0.3667,
+        "per_seed_min": 0.2333,
+        "per_seed_max": 0.45,
+        "n_seeds": 8,
+        "ensemble": 0.3667
+      },
+      "STACK": {
+        "n_rings": 55,
+        "per_seed_mean": 0.4545,
+        "per_seed_min": 0.2727,
+        "per_seed_max": 0.5455,
+        "n_seeds": 8,
+        "ensemble": 0.5636
+      },
+      "_spread": {
+        "hardest": "FAN-IN",
+        "hardest_recall": 0.2297,
+        "easiest": "GATHER-SCATTER",
+        "easiest_recall": 0.7,
+        "ratio": 3.05
+      }
+    },
+    "typology_coverage_pct": 49.54
+  }
+}

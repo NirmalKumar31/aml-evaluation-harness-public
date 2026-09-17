@@ -1,0 +1,41 @@
+{
+  "component": "parse_patterns",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "src": "data/HI-Large_Patterns.txt",
+    "dest": "data/bronze/patterns_Large",
+    "parser_version": "1.0.0"
+  },
+  "config_hash": "a79412afad71988b614d9ff0228edefec472b0f0ca67befab65bf22bce7fd59d",
+  "code_git_sha": "79cd669f6e6228747db5b7dff91335aae4ac5467",
+  "wall_clock_sec": 0.4,
+  "metrics": {
+    "input_sha256": "bcf815a1931cfdcefd5d6d9feaa8f95dbc33cfd6ef8cd52d9a41e8d994c22820",
+    "rings": 16467,
+    "ring_txns": 137936,
+    "distinct_ring_accounts": 115129,
+    "typologies": 8,
+    "start_time": "2022-08-01 00:08:00",
+    "end_time": "2023-01-12 16:49:00",
+    "median_txns_per_ring": 6.0,
+    "median_accounts_per_ring": 7.0,
+    "max_duration_days": 70.4528,
+    "rings_ge_3_txns": 11329,
+    "typology_counts": {
+      "BIPARTITE": 2109,
+      "STACK": 2096,
+      "CYCLE": 2086,
+      "SCATTER-GATHER": 2067,
+      "GATHER-SCATTER": 2054,
+      "FAN-OUT": 2040,
+      "FAN-IN": 2014,
+      "RANDOM": 2001
+    }
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-11T19:28:24Z"
+}

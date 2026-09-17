@@ -1,0 +1,26 @@
+{
+ "_comment": "An AGGREGATE inventory of the replay bundles. It ships in every build, including the public snapshot that withholds the bundles themselves while their CDLA redistribution status is unreviewed. It carries counts and per-file hashes, and no row-level data. `release_facts.py` reads it when the Parquet files are absent, so a licence notice cannot be silently rewritten to describe nothing.",
+ "bundles": 9,
+ "bundle_names": [
+  "large_lgbm_s0",
+  "large_lgbm_s1",
+  "large_lgbm_s2",
+  "large_sorted_lgbm_s0",
+  "large_sorted_lgbm_s1",
+  "large_sorted_lgbm_s2",
+  "medium_baseline_s0",
+  "medium_gbdt_s0",
+  "small_gbdt_s0"
+ ],
+ "files": 45,
+ "rows": 526355,
+ "by_kind": {
+  "account_days_topk.parquet": 335269,
+  "per_day_positives.parquet": 586,
+  "ring_endpoints.parquet": 79264,
+  "ring_membership.parquet": 71604,
+  "ring_transactions.parquet": 39632
+ },
+ "row_level_data_included": false,
+ "how_to_obtain": "regenerate with `scripts/make_replay_bundle.py` after obtaining AMLworld from its official source; see DATA_LICENSE.md"
+}

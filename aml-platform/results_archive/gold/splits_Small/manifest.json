@@ -1,0 +1,45 @@
+{
+  "component": "build_splits",
+  "run_key": "47d3961a57735ebb",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "patterns": "data/bronze/patterns_Small",
+    "labeled": "data/gold/reconcile_Small",
+    "cut_time": "2022-09-05",
+    "dest": "data/gold/splits_Small",
+    "split_spec_version": "1.0.0",
+    "min_test_positives": 100
+  },
+  "config_hash": "cc3fb1b0cf574139c58bc10ce7dd41b73dc178e3fcedca6065eb22283bd06b7d",
+  "code_git_sha": "3548fc3f83fe67acac1833ec95bf9d902818e57b",
+  "wall_clock_sec": 1.031,
+  "metrics": {
+    "cut_time": "2022-09-05",
+    "train_rows": 2284182,
+    "train_positives": 1528,
+    "test_rows": 2793197,
+    "test_positives": 2683,
+    "train_rings": 141,
+    "test_rings_before_drop": 229,
+    "dropped_rings": 85,
+    "test_rings_kept": 144,
+    "overlap_accounts": 64,
+    "dropped_pct": 37.12,
+    "test_positive_account_days": 4308,
+    "test_total_account_days": 1395196,
+    "unlabeled_positive_acct_days_touching_train_rings": 11,
+    "unlabeled_handling": "A: disjointness applies to ring-participating accounts only",
+    "assertions_passed": [
+      "accounts_disjoint",
+      "rings_disjoint",
+      "no_temporal_bleed",
+      "no_train_ring_tails_in_test"
+    ]
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-22T14:45:35Z"
+}

@@ -1,0 +1,31 @@
+{
+  "component": "reconcile_labels",
+  "run_key": "c6bebf1292f3b8c9",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "txns": "data/bronze/txns_Small",
+    "patterns": "data/bronze/patterns_Small",
+    "dest": "data/gold/reconcile_Small",
+    "join_keys": "event_time, sender_id, receiver_id, round(amount_paid, 2), payment_format"
+  },
+  "config_hash": "63bc9177a296493de4596ed5c29c4807064c0b05210f7e6140a46bf233da7ecb",
+  "code_git_sha": "3548fc3f83fe67acac1833ec95bf9d902818e57b",
+  "wall_clock_sec": 0.726,
+  "metrics": {
+    "rows": 5078345,
+    "flagged_txns": 5177,
+    "ring_txns_in_patterns_file": 3209,
+    "flagged_with_ring": 3209,
+    "flagged_without_ring": 1968,
+    "typology_coverage_pct": 61.99,
+    "unflagged_but_in_a_ring": 0,
+    "ring_txns_not_found_in_trans": 0,
+    "ambiguous_content_keys": 0
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-22T14:44:55Z"
+}

@@ -1,0 +1,136 @@
+# The static gates: everything checkable without running the pipeline.
+#
+# These exist because the audit found real defects in exactly these files
+# while `ci` was green -- a provisioning script that could format a non-empty
+# disk, a NAT gateway declared but never attached, workflows on mutable tags.
+# None of that is reachable by pytest, and all of it is reachable by a linter.
+name: gates
+
+on:
+  push:
+    branches: [main, master, 'stage-*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0          # gitleaks scans history, not the worktree
+
+      # A shell script that provisions a VM and formats a disk is production
+      # code. It was reviewed by reading it, which is how `mkfs.ext4 -F` on a
+      # device chosen by SIZE survived to a release candidate.
+      - name: ShellCheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          find . -name '*.sh' -not -path './.git/*' -print0 \
+            | xargs -0 -r shellcheck -S warning
+
+      # Workflow files are the one kind of code that cannot be run locally, so
+      # a typo in one is found by pushing it. actionlint finds it here instead.
+      - name: actionlint
+        run: |
+          bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.4/scripts/download-actionlint.bash) 1.7.4
+          ./actionlint -color
+
+      - name: Actions must be pinned to a commit SHA
+        run: |
+          # A mutable tag means the workflow that passed is not necessarily the
+          # workflow that runs next time. `@v4` is a moving target by design.
+          if grep -rnE '^\s*(-\s*)?uses:\s*[^@]+@(v[0-9]|main|master)\s*$' .github/workflows/; then
+            echo "::error::actions above are on mutable refs; pin to a 40-char commit SHA"
+            exit 1
+          fi
+          echo "all actions pinned"
+
+      - name: Bicep build
+        run: |
+          az bicep install
+          az bicep build --file aml-platform/infra/main.bicep --stdout > /dev/null
+          echo "bicep compiles"
+
+      # `.gitignore` is not a privacy control: an ignored file that was ever
+      # committed stays reachable after the repository goes public.
+      # THE BINARY, PINNED AND CHECKSUMMED -- not the JavaScript action.
+      #
+      # gitleaks-action v2.3.7 pulls an old gitleaks (8.16.1), talks to the
+      # Actions cache and the GitHub API to do it, and started failing on a
+      # cache 400 followed by an octokit error on the Node 24 runner. A
+      # secret-scanning gate that needs three network services and a
+      # deprecated JS runtime to start is a gate that will keep going red for
+      # reasons unrelated to secrets.
+      #
+      # Downloading one release tarball and verifying its SHA-256 needs none of
+      # that, pins the scanner version for real, and is the same supply-chain
+      # rule this repository applies to its own dependencies.
+      - name: Secret scan (full history)
+        run: |
+          V=8.21.2
+          SHA=5bc41815076e6ed6ef8fbecc9d9b75bcae31f39029ceb55da08086315316e3ba
+          curl -fsSL -o /tmp/gitleaks.tgz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${V}/gitleaks_${V}_linux_x64.tar.gz"
+          echo "${SHA}  /tmp/gitleaks.tgz" | sha256sum -c -
+          tar -xzf /tmp/gitleaks.tgz -C /tmp gitleaks
+          /tmp/gitleaks git --no-banner --redact --exit-code 1 .
+
+      # SAST, against a triaged baseline. New findings fail; the 51 known ones
+      # are documented in aml-platform/docs/SAST_TRIAGE.md with an assessment
+      # each. A baseline regenerated without a triage entry is a gate switched
+      # off, so the two are meant to move together.
+      # PINNED, and gating on HIGH only.
+      #
+      # The first version installed bandit unpinned and compared against a
+      # frozen baseline. CI resolved a different version, scored the same code
+      # differently (42 medium + 4 high against 47 medium + 0 high locally),
+      # and the baseline stopped matching. A gate whose verdict depends on
+      # which build day it runs is not a gate -- and installing an unpinned
+      # tool is the very supply-chain habit the audit flagged elsewhere.
+      #
+      # So: pin the version, and fail on HIGH. The 47 medium findings are all
+      # f-string DuckDB SQL over operator-supplied paths, triaged one class at
+      # a time in aml-platform/docs/SAST_TRIAGE.md, and counted here for
+      # visibility rather than silently tolerated.
+      #
+      # scripts/ IS IN SCOPE NOW. It was not, and it is the code that provisions
+      # cloud resources, formats disks, downloads datasets and generates every
+      # published artifact -- a narrower blast radius than src/ in no sense at
+      # all. "No high-severity findings" over half the tree is a weaker
+      # statement than it reads as.
+      - name: Bandit
+        run: |
+          pip install -q 'bandit==1.9.4'
+          # HIGH severity fails outright.
+          bandit -r aml-platform/src/ aml-platform/scripts/ -lll -q
+          # AND the medium-and-above set is compared against a recorded,
+          # triaged baseline. This step used to print the medium findings with
+          # --exit-zero while SAST_TRIAGE.md and this workflow both claimed
+          # that new findings fail -- so a new medium SQL-construction finding,
+          # the exact class the triage document is about, would have passed.
+          # The policy was aspirational; now it is enforced.
+          python3 aml-platform/scripts/check_sast.py
+
+      - name: Local Markdown links and table structure
+        run: python3 aml-platform/scripts/check_links.py .
+
+      # Markdown STYLE, configured on purpose. A default run over this
+      # repository returns ~3,148 findings, 2,234 of them long lines -- and
+      # wrapping the results tables to satisfy a line-length rule would make
+      # them worse. So .markdownlint-cli2.jsonc turns off what does not apply
+      # here, scopes the run to CURRENT documents (archived audits and
+      # retracted results are a record and are not edited to please a linter),
+      # and enforces what does: heading structure, fenced-code languages, list
+      # consistency and trailing whitespace. The version is pinned, for the
+      # same reason bandit is.
+      - name: Markdown style
+        run: npx --yes markdownlint-cli2@0.14.0

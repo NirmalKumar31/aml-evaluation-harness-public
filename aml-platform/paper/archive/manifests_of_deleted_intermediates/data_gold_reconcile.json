@@ -1,0 +1,30 @@
+{
+  "component": "reconcile_labels",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "txns": "data/bronze/txns",
+    "patterns": "data/bronze/patterns",
+    "dest": "data/gold/reconcile",
+    "join_keys": "event_time, sender_id, receiver_id, round(amount_paid, 2), payment_format"
+  },
+  "config_hash": "eef8ade1c2e4a099661731f5b1c5b698437385f275ad2fa8193227f2aac691b5",
+  "code_git_sha": "e222cdc3c2421ce2f01878e53fbce85eb52b8c07",
+  "wall_clock_sec": 1.116,
+  "metrics": {
+    "rows": 5078345,
+    "flagged_txns": 5177,
+    "ring_txns_in_patterns_file": 3209,
+    "flagged_with_ring": 3209,
+    "flagged_without_ring": 1968,
+    "typology_coverage_pct": 61.99,
+    "unflagged_but_in_a_ring": 0,
+    "ring_txns_not_found_in_trans": 0,
+    "ambiguous_content_keys": 0
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-11T19:19:29Z"
+}

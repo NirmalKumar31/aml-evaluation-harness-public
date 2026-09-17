@@ -1,0 +1,336 @@
+# Builds the amd64 container image.
+#
+# WHY THIS IS NOT OPTIONAL POLISH
+#     The development laptop is arm64 and has no Docker installed. Azure
+#     compute is amd64. An image built locally would either not build at all,
+#     or build and then die at container start with "exec format error" --
+#     after the compute has been provisioned and billed. `ubuntu-latest` is
+#     amd64, so this runner is currently the only way this project can produce
+#     a runnable image at all.
+#
+#     It also runs the test suite INSIDE the built image. "The image starts" is
+#     a much weaker statement than "the image behaves like the machine the
+#     results came from", and the second one is what the cloud run depends on.
+name: image
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+    # NO `paths` FILTER, deliberately.
+    #
+    # It was limited to `aml-platform/**` and this file, so a root-only change
+    # produced no image run at all -- and a required status check that
+    # sometimes does not exist blocks a pull request forever rather than
+    # passing it. The build is six minutes and the concurrency group cancels
+    # superseded runs; always having the status is worth more than skipping
+    # the occasional unnecessary rebuild.
+  # PULL REQUESTS TOO, and this is the point of the trigger.
+  #
+  # Without it this workflow cannot be a required pre-merge check -- there is
+  # no run to require -- while the release checklist said the image check
+  # should be required. A PR build gets no registry credentials and does not
+  # push; it builds, asserts provenance, and runs the suite inside the image,
+  # which is the part worth gating on.
+  # NO PATH FILTER HERE EITHER, and the header above already said so while
+  # this block still had one.
+  #
+  # A root-only change -- README, LICENSE, SECURITY.md, CITATION.cff -- matched
+  # neither pattern, so no `image` run was created. Once `image` is a REQUIRED
+  # check, a pull request with no run waits forever for a status that cannot
+  # appear: the check is not failing, it does not exist. A six-minute build on
+  # the occasional documentation PR is the cheaper half of that trade, and the
+  # concurrency group cancels superseded runs.
+  pull_request:
+  workflow_dispatch:
+
+
+# Least privilege at the TOP level, so a job that forgets to declare its own
+# does not silently inherit write scope. The image job widens this to
+# `packages: write` for exactly the step that needs it.
+permissions:
+  contents: read
+
+# A superseded run is wasted money and a misleading green tick. Cancel it.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      # `packages: write` for the whole job, and that IS broader than the two
+      # steps that need it.
+      #
+      # The previous comment said the `if:` on the login and push steps
+      # narrowed the scope. It does not: an `if:` decides what RUNS, not what
+      # the job's token may do, so every step in a pull-request build holds a
+      # package-write token it has no use for. An audit was right to flag it.
+      #
+      # It is not expressible as a conditional -- GitHub rejects an expression
+      # in `permissions` -- and the obvious fix, a separate publish job, would
+      # put the push on a different runner from the Docker daemon that holds
+      # the TESTED image. Rebuilding there is precisely the defect this
+      # workflow was changed to remove: test one artifact, publish another.
+      #
+      # So this is an accepted trade, written down rather than explained away:
+      # narrower scope would cost the tested-equals-published guarantee.
+      # GitHub already withholds write scope from FORK pull requests, which is
+      # the case that matters for untrusted code.
+      packages: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      # GHCR rejects any tag containing an uppercase letter, and GitHub
+      # usernames routinely contain them. github.repository is passed through
+      # verbatim by every example in the docs, so this fails on first run for
+      # anyone whose username is not already lowercase.
+      - name: Compute a lowercase image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/aml-platform" >> "$GITHUB_ENV"
+
+      - uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
+
+      # Not on pull requests: a fork PR must never receive a token that can
+      # write packages, and the PR path does not push.
+      - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build (amd64) and load for testing
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6.9.0
+        with:
+          context: aml-platform
+          platforms: linux/amd64
+          load: true
+          # WITHOUT THIS THE IMAGE DOES NOT KNOW WHAT IT IS.
+          # .dockerignore excludes .git (correctly -- it is not needed at
+          # runtime), so manifest.py finds no repository and records
+          # code_git_sha "unknown". Seven archived manifests are in exactly
+          # that state. The Dockerfile grew an ARG to fix it; this is the half
+          # that passes the value in, and until now CI did not.
+          build-args: |
+            AML_GIT_SHA=${{ github.sha }}
+          tags: ${{ env.IMAGE }}:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # pytest is deliberately stripped from requirements.lock -- a production
+      # image should not ship a test runner. So it is installed here, for this
+      # one check, rather than baked in.
+      - name: Provenance must be baked in, not discovered
+        run: |
+          docker run --rm --entrypoint python ${{ env.IMAGE }}:ci -c \
+            "import os, sys; s = os.environ.get('AML_GIT_SHA', 'unknown'); \
+             print('AML_GIT_SHA =', s); sys.exit(s == 'unknown')"
+
+      # pytest from a LOCK, not from whatever is current. "The suite passes
+      # inside the image" was previously a statement about whichever pytest
+      # existed that morning. A production image should not ship a test runner,
+      # so it is installed for this check and not baked in -- but installed
+      # from a hashed lock, like everything else.
+      - name: Run the full suite inside the image
+        run: |
+          # `-p no:cacheprovider`, because /app is read-only for the runtime
+          # user on purpose and pytest otherwise emits two PytestCacheWarnings
+          # trying to write .pytest_cache there. The read-only source is the
+          # feature; the warning is noise in a release gate.
+          #
+          # NO `| tee`. GitHub's default shell is `bash -e`, WITHOUT pipefail,
+          # so a pipeline's status is the last command's -- `docker run ... |
+          # tee` reports tee's success and a red suite inside the image would
+          # have gone green. Redirect, then check the status explicitly.
+          set +e
+          # The tested image's own identity, so the suite running inside it
+          # records the artifact it ran in rather than the OS tag that
+          # artifact reports. `manifest.env_id()` folds this into the cache
+          # key; nothing was supplying it.
+          TESTED=$(docker image inspect --format '{{.Id}}' "${{ env.IMAGE }}:ci")
+          docker run --rm -v "$PWD/aml-platform:/lock:ro" \
+            -e AML_IMAGE_DIGEST="$TESTED" \
+            --entrypoint sh ${{ env.IMAGE }}:ci -c \
+            "pip install -q --require-hashes -r /lock/requirements-dev.linux-amd64.lock \
+             && python -m pytest -q -rs -p no:cacheprovider" > image-pytest.txt 2>&1
+          status=$?
+          cat image-pytest.txt
+          exit $status
+
+      # PARITY, ASSERTED BY REASON rather than by count.
+      #
+      # The image used to skip 14 more tests than the host and report a green
+      # tick for it: results_archive/ was excluded, so every replay
+      # recomputation, provenance check and pin-contract test found nothing and
+      # skipped. "The suite runs in the image" was true and "the image
+      # validates the released archive" was not -- and only the second is
+      # evidence that the artifact behaves like the machine the results came
+      # from.
+      #
+      # A count would be the wrong assertion: it drifts every time a test is
+      # added. What must hold is that the only things skipped in here are the
+      # ones that CANNOT run in here. The archive and docs/ now ship in the
+      # image, so the permitted reasons are the repository-ROOT documents and
+      # the Dockerfile -- outside this build context by construction -- plus
+      # the data-dependent contract tests, which skip on the host too.
+      # Anything else means something stopped running inside the artifact.
+      # See aml-platform/docs/RELEASE_CHECKLIST.md section 3a.
+      - name: Only the unrunnable may skip inside the image
+        run: |
+          python3 - <<'PY'
+          import sys
+          # EVERY skip reason the suite can emit, not just the ones someone
+          # remembered. Twice in one session a new test shipped a reason that
+          # was not here, and because this step fails on an unlisted skip, the
+          # required `image` job went red and blocked every merge.
+          #
+          # The list is now a REGISTRY: `test_every_skip_reason_is_registered`
+          # keeps it in sync with the suite, so adding a reason is a deliberate
+          # act rather than a discovery in CI. This step still enforces the
+          # real rule -- that only a reason on this list may fire inside the
+          # image -- so nothing is weakened by listing them all.
+          # EVERY skip reason the suite can emit, from the WHOLE tests/
+          # tree -- not one file. Regenerating this from
+          # test_audit_regressions.py alone dropped every tests/contract/
+          # reason and turned this job red on the next push; the sync test
+          # read the same single file, so it passed while the list was wrong.
+          # A checker narrower than the thing it checks is this project's
+          # signature defect, and it got me again here.
+          #
+          # test_every_skip_reason_is_registered keeps this in sync. The job
+          # still enforces the real rule: only a listed reason may FIRE.
+          allowed = [
+              "Dockerfile not present (running inside the image)",
+              "HI-Small bronze not built; run `make ingest`",
+              "Makefile not present (running inside the image)",
+              "budget null not generated in this checkout",
+              "cli does not expose its parser",
+              "coupling artifact not generated in this checkout",
+              "current documents not present (running inside the image)",
+              "demo did not build: {r.stderr[-400:]}",
+              "docs/ not present (running inside the image)",
+              "git unavailable: {r.stderr.decode()[:120]}",
+              "no derived artifacts in this checkout",
+              "no exposure measured in this checkout",
+              "no gold archive in this checkout",
+              "no replay bundles in this checkout",
+              "package source not present",
+              "patterns absent; exposure correctly not computed",
+              "release facts not generated in this checkout",
+              "replay bundle not archived in this checkout",
+              "repository documents not present (running inside the image)",
+              "repository root not present (running inside the image)",
+              "run `make patterns reconcile VARIANT=Small` first",
+              "sbom not generated in this checkout",
+              "scripts/ not present",
+              "split-inflation gold outputs not built in this checkout",
+              "typology artifacts not generated in this checkout",
+              "typology null not generated in this checkout",
+              "window decomposition not generated in this checkout",
+          ]
+          skipped = [ln.rstrip() for ln in open("image-pytest.txt")
+                     if ln.startswith("SKIPPED")]
+          bad = [ln for ln in skipped if not any(a in ln for a in allowed)]
+          print(f"{len(skipped)} skip(s) inside the image")
+          if bad:
+              print("skipped for a reason that is not part of the defined "
+                    "parity gap:")
+              for b in bad:
+                  print("  " + b)
+              sys.exit(1)
+          print("every skip inside the image is one that cannot run there")
+          PY
+
+      - name: Verify the DuckDB azure extension is baked in, not fetched at runtime
+        run: |
+          docker run --rm --entrypoint python ${{ env.IMAGE }}:ci -c \
+            "import duckdb; c=duckdb.connect(); c.execute('LOAD azure'); \
+             print('azure extension OK')"
+
+      # PUSH THE IMAGE THAT WAS TESTED, not a second build of the same
+      # source.
+      #
+      # This step used to invoke `docker/build-push-action` a SECOND time with
+      # `push: true`. Everything above -- provenance, the full suite inside the
+      # container, the skip-reason parity check, the DuckDB extension check --
+      # ran against the `:ci` image loaded by the first build. The second build
+      # produced a different artifact and published that one. Layer cache
+      # makes them usually identical and never provably identical, and this
+      # Dockerfile consumes mutable external state on purpose: APT
+      # repositories and a DuckDB extension fetched at build time. "We tested
+      # an image and published an image" is not the claim a release needs.
+      #
+      # So: tag the already-loaded, already-tested image and push THAT. No
+      # rebuild exists to differ.
+      - name: Push the tested image
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          TESTED=$(docker image inspect --format '{{.Id}}' "${{ env.IMAGE }}:ci")
+          echo "tested image id: $TESTED"
+
+          # THREE KINDS OF TAG, because they answer different questions.
+          #   latest    what should I pull to try it
+          #   <sha>     which commit is this, exactly
+          #   <vX.Y.Z>  which release is this, for a citation
+          # `latest` alone cannot answer either of the other two, and a paper
+          # citing an image needs the third.
+          TAGS="latest ${{ github.sha }}"
+          case "${{ github.ref }}" in
+            refs/tags/v*) TAGS="$TAGS ${{ github.ref_name }}" ;;
+          esac
+
+          for t in $TAGS; do
+            docker tag "${{ env.IMAGE }}:ci" "${{ env.IMAGE }}:$t"
+            # Every tag must still be the image we tested. `docker tag` cannot
+            # make it otherwise, and asserting it costs nothing.
+            got=$(docker image inspect --format '{{.Id}}' "${{ env.IMAGE }}:$t")
+            [ "$got" = "$TESTED" ] || { echo "::error::$t is not the tested image"; exit 1; }
+            docker push "${{ env.IMAGE }}:$t"
+          done
+
+          DIGEST=$(docker image inspect --format '{{index .RepoDigests 0}}' \
+                     "${{ env.IMAGE }}:${{ github.sha }}")
+          echo "PUBLISHED DIGEST: $DIGEST"
+          echo "digest=$DIGEST" >> "$GITHUB_STEP_SUMMARY"
+
+          # Pull the published digest back and confirm it is the same image.
+          # This is the acceptance test: the digest under the commit tag must
+          # be the artifact the suite ran in.
+          docker rmi "${{ env.IMAGE }}:latest" > /dev/null 2>&1 || true
+          docker pull -q "$DIGEST"
+          back=$(docker image inspect --format '{{.Id}}' "$DIGEST")
+          if [ "$back" != "$TESTED" ]; then
+            echo "::error::the published digest is not the tested image"
+            exit 1
+          fi
+          echo "the published digest IS the tested image"
+
+      # GHCR packages are PRIVATE by default even on a public repository, and
+      # an anonymous pull then fails with `unauthorized`. If this image is ever
+      # pulled by Azure Container Instances without a pull secret, make the
+      # package public in the repo's Packages settings, or use ACR instead.
+      # GHCR packages are PRIVATE by default even when the repository is
+      # public, so an anonymous `docker pull` fails with `unauthorized` and the
+      # published pull command in the README does not work for anybody. That is
+      # a decision, not an accident, and it has to be made explicitly: either
+      # flip the package to public in repo Settings -> Packages, or state in
+      # the README that the image requires authentication.
+      #
+      # This step TESTS the answer rather than asserting it. It does not fail
+      # the build -- a private package is a legitimate choice -- but it puts
+      # the true state in the log instead of leaving it to be discovered by a
+      # reader whose pull fails.
+      - name: Report whether the published image is anonymously pullable
+        if: github.event_name != 'pull_request'
+        run: |
+          docker logout ghcr.io
+          if docker manifest inspect "${{ env.IMAGE }}:latest" > /dev/null 2>&1; then
+            echo "ANONYMOUS PULL: OK -- the GHCR package is public"
+          else
+            echo "ANONYMOUS PULL: DENIED -- the GHCR package is private."
+            echo "Either make it public in Settings -> Packages, or say so in the README."
+          fi

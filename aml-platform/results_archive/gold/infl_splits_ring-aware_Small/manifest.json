@@ -1,0 +1,158 @@
+{
+  "component": "build_splits",
+  "run_key": "9f752274c4d80c70",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "patterns": "data/bronze/patterns_Small",
+    "labeled": "data/gold/reconcile_Small",
+    "cut_time": "2022-09-05",
+    "dest": "data/gold/infl_splits_ring-aware_Small",
+    "split_spec_version": "1.1.0",
+    "min_test_positives": 100,
+    "protocol": "ring-aware"
+  },
+  "config_hash": "52586af75479565e52b9ee26d5218e1e59d1d32054974f68e510db5e8df1e051",
+  "code_git_sha": "ec333b34357a835c4448f3640837f84a6109ce97",
+  "wall_clock_sec": 2.107,
+  "metrics": {
+    "cut_time": "2022-09-05",
+    "train_rows": 2284182,
+    "train_positives": 1528,
+    "test_rows": 2793197,
+    "test_positives": 2683,
+    "train_rings": 141,
+    "test_rings_before_drop": 229,
+    "dropped_rings": 85,
+    "test_rings_kept": 144,
+    "overlap_accounts": 64,
+    "dropped_pct": 37.12,
+    "test_positive_account_days": 4308,
+    "test_total_account_days": 1395196,
+    "unlabeled_positive_acct_days_touching_train_rings": 11,
+    "unlabeled_handling": "A: disjointness applies to ring-participating accounts only",
+    "protocol": "ring-aware",
+    "straddling_ring_tail_rows_in_test": 0,
+    "assertions_passed": [
+      "accounts_disjoint",
+      "rings_disjoint",
+      "no_temporal_bleed",
+      "no_train_ring_tails_in_test"
+    ]
+  },
+  "outputs": [
+    {
+      "path": "dropped_rings.parquet",
+      "bytes": 580,
+      "sha256": "995c98989dc75e03a03e9d73279afa70159eee5bb91930db55c5a43a000d8d5f"
+    },
+    {
+      "path": "test/event_date=2022-09-05/data_0.parquet",
+      "bytes": 20446850,
+      "sha256": "f30221e9abf146d18d4f6e3d20e2cb190a3b61da0562203c54cb2b013e751912"
+    },
+    {
+      "path": "test/event_date=2022-09-06/data_0.parquet",
+      "bytes": 20427745,
+      "sha256": "6aa31fb1f7f3238b6946672a85b46bb7024d15c21ace1f81a7062ad7069a9969"
+    },
+    {
+      "path": "test/event_date=2022-09-07/data_0.parquet",
+      "bytes": 20454078,
+      "sha256": "1c08f14a602bea7cf3d58bb728014b72500fcb62fefb34bade2f05a4be1bffa3"
+    },
+    {
+      "path": "test/event_date=2022-09-08/data_0.parquet",
+      "bytes": 20467195,
+      "sha256": "1d1392f457389b39894bff8a8bbc5fc04add1ede33f393eae559259384bcd7ae"
+    },
+    {
+      "path": "test/event_date=2022-09-09/data_0.parquet",
+      "bytes": 29113014,
+      "sha256": "874e02b719ad732b30061f3188dca3de5bfbfb41e5f484dc3f02b82bb68e5bee"
+    },
+    {
+      "path": "test/event_date=2022-09-10/data_0.parquet",
+      "bytes": 9109986,
+      "sha256": "7b370b2d8e69b342ffe7636e1c862e53042f27c935b64d2401414b44f638e128"
+    },
+    {
+      "path": "test/event_date=2022-09-11/data_0.parquet",
+      "bytes": 24031,
+      "sha256": "8e42fe64ec934c703b394cbf9e1f71bb35972d8bcee5a1c6f63f6c7554e00ff5"
+    },
+    {
+      "path": "test/event_date=2022-09-12/data_0.parquet",
+      "bytes": 18236,
+      "sha256": "f098b99933aa532a81a686b0c8485d5c34be6bea50773d5908b4525a5b3e7d06"
+    },
+    {
+      "path": "test/event_date=2022-09-13/data_0.parquet",
+      "bytes": 13096,
+      "sha256": "625ef87f6389ec194128891f1f38edd069767f798ae1e529cddc4d5758c36976"
+    },
+    {
+      "path": "test/event_date=2022-09-14/data_0.parquet",
+      "bytes": 9680,
+      "sha256": "669e40b8b29b0a14e758e40d7a9b52ea2d027849837cbbef6b668f409ccaef06"
+    },
+    {
+      "path": "test/event_date=2022-09-15/data_0.parquet",
+      "bytes": 5193,
+      "sha256": "b797d8baa42d04bd98be60f54716b50b9d869927991037d51425b4fa4e9b5159"
+    },
+    {
+      "path": "test/event_date=2022-09-16/data_0.parquet",
+      "bytes": 5377,
+      "sha256": "fb6a91717a76771b1768174f8128f71bf32c1eeb67ac22070a31330f94661349"
+    },
+    {
+      "path": "test/event_date=2022-09-17/data_0.parquet",
+      "bytes": 3619,
+      "sha256": "db1975f4a25589e57e43c0f0261bc28fbe9cf30593405ce8bac93cab0d17a56a"
+    },
+    {
+      "path": "test/event_date=2022-09-18/data_0.parquet",
+      "bytes": 3759,
+      "sha256": "c4c4d2cddb1b5f2a313d05574e6750b5b5ea42bb7e31d5d223fc64db65d5cad7"
+    },
+    {
+      "path": "test_rings.parquet",
+      "bytes": 816,
+      "sha256": "c0a346119dc2fbc29f269ef82164e6d5d30a88d73166ce774b819336e8b8afc6"
+    },
+    {
+      "path": "train/event_date=2022-09-01/data_0.parquet",
+      "bytes": 52758765,
+      "sha256": "b26d683a7285771e9d5003ba960d69b249a3efe68dd2096f26fef4a603d76ee3"
+    },
+    {
+      "path": "train/event_date=2022-09-02/data_0.parquet",
+      "bytes": 33168044,
+      "sha256": "cb2ab02fb4b9915e47755a06ec85d089c3d3b5267273ecfdd58dd3040e570377"
+    },
+    {
+      "path": "train/event_date=2022-09-03/data_0.parquet",
+      "bytes": 9067342,
+      "sha256": "30c5695002ea32263f389353f1897d04953430dd249e4125b647e2fd2f7be87c"
+    },
+    {
+      "path": "train/event_date=2022-09-04/data_0.parquet",
+      "bytes": 9070278,
+      "sha256": "bb26d28b54e7447ca311c07901744c614ec70683f0dd41c59ce46e41a7485db9"
+    },
+    {
+      "path": "train_rings.parquet",
+      "bytes": 838,
+      "sha256": "37c5c3ca0f4aa116c6c9c4d82cbf49345177e128b399c61075eb1bb0c3400e07"
+    }
+  ],
+  "output_hash_max_bytes": 67108864,
+  "stale_outputs_removed": [],
+  "code_tree_sha256": "c9d5d5170777420db8902a76d51878be3b031612972c1fff74a5ddebc1fd4cec",
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-09-12T01:24:14Z"
+}

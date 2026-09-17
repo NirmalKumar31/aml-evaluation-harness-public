@@ -1,0 +1,54 @@
+# RELEASE TOOLING, pinned. Builds and checks the distribution artifacts.
+#
+# SEPARATE FROM THE DEV LOCK ON PURPOSE. `make package-smoke` failed in a
+# clean clone with "No module named build" -- an audit ran the documented
+# two-command setup and the second command did not work. Neither dev lock
+# contained `build`, `twine` was absent everywhere, and `make release-check`
+# did not call the target, so nothing noticed.
+#
+# Not merged into requirements-dev.lock because a test asserts that file is
+# byte-equal in package set to its hashed linux/amd64 twin, and these are
+# build-host tools that never enter the image or touch a result. They are
+# installed into a throwaway venv by `make package-smoke`.
+#
+# Resolved on CPython 3.12. Regenerate with:
+#   python3.12 -m venv /tmp/reltool && /tmp/reltool/bin/pip install build twine
+#   /tmp/reltool/bin/pip list --format=freeze | grep -viE '^(pip|setuptools|wheel)='
+
+# THE BUILD BACKEND, pinned here too.
+#
+# `python -m build` creates an ISOLATED environment and resolves
+# `requires = ["setuptools>=77"]` from PyPI at build time -- an audit's log
+# showed it installing setuptools==84.0.0, which appears in no lock in this
+# repository. "The build tools come from a lock" was therefore half true: the
+# frontend was pinned and the backend that actually produces the wheel was
+# not, so the same source could build with a different backend next week.
+#
+# `make package-smoke` installs these and passes `--no-isolation`, so the
+# backend is the one written down.
+setuptools==84.0.0
+wheel==0.48.0
+build==1.6.1
+certifi==2026.7.22
+charset-normalizer==3.5.1
+docutils==0.23
+id==1.6.1
+idna==3.19
+jaraco.classes==3.4.0
+jaraco.context==6.1.2
+jaraco.functools==4.6.0
+keyring==25.7.0
+markdown-it-py==4.2.0
+mdurl==0.1.2
+more-itertools==11.1.0
+nh3==0.3.7
+packaging==26.3
+Pygments==2.21.0
+pyproject_hooks==1.2.0
+readme_renderer==46.0
+requests==2.34.2
+requests-toolbelt==1.0.0
+rfc3986==2.0.0
+rich==15.0.0
+twine==7.0.0
+urllib3==2.7.0

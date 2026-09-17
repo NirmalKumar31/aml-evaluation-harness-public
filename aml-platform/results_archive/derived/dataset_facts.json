@@ -1,0 +1,99 @@
+{
+ "source": "data/HI-Medium_Trans.csv",
+ "rows": 31898238,
+ "positives": 35230,
+ "prevalence_pct": 0.1104,
+ "by_payment_format": [
+  {
+   "format": "ACH",
+   "rows": 3868410,
+   "positives": 30746,
+   "laundering_rate_pct": 0.7948,
+   "share_of_rows_pct": 12.13,
+   "share_of_positives_pct": 87.27
+  },
+  {
+   "format": "Cheque",
+   "rows": 12280058,
+   "positives": 2220,
+   "laundering_rate_pct": 0.0181,
+   "share_of_rows_pct": 38.5,
+   "share_of_positives_pct": 6.3
+  },
+  {
+   "format": "Credit Card",
+   "rows": 8777816,
+   "positives": 1354,
+   "laundering_rate_pct": 0.0154,
+   "share_of_rows_pct": 27.52,
+   "share_of_positives_pct": 3.84
+  },
+  {
+   "format": "Cash",
+   "rows": 3217531,
+   "positives": 666,
+   "laundering_rate_pct": 0.0207,
+   "share_of_rows_pct": 10.09,
+   "share_of_positives_pct": 1.89
+  },
+  {
+   "format": "Bitcoin",
+   "rows": 689038,
+   "positives": 244,
+   "laundering_rate_pct": 0.0354,
+   "share_of_rows_pct": 2.16,
+   "share_of_positives_pct": 0.69
+  },
+  {
+   "format": "Wire",
+   "rows": 1119774,
+   "positives": 0,
+   "laundering_rate_pct": 0.0,
+   "share_of_rows_pct": 3.51,
+   "share_of_positives_pct": 0.0
+  },
+  {
+   "format": "Reinvestment",
+   "rows": 1945611,
+   "positives": 0,
+   "laundering_rate_pct": 0.0,
+   "share_of_rows_pct": 6.1,
+   "share_of_positives_pct": 0.0
+  }
+ ],
+ "formats_with_zero_positives": [
+  "Wire",
+  "Reinvestment"
+ ],
+ "pct_rows_in_zero_positive_formats": 9.61,
+ "code_git_sha": "09dbe48c2b429c7868a87c36917c1a781e4daa33",
+ "generator_script": "aml-platform/scripts/measure_dataset_facts.py",
+ "generator_sha256": "eb1cab78805dfc15c794a5bfbbefc6c96f855af96bc378123efd293da2dccc05",
+ "generator_matches_commit": true,
+ "code_tree_sha256": "74c336ed3557320e4a50de2a20ca9a9ee923c1df30fd9b0a7eb782367cc06941",
+ "code_tree_matches_commit": true,
+ "provenance_scope": [
+  "aml-platform/src",
+  "aml-platform/scripts"
+ ],
+ "scope_clean": true,
+ "generated_at": "2026-09-15T06:45:40Z",
+ "python_version": "3.12.3",
+ "platform": "macOS-26.5.2-arm64-arm-64bit",
+ "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
+ "status": "ok",
+ "inputs": [
+  {
+   "path": "data/HI-Medium_Trans.csv",
+   "bytes": 3031783420,
+   "kind": "file",
+   "sha256": null,
+   "sha256_skipped": "larger than 67108864 bytes"
+  }
+ ],
+ "parameters": {
+  "src": "data/HI-Medium_Trans.csv"
+ },
+ "written_at": "2026-09-15T06:45:40Z",
+ "source_csv": "data/HI-Medium_Trans.csv"
+}

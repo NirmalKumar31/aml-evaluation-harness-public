@@ -1,0 +1,151 @@
+{
+  "component": "train_model[gbdt]",
+  "run_key": "27bbf1ed8a89dc7a",
+  "status": "ok",
+  "error": null,
+  "config": {
+    "features": "data/silver/features_Medium",
+    "splits": "data/gold/splits_Medium",
+    "model": "gbdt",
+    "seed": 4,
+    "sample": 1.0,
+    "feature_list": [
+      "log_amount_paid",
+      "log_amount_received",
+      "fx_ratio",
+      "currency_mismatch",
+      "amount_roundness",
+      "hour",
+      "dayofweek",
+      "is_weekend",
+      "is_self_transfer",
+      "is_cross_bank",
+      "payment_format_code",
+      "payment_currency_code",
+      "s_n_1d",
+      "s_n_7d",
+      "s_n_30d",
+      "s_mean_amt_7d",
+      "s_std_amt_7d",
+      "s_max_amt_30d",
+      "s_n_out_7d",
+      "s_secs_since_prev",
+      "s_secs_since_prev_cp",
+      "s_amt_vs_hist",
+      "r_n_1d",
+      "r_n_7d",
+      "r_n_30d",
+      "r_mean_amt_7d",
+      "r_std_amt_7d",
+      "r_max_amt_30d",
+      "r_n_out_7d",
+      "r_secs_since_prev",
+      "r_secs_since_prev_cp",
+      "r_amt_vs_hist"
+    ],
+    "n_features": 32
+  },
+  "config_hash": "923064867d0c6518cf113c7244aa77de9fce1797408c481e83777698ad6e87e2",
+  "code_git_sha": "2a4d478af0987f9efa0d4537f431c34ecfa04159",
+  "wall_clock_sec": 416.272,
+  "metrics": {
+    "train_rows": 19487126,
+    "train_positives": 15713,
+    "test_rows": 12402530,
+    "test_positives": 10935,
+    "model_artifact_sha256": "1e717119d93714b30394266ab5ff8c2a443baeddf8569418c47acba6d976b891",
+    "model_artifact_mb": 1.12,
+    "sample_fraction": 1.0,
+    "n_account_days": 6204374,
+    "n_positive_account_days": 18130,
+    "average_precision": 0.2546722855512772,
+    "roc_auc_footnote_only": 0.9826662432510616,
+    "recall@10": 0.006177606177606178,
+    "recall_ceiling@10": 0.010148924434638721,
+    "recall_efficiency@10": 0.608695652173913,
+    "precision@10": 0.6086956521739131,
+    "alerts_per_true_positive@10": 1.6428571428571428,
+    "ring_recall@10": 0.06994328922495274,
+    "recall@25": 0.01450634307777165,
+    "recall_ceiling@25": 0.024379481522338667,
+    "recall_efficiency@25": 0.5950226244343891,
+    "precision@25": 0.5910112359550562,
+    "alerts_per_true_positive@25": 1.6920152091254752,
+    "ring_recall@25": 0.14177693761814744,
+    "recall@50": 0.028185328185328186,
+    "recall_ceiling@50": 0.04732487589630447,
+    "recall_efficiency@50": 0.5955710955710956,
+    "precision@50": 0.5914351851851852,
+    "alerts_per_true_positive@50": 1.6908023483365948,
+    "ring_recall@50": 0.22873345935727787,
+    "recall@100": 0.05234418091560949,
+    "recall_ceiling@100": 0.08532818532818533,
+    "recall_efficiency@100": 0.6134453781512605,
+    "precision@100": 0.5976070528967254,
+    "alerts_per_true_positive@100": 1.6733403582718651,
+    "ring_recall@100": 0.40264650283553877,
+    "recall@200": 0.104853833425262,
+    "recall_ceiling@200": 0.15488141202426917,
+    "recall_efficiency@200": 0.676994301994302,
+    "precision@200": 0.6589254766031196,
+    "alerts_per_true_positive@200": 1.5176223040504997,
+    "ring_recall@200": 0.6030245746691871,
+    "recall@500": 0.23193601765030336,
+    "recall_ceiling@500": 0.3375620518477661,
+    "recall_efficiency@500": 0.6870915032679739,
+    "precision@500": 0.6604366263546411,
+    "alerts_per_true_positive@500": 1.5141498216409037,
+    "ring_recall@500": 0.8676748582230623,
+    "recall@1000": 0.3392719249862107,
+    "recall_ceiling@1000": 0.5726420297848869,
+    "recall_efficiency@1000": 0.59246773261414,
+    "precision@1000": 0.5502281062706861,
+    "alerts_per_true_positive@1000": 1.8174280604779711,
+    "ring_recall@1000": 0.943289224952741,
+    "typology_coverage_pct": 49.54,
+    "ci_lo": 0.022374649992747415,
+    "ci_hi": 0.03360923973109003,
+    "n_clusters": 9653,
+    "n_ring_clusters": 529,
+    "n_bootstrap": 500,
+    "per_typology": {
+      "BIPARTITE": {
+        "n_rings": 61,
+        "ring_recall@50": 0.09836065573770492
+      },
+      "CYCLE": {
+        "n_rings": 78,
+        "ring_recall@50": 0.20512820512820512
+      },
+      "FAN-IN": {
+        "n_rings": 74,
+        "ring_recall@50": 0.10810810810810811
+      },
+      "FAN-OUT": {
+        "n_rings": 65,
+        "ring_recall@50": 0.18461538461538463
+      },
+      "GATHER-SCATTER": {
+        "n_rings": 60,
+        "ring_recall@50": 0.7
+      },
+      "RANDOM": {
+        "n_rings": 76,
+        "ring_recall@50": 0.10526315789473684
+      },
+      "SCATTER-GATHER": {
+        "n_rings": 60,
+        "ring_recall@50": 0.23333333333333334
+      },
+      "STACK": {
+        "n_rings": 55,
+        "ring_recall@50": 0.2727272727272727
+      }
+    }
+  },
+  "env": {
+    "python": "3.12.3",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "written_at": "2026-08-24T01:53:14Z"
+}
