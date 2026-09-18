@@ -1,18 +1,20 @@
 {
- "code_git_sha": "7f199d74d14dd13811c8ce917da1fc4773bcac7f",
+ "code_git_sha": "4b583103dc359ff1ec76508580ac434a04a19ac6",
  "generator_script": "aml-platform/scripts/verify_dataset.py",
  "generator_sha256": "e279fa60a302fa8d2068f2db336651033d9b2b6c7cb27ed8b62c90295a461a3a",
- "generator_matches_commit": null,
- "code_tree_sha256": "0bb75f20e3948e7be78a23c117048b797537faf6b1834d39a4e5530f580a478f",
- "code_tree_matches_commit": null,
+ "generator_matches_commit": true,
+ "code_tree_sha256": "6f5347a93ea1e5878014646653291db946befa8d8548a7fd8cf6cc2e591f2c67",
+ "code_tree_matches_commit": true,
+ "generator_blob_oid": "1003ff4685a8f5e118bc10d52c950cf39a031df7",
+ "package_tree_oid": "b2cbe23795b2e960f1a3350e582bd1efb50481f5",
  "provenance_scope": [
   "aml-platform/src",
   "aml-platform/scripts"
  ],
- "scope_clean": null,
- "generated_at": "2026-09-17T02:19:23Z",
+ "scope_clean": true,
+ "generated_at": "2026-09-17T23:19:11Z",
  "python_version": "3.12.3",
- "platform": "Linux-6.8.0-1064-azure-x86_64-with-glibc2.36",
+ "platform": "macOS-26.5.2-arm64-arm-64bit",
  "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
  "status": "ok",
  "inputs": [
@@ -43,13 +45,6 @@
    "sha256": "d612cd7ed6f7761c0e36f3b788dfbae68aa0842c77145b192c777c22daba5c9f"
   },
   {
-   "path": "data/HI-Large_Trans.csv",
-   "bytes": 17052760651,
-   "kind": "file",
-   "sha256": null,
-   "sha256_skipped": "larger than 67108864 bytes"
-  },
-  {
    "path": "data/HI-Large_Patterns.txt",
    "bytes": 13807473,
    "kind": "file",
@@ -78,7 +73,7 @@
   "HI-Large_Patterns.txt"
  ],
  "complete": true,
- "pinned_at": "2026-09-17T02:19:23Z",
+ "pinned_at": "2026-09-17T23:19:11Z",
  "dataset": "IBM AMLworld (Altman et al., NeurIPS 2023 D&B)",
  "licence": "CDLA-Sharing-1.0; not redistributed. See DATA_LICENSE.md",
  "source": "https://www.kaggle.com/datasets/ealtman2019/ibm-transactions-for-anti-money-laundering-aml",
@@ -100,18 +95,14 @@
    "sha256": "d612cd7ed6f7761c0e36f3b788dfbae68aa0842c77145b192c777c22daba5c9f",
    "bytes": 2279574
   },
-  "HI-Large_Trans.csv": {
-   "sha256": "d13635e297c64673826217631fb88d635c4f506052e1bde833895eda2a65c3f2",
-   "bytes": 17052760651
-  },
   "HI-Large_Patterns.txt": {
    "sha256": "bcf815a1931cfdcefd5d6d9feaa8f95dbc33cfd6ef8cd52d9a41e8d994c22820",
    "bytes": 13807473
+  },
+  "HI-Large_Trans.csv": {
+   "sha256": "d13635e297c64673826217631fb88d635c4f506052e1bde833895eda2a65c3f2",
+   "bytes": 17052760651,
+   "carried_from": "a previous pin; not present on this machine at re-pin time"
   }
- },
- "produced_on": {
-  "host": "Azure VM aml-vm (Standard_E4ds_v7, amd64)",
-  "environment": "the release container built from this commit's Dockerfile",
-  "why": "reads dataset-derived inputs that live only on the cloud VM; verified against all six pinned files there"
  }
 }

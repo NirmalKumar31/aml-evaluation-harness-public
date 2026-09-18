@@ -66,7 +66,13 @@ def malformed_tables(files: list[Path], root: Path) -> list[str]:
         lines = f.read_text(encoding="utf-8", errors="replace").splitlines()
         header_cells = None
         for n, line in enumerate(lines, 1):
-            stripped = line.strip()
+            # ⛔ BLOCKQUOTED TABLES WERE SKIPPED ENTIRELY. The test was
+            # `startswith("|")`, and a table inside a `>` quote starts with
+            # `> |` -- so `paper/RESULTS_typology.md` carried eight rows with
+            # the wrong cell count past this check while markdownlint, which
+            # runs in a different workflow, failed on them. A structural check
+            # that cannot see a whole syntactic form is not checking it.
+            stripped = re.sub(r"^\s*(?:>\s*)+", "", line).strip()
             if not stripped.startswith("|"):
                 header_cells = None
                 continue

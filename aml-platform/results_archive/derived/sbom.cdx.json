@@ -1,16 +1,18 @@
 {
- "code_git_sha": "64f0b42e59b8978901c7b0834c96759d97ae857b",
+ "code_git_sha": "76615ae12bfc63075fc3f9ee2625acfe7a748844",
  "generator_script": "aml-platform/scripts/make_sbom.py",
  "generator_sha256": "6339357bb0aacd49c60f88fb19c4a8aec3e62d2db89db503f0858c768e623229",
  "generator_matches_commit": true,
- "code_tree_sha256": "0bb75f20e3948e7be78a23c117048b797537faf6b1834d39a4e5530f580a478f",
+ "code_tree_sha256": "6f5347a93ea1e5878014646653291db946befa8d8548a7fd8cf6cc2e591f2c67",
  "code_tree_matches_commit": true,
+ "generator_blob_oid": "74c4fc74f327fa85a687451b8be4f86b8a7eafe7",
+ "package_tree_oid": "b2cbe23795b2e960f1a3350e582bd1efb50481f5",
  "provenance_scope": [
   "aml-platform/src",
   "aml-platform/scripts"
  ],
  "scope_clean": true,
- "generated_at": "2026-09-16T23:47:05Z",
+ "generated_at": "2026-09-17T17:43:18Z",
  "python_version": "3.12.3",
  "platform": "macOS-26.5.2-arm64-arm-64bit",
  "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
@@ -30,11 +32,11 @@
  "specVersion": "1.5",
  "version": 1,
  "metadata": {
-  "timestamp": "2026-09-16T23:47:05Z",
+  "timestamp": "2026-09-17T17:43:18Z",
   "component": {
    "type": "application",
    "name": "aml-evaluation-harness",
-   "version": "64f0b42e59b8978901c7b0834c96759d97ae857b"
+   "version": "76615ae12bfc63075fc3f9ee2625acfe7a748844"
   },
   "properties": [
    {

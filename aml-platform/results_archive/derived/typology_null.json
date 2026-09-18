@@ -139,112 +139,152 @@
   }
  },
  "permutation_spread_Medium": {
+  "estimand": "ring_coverage_concentration per typology: the share of a typology's rings the ranker covers, divided by what a WITHIN-DAY permutation of ring-transaction scores gives it. Below 1 means the alerts concentrate into fewer distinct rings than a ring-blind reassignment of the same scores -- it is NOT a statement that the model is worse than chance at finding rings, and metrics.py:640 renames the metric to stop that reading.",
   "budget": 50,
-  "draws": 400,
+  "draws": 50000,
   "observed_spread": 3.46875,
-  "null_spread_median": 3.42745,
-  "null_spread_p95": 4.60417,
-  "p_value": 0.46633,
-  "observed_percentile": 53.5,
+  "null_spread_median": 3.4131,
+  "null_spread_p95": 4.56,
+  "p_value": 0.45661,
+  "observed_percentile": 54.3,
   "per_typology_concentration": {
    "BIPARTITE": {
     "observed": 0.22951,
-    "null": 0.27434,
-    "concentration": 0.8366,
+    "null": 0.27408,
+    "concentration": 0.8374,
     "ci95": [
      0.6087,
      1.2727
     ],
-    "p_two_sided": 0.37656,
-    "distinguishable_from_1": false,
+    "p_two_sided": 0.40903,
+    "n_draws_at_or_beyond": 20451,
+    "p_mc_se": 0.0022,
+    "ci95_excludes_1": false,
     "p_holm": 1.0
    },
    "CYCLE": {
     "observed": 0.38462,
-    "null": 0.30429,
-    "concentration": 1.264,
+    "null": 0.30553,
+    "concentration": 1.2589,
     "ci95": [
      0.9677,
-     1.875
+     1.7647
     ],
-    "p_two_sided": 0.10973,
-    "distinguishable_from_1": false,
-    "p_holm": 0.5985
+    "p_two_sided": 0.1029,
+    "n_draws_at_or_beyond": 5144,
+    "p_mc_se": 0.00136,
+    "ci95_excludes_1": false,
+    "p_holm": 0.56543
    },
    "FAN-IN": {
     "observed": 0.21622,
-    "null": 0.36095,
-    "concentration": 0.599,
+    "null": 0.36403,
+    "concentration": 0.594,
     "ci95": [
      0.4706,
-     0.8421
+     0.8
     ],
-    "p_two_sided": 0.00998,
-    "distinguishable_from_1": true,
-    "p_holm": 0.0798
+    "p_two_sided": 0.00506,
+    "n_draws_at_or_beyond": 252,
+    "p_mc_se": 0.00032,
+    "ci95_excludes_1": true,
+    "p_holm": 0.04048
    },
    "FAN-OUT": {
     "observed": 0.33846,
-    "null": 0.32031,
-    "concentration": 1.0567,
+    "null": 0.32295,
+    "concentration": 1.048,
     "ci95": [
-     0.8148,
+     0.7857,
      1.5714
     ],
-    "p_two_sided": 0.80798,
-    "distinguishable_from_1": false,
+    "p_two_sided": 0.771,
+    "n_draws_at_or_beyond": 38550,
+    "p_mc_se": 0.00188,
+    "ci95_excludes_1": false,
     "p_holm": 1.0
    },
    "GATHER-SCATTER": {
     "observed": 0.75,
-    "null": 0.81883,
-    "concentration": 0.9159,
+    "null": 0.82141,
+    "concentration": 0.9131,
     "ci95": [
      0.8333,
      1.0
     ],
-    "p_two_sided": 0.09975,
-    "distinguishable_from_1": false,
-    "p_holm": 0.5985
+    "p_two_sided": 0.09424,
+    "n_draws_at_or_beyond": 4711,
+    "p_mc_se": 0.00131,
+    "ci95_excludes_1": false,
+    "p_holm": 0.56543
    },
    "RANDOM": {
     "observed": 0.28947,
-    "null": 0.27987,
-    "concentration": 1.0343,
+    "null": 0.27937,
+    "concentration": 1.0362,
     "ci95": [
      0.7857,
-     1.4691
+     1.4667
     ],
-    "p_two_sided": 0.88279,
-    "distinguishable_from_1": false,
+    "p_two_sided": 0.88322,
+    "n_draws_at_or_beyond": 44161,
+    "p_mc_se": 0.00144,
+    "ci95_excludes_1": false,
     "p_holm": 1.0
    },
    "SCATTER-GATHER": {
     "observed": 0.41667,
-    "null": 0.55446,
-    "concentration": 0.7515,
+    "null": 0.54963,
+    "concentration": 0.7581,
     "ci95": [
-     0.625,
-     0.8929
+     0.641,
+     0.9259
     ],
-    "p_two_sided": 0.01496,
-    "distinguishable_from_1": true,
-    "p_holm": 0.10474
+    "p_two_sided": 0.02162,
+    "n_draws_at_or_beyond": 1080,
+    "p_mc_se": 0.00065,
+    "ci95_excludes_1": true,
+    "p_holm": 0.15134
    },
    "STACK": {
     "observed": 0.38182,
-    "null": 0.43305,
-    "concentration": 0.8817,
+    "null": 0.43548,
+    "concentration": 0.8768,
     "ci95": [
      0.7,
      1.1667
     ],
-    "p_two_sided": 0.42893,
-    "distinguishable_from_1": false,
+    "p_two_sided": 0.44503,
+    "n_draws_at_or_beyond": 22251,
+    "p_mc_se": 0.00222,
+    "ci95_excludes_1": false,
     "p_holm": 1.0
    }
   },
-  "n_distinguishable_from_1_after_holm": 0,
+  "n_significant_after_holm_at_0.05": 1,
+  "smallest_p_holm": 0.04048,
+  "smallest_p_holm_attainable_at_this_draw_count": 0.00016,
+  "smallest_p_holm_mc_ci95": [
+   0.0355,
+   0.04545
+  ],
+  "holm_conclusion_is_resolved": true,
+  "draws_needed_to_resolve_at_0.05": null,
+  "holm_family": {
+   "n_tests": 8,
+   "definition": "the per-typology ring_coverage_concentration tests in this block, one per typology present",
+   "members": [
+    "FAN-IN",
+    "SCATTER-GATHER",
+    "GATHER-SCATTER",
+    "CYCLE",
+    "BIPARTITE",
+    "STACK",
+    "FAN-OUT",
+    "RANDOM"
+   ],
+   "note": "other p-values in this file (the spread null, exposure_vs_detection) are separate pre-specified questions and are NOT in this family"
+  },
   "basis": {
    "this_null": {
     "model": "single fit, replay bundle, `models` lineage",
@@ -261,7 +301,7 @@
    },
    "like_for_like_test_not_run": "an ensemble replay under current HEAD, asserting that the null's per-typology observed rates equal the source artifact's. It needs the HI-Medium feature table rebuilt (hours, and more free disk than this machine has), so the 3.05x figure is withdrawn because its H0 is false -- not because a valid null was computed for it"
   },
-  "interpretation": "`concentration` is `ring_coverage_concentration` computed per typology: observed ring recall over a within-day permutation null that conditions on the model's own per-day score multiset. Below 1 means the alerts concentrate into FEWER DISTINCT RINGS than a ring-blind reassignment of the same scores -- NOT that the model is worse than chance at finding rings (see metrics.py:640). Six of eight intervals span 1 and nothing survives Holm, so no per-typology ordering is established here either; the spread p-value above is the finding, and it is a null result."
+  "interpretation": "`concentration` is `ring_coverage_concentration` computed per typology: observed ring recall over a within-day permutation null that conditions on the model's own per-day score multiset. Below 1 means the alerts concentrate into FEWER DISTINCT RINGS than a ring-blind reassignment of the same scores -- NOT that the model is worse than chance at finding rings, and not that the typology is harder to detect (see metrics.py:640). No per-typology ORDERING is established: 6 of 8 intervals span 1. 1 deviation (FAN-IN) has an adjusted p-value of 0.04048 with a Monte-Carlo interval of [0.03550376248993439, 0.04545461834244896], which clears 0.05. It is FRAGILE IN THE FAMILY SIZE: the multiplier here is 8, declared in `holm_family`, and at 10 tests the same raw p-value gives 0.05060 and the finding is gone. Report it with the family, or not at all."
  },
  "exposure_vs_detection": {
   "rho": 0.7857,
@@ -332,20 +372,22 @@
   "min_feasible_tail_rate": 0.05413,
   "note": "a tail rate outside this range cannot reproduce the observed pooled rate with a head rate in [0, 1]"
  },
- "code_git_sha": "7f199d74d14dd13811c8ce917da1fc4773bcac7f",
+ "code_git_sha": "91bafc5ddd678a2b3fd3b46b647f58e6379147d7",
  "generator_script": "aml-platform/scripts/typology_null.py",
- "generator_sha256": "f04ba32ec25b15321be1fd672ee1f1d43671e0e94916028d6ae2cf5406210218",
- "generator_matches_commit": null,
- "code_tree_sha256": "0bb75f20e3948e7be78a23c117048b797537faf6b1834d39a4e5530f580a478f",
- "code_tree_matches_commit": null,
+ "generator_sha256": "f486b99d946ebabda282bfd67adcdc7bb387b0339d15a774d0e42d78ebe0c9a1",
+ "generator_matches_commit": true,
+ "code_tree_sha256": "6f5347a93ea1e5878014646653291db946befa8d8548a7fd8cf6cc2e591f2c67",
+ "code_tree_matches_commit": true,
+ "generator_blob_oid": "0bd690d119517cbcd6430e8666509d17cb038f67",
+ "package_tree_oid": "b2cbe23795b2e960f1a3350e582bd1efb50481f5",
  "provenance_scope": [
   "aml-platform/src",
   "aml-platform/scripts"
  ],
- "scope_clean": null,
- "generated_at": "2026-09-17T02:15:43Z",
+ "scope_clean": true,
+ "generated_at": "2026-09-17T23:16:13Z",
  "python_version": "3.12.3",
- "platform": "Linux-6.8.0-1064-azure-x86_64-with-glibc2.36",
+ "platform": "macOS-26.5.2-arm64-arm-64bit",
  "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
  "status": "ok",
  "inputs": [
@@ -396,14 +438,9 @@
   "draws": 20000,
   "thin_from": "2022-09-17",
   "ring_budget": 50,
-  "perm_draws": 400,
+  "perm_draws": 50000,
   "patterns_dir": "data/bronze/patterns_Medium",
   "bundle": "results_archive/replay/medium_gbdt_s0",
   "rates": "MEASURED from the bundle, not assumed"
- },
- "produced_on": {
-  "host": "Azure VM aml-vm (Standard_E4ds_v7, amd64)",
-  "environment": "the release container built from this commit's Dockerfile",
-  "why": "reads dataset-derived inputs that live only on the cloud VM; verified against all six pinned files there"
  }
 }

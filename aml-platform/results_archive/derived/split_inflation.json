@@ -1,16 +1,18 @@
 {
-  "code_git_sha": "09dbe48c2b429c7868a87c36917c1a781e4daa33",
+  "code_git_sha": "4b583103dc359ff1ec76508580ac434a04a19ac6",
   "generator_script": "aml-platform/scripts/analyze_split_inflation.py",
   "generator_sha256": "63b4cb5e61c05d43ceeb006308c0aa7e4e954317693379cae63f9ee333b53466",
   "generator_matches_commit": true,
-  "code_tree_sha256": "74c336ed3557320e4a50de2a20ca9a9ee923c1df30fd9b0a7eb782367cc06941",
+  "code_tree_sha256": "6f5347a93ea1e5878014646653291db946befa8d8548a7fd8cf6cc2e591f2c67",
   "code_tree_matches_commit": true,
+  "generator_blob_oid": "c5aa22797b881c9f87f63c05119ac9639120e0be",
+  "package_tree_oid": "b2cbe23795b2e960f1a3350e582bd1efb50481f5",
   "provenance_scope": [
     "aml-platform/src",
     "aml-platform/scripts"
   ],
   "scope_clean": true,
-  "generated_at": "2026-09-15T06:45:36Z",
+  "generated_at": "2026-09-17T23:19:14Z",
   "python_version": "3.12.3",
   "platform": "macOS-26.5.2-arm64-arm-64bit",
   "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
@@ -22,7 +24,8 @@
       "n_files": 132,
       "bytes": 1197355572,
       "listing_sha256": "2c45028fbe216eda6fe9c07ae35c5042acb2fca465eb5fe67cbe02b17f3c3f5a",
-      "identity": "metadata (path and size), NOT content"
+      "identity": "metadata (path and size), NOT content",
+      "identity_reason": "1197355572 bytes exceeds OUTPUT_HASH_MAX_BYTES=67108864"
     }
   ],
   "parameters": {

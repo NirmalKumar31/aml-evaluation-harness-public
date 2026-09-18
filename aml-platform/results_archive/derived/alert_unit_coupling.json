@@ -7,6 +7,8 @@
  ],
  "bundles": {
   "large_lgbm_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how many distinct ring TRANSACTIONS an account-day alert budget actually touches, and how often both endpoints of a ring transaction are attributable. The alerting unit is the account-day throughout; the transaction counts are consequences of that budget, not a second alert unit.",
    "has_transaction_identity": false,
    "alerted_account_days@50": 4117,
    "tie_groups@50": 2435,
@@ -85,6 +87,8 @@
    "ring_score_groups_spanning_multiple_txns@1000": 0
   },
   "large_lgbm_s1": {
+   "alert_unit": "account-day",
+   "estimand": "how many distinct ring TRANSACTIONS an account-day alert budget actually touches, and how often both endpoints of a ring transaction are attributable. The alerting unit is the account-day throughout; the transaction counts are consequences of that budget, not a second alert unit.",
    "has_transaction_identity": false,
    "alerted_account_days@50": 4117,
    "tie_groups@50": 2414,
@@ -163,6 +167,8 @@
    "ring_score_groups_spanning_multiple_txns@1000": 0
   },
   "large_lgbm_s2": {
+   "alert_unit": "account-day",
+   "estimand": "how many distinct ring TRANSACTIONS an account-day alert budget actually touches, and how often both endpoints of a ring transaction are attributable. The alerting unit is the account-day throughout; the transaction counts are consequences of that budget, not a second alert unit.",
    "has_transaction_identity": false,
    "alerted_account_days@50": 4117,
    "tie_groups@50": 2477,
@@ -238,6 +244,8 @@
    "ring_score_groups_spanning_multiple_txns@1000": 0
   },
   "large_sorted_lgbm_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how many distinct ring TRANSACTIONS an account-day alert budget actually touches, and how often both endpoints of a ring transaction are attributable. The alerting unit is the account-day throughout; the transaction counts are consequences of that budget, not a second alert unit.",
    "has_transaction_identity": false,
    "alerted_account_days@50": 4117,
    "tie_groups@50": 2405,
@@ -322,6 +330,8 @@
    "ring_score_groups_spanning_multiple_txns@1000": 0
   },
   "large_sorted_lgbm_s1": {
+   "alert_unit": "account-day",
+   "estimand": "how many distinct ring TRANSACTIONS an account-day alert budget actually touches, and how often both endpoints of a ring transaction are attributable. The alerting unit is the account-day throughout; the transaction counts are consequences of that budget, not a second alert unit.",
    "has_transaction_identity": false,
    "alerted_account_days@50": 4117,
    "tie_groups@50": 2459,
@@ -385,6 +395,8 @@
    "ring_score_groups_spanning_multiple_txns@1000": 0
   },
   "large_sorted_lgbm_s2": {
+   "alert_unit": "account-day",
+   "estimand": "how many distinct ring TRANSACTIONS an account-day alert budget actually touches, and how often both endpoints of a ring transaction are attributable. The alerting unit is the account-day throughout; the transaction counts are consequences of that budget, not a second alert unit.",
    "has_transaction_identity": false,
    "alerted_account_days@50": 4117,
    "tie_groups@50": 2463,
@@ -451,6 +463,8 @@
    "ring_score_groups_spanning_multiple_txns@1000": 0
   },
   "medium_baseline_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how many distinct ring TRANSACTIONS an account-day alert budget actually touches, and how often both endpoints of a ring transaction are attributable. The alerting unit is the account-day throughout; the transaction counts are consequences of that budget, not a second alert unit.",
    "has_transaction_identity": false,
    "alerted_account_days@50": 864,
    "tie_groups@50": 457,
@@ -520,6 +534,8 @@
    "ring_score_groups_spanning_multiple_txns@1000": 0
   },
   "medium_gbdt_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how many distinct ring TRANSACTIONS an account-day alert budget actually touches, and how often both endpoints of a ring transaction are attributable. The alerting unit is the account-day throughout; the transaction counts are consequences of that budget, not a second alert unit.",
    "has_transaction_identity": false,
    "alerted_account_days@50": 864,
    "tie_groups@50": 490,
@@ -585,6 +601,8 @@
    "ring_score_groups_spanning_multiple_txns@1000": 1
   },
   "small_gbdt_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how many distinct ring TRANSACTIONS an account-day alert budget actually touches, and how often both endpoints of a ring transaction are attributable. The alerting unit is the account-day throughout; the transaction counts are consequences of that budget, not a second alert unit.",
    "has_transaction_identity": false,
    "alerted_account_days@50": 577,
    "tie_groups@50": 339,
@@ -648,18 +666,20 @@
    "ring_score_groups_spanning_multiple_txns@1000": 0
   }
  },
- "code_git_sha": "23d70e6e0c3da1672e3e2c335ea98244b1fc919d",
+ "code_git_sha": "6afe21c5237bf034b511faa639467eb8ad992832",
  "generator_script": "aml-platform/scripts/alert_unit_coupling.py",
- "generator_sha256": "790a9f848639e01906701796585b255a9137d15ff3469f05a49c01655546de52",
+ "generator_sha256": "f650d37c29e296d5fc10c440714e1f7d87a32abf0e75d244e2664c2b92271fcd",
  "generator_matches_commit": true,
- "code_tree_sha256": "0a4c4323ad9337c28efb35874fba22cf0f4dc8b85fb77ab2650596ad49c1f4f2",
+ "code_tree_sha256": "6f5347a93ea1e5878014646653291db946befa8d8548a7fd8cf6cc2e591f2c67",
  "code_tree_matches_commit": true,
+ "generator_blob_oid": "f2eba109d3fad6e83dd4b09ca760fb29fd9d5ba8",
+ "package_tree_oid": "b2cbe23795b2e960f1a3350e582bd1efb50481f5",
  "provenance_scope": [
   "aml-platform/src",
   "aml-platform/scripts"
  ],
  "scope_clean": true,
- "generated_at": "2026-09-16T20:57:32Z",
+ "generated_at": "2026-09-17T23:00:20Z",
  "python_version": "3.12.3",
  "platform": "macOS-26.5.2-arm64-arm-64bit",
  "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",

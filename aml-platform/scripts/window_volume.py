@@ -162,7 +162,13 @@ def bundle_decomposition(bundle: Path, profiles: dict, budgets=(50, 200)) -> dic
     # is what makes it impossible to ship silently.
     head, tail = set(days_all[:drop]), set(days_all[drop:])
 
-    out = {"segment_boundary_index": drop,
+    out = {"alert_unit": "account-day",
+           "estimand": (
+               "how each published budget metric divides between the "
+               "volume-regime days and the generator's wind-down, per "
+               "archived bundle. A decomposition of an observed number, not "
+               "an estimate of anything about a population."),
+           "segment_boundary_index": drop,
            "segment_boundary_day": str(days_all[drop]) if drop < len(days_all) else None,
            "segment_boundary_source": source,
            "head_days": len(head), "tail_days": len(tail),

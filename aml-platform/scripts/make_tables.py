@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -57,6 +58,135 @@ UNITS = {
 }
 ORDER = ["average_precision__txn", "precision@50", "recall@50", "recall_ceiling@50",
          "recall_efficiency@50", "recall@200", "ring_recall@200"]
+
+
+def _norm(val: str) -> str:
+    """Trailing-zero normalisation, ONLY for values carrying a decimal point.
+
+    `val.rstrip("0")` applied to an integer is destructive: 350 became "35",
+    100 became "1", 18130 became "1813". On the source side that made an
+    honest `350 <- ...#alerts@50_head` binding impossible to state -- the gate
+    reported `3 is bound to ..., which holds 350`. On the derived side it was
+    worse than useless, because `<!-- derived: 35 = anything at all -->` then
+    exempted a prose 350x. `document_tokens` already guarded this with
+    `if "." in tok`; the two marker parsers did not.
+    """
+    return val.rstrip("0").rstrip(".") if "." in val else val
+
+
+def _operand_forms(tok: str) -> set[str]:
+    """The string forms a marker operand may legitimately take in the index.
+
+    ⛔ NO /100 IMAGE. This used to add it, which let the number being CLAIMED
+    legitimise the operand claiming it: `_operand_forms("199")` contained
+    "1.99", "1.99" is somewhere in a 21,000-value index, so
+    `<!-- derived: 199/100 -->` supported a prose 1.99x. The percent
+    candidates belong to the PROSE presence test, where "2.571%" and 0.02571
+    really are the same claim; an operand is a measured quantity and must be
+    found as itself.
+    """
+    out = {tok, _norm(tok)}
+    try:
+        f = float(tok)
+    except ValueError:
+        return out
+    for cand in (f"{f:.4f}", f"{f:.6f}"):
+        out.add(cand)
+        out.add(_norm(cand))
+    return out
+
+
+def _divides_by_power_of_ten(expr: str) -> float | None:
+    """The divisor of any `/` in `expr` that evaluates to 10**k, or None.
+
+    Spelling-independent on purpose. The rule was a regex over the literal
+    text and an audit walked through it three times in one line: `/ 100.0`,
+    `/(50*2)` and `/1e2` are the same divisor as the `/100` it caught.
+    """
+    import ast
+
+    try:
+        tree = ast.parse(expr.strip(), mode="eval")
+    except SyntaxError:
+        return None
+    for node in ast.walk(tree):
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+            v = _safe_eval(ast.unparse(node.right))
+            if v and v > 0:
+                k = math.log10(v)
+                if abs(k - round(k)) < 1e-12 and round(k) != 0:
+                    return v
+    return None
+
+
+def arithmetic_objection(item: str, known: dict) -> str | None:
+    """Why this marker arithmetic is not support, or None if it is.
+
+    Arithmetic can be perfectly valid and still prove nothing. Two ways, both
+    found by audit against this gate after three rounds of hardening:
+
+    NO-OP. `<!-- derived: 1.99/1 -->` evaluates to 1.99 and therefore
+    "accounts for" a prose `1.99x`. Dividing by one was a universal
+    exemption -- four fabricated claims, including a stale headline this gate
+    exists to prevent, passed with `checked 0 value(s); 7 exempted`. An
+    expression whose result is one of its own literals did no work.
+
+    UNBOUND OPERANDS. The operands were never compared to anything, so
+    `812.44/1` cited a value present in no artifact. Small integers stay
+    exempt because day counts and arities are legitimately literal: the live
+    corpus uses 1, 2, 3, 7 and 8, and nothing larger.
+    """
+    v = _safe_eval(item)
+    if v is None:
+        return None
+    toks = re.findall(r"\d+(?:\.\d+)?", item)
+    if any(abs(v - float(t)) <= 1e-12 for t in toks):
+        return (f"the arithmetic `{item}` returns one of its own operands, so "
+                f"it supports nothing -- dividing by one is not a derivation")
+    small = [t for t in toks if "." not in t and int(t) <= 100]
+    loose = [t for t in toks
+             if t not in small and not (_operand_forms(t) & set(known))]
+    if loose:
+        return (f"the operand(s) {', '.join(loose)} in `{item}` appear in no "
+                f"artifact -- a derivation must start from measured values")
+    # ⛔ SMALL INTEGERS ARE A FREE ALPHABET, and exempting them unconditionally
+    # made any value expressible as p/q with p,q <= 100 free: `37/2` supported
+    # a fabricated 18.5x, `81/5` a fabricated 16.2x. Day counts and arities
+    # legitimately ARE literal, so they stay allowed -- but an expression made
+    # of nothing but small integers is not checkable against anything, and the
+    # gate has to say so instead of blessing it.
+    # ⛔ AND SMALL INTEGERS IN QUANTITY ARE A FREE ALPHABET. Allowing any
+    # number of them let ONE bound operand reach almost any value:
+    # `0.00243*25*75/14` produced a fabricated 0.3254 and `0.00243*79*81` a
+    # fabricated 15.55x, both exempted with zero findings. Measured, one bound
+    # operand plus unbounded small integers hit 180 of 200 randomly chosen
+    # four-decimal values in (0,1) -- which is the entire range this gate
+    # exists to protect. Day counts and arities are legitimately literal, and
+    # every live marker uses at most ONE of them; more than one is a knob.
+    if len(small) > 1:
+        return (f"`{item}` uses {len(small)} free small-integer literals "
+                f"({', '.join(small)}). One is a day count or an arity; "
+                f"several are a dial that reaches any value from one measured "
+                f"operand. State the source with "
+                f"`<!-- source: V <- path#key -->` instead")
+    # A POWER OF TEN IS A UNIT CONVERSION, NOT A DERIVATION, and the regex
+    # that used to say so was evaded three ways: `/ 100.0` (the `(?![\d.])`
+    # lookahead killed it), `/(50*2)` (a parenthesised product it could not
+    # see), and `/1e2`. Evaluate the divisor instead of matching its spelling.
+    div = _divides_by_power_of_ten(item)
+    if div:
+        return (f"`{item}` divides by {div:g}, a power of ten, which rescales "
+                f"a count rather than comparing it to anything. A lift divides "
+                f"by its null; a share divides by its total. If this is a unit "
+                f"change, state the source with "
+                f"`<!-- source: V <- path#key -->`")
+    if not [t for t in toks if t not in small]:
+        return (f"`{item}` is built entirely from small integer literals, so "
+                f"nothing in it is bound to a measurement and any value in "
+                f"its range could be produced. State the source instead, with "
+                f"`<!-- source: V <- path#key -->`, or give the reason with "
+                f"`<!-- derived: V = <why> -->`")
+    return None
 
 
 # `$64.32`, `$0.41600/hr`. Captured without the symbol so the value can be
@@ -247,7 +377,7 @@ def derived_reasons(body: str | None) -> tuple[list[float], dict[str, str], list
             continue
         m = _NAMED.match(item)
         if m:
-            named[m["val"].rstrip("0").rstrip(".")] = m["why"].strip()
+            named[_norm(m["val"])] = m["why"].strip()
         else:
             junk.append(item)
     return values, named, junk
@@ -280,26 +410,45 @@ def sourced_claims(body: str | None) -> dict:
         if not item or "<-" not in item:
             continue
         val, ref = (x.strip() for x in item.split("<-", 1))
-        out[val.rstrip("0").rstrip(".")] = ref
+        out[_norm(val)] = ref
     return out
 
 
 def resolve_source(ref: str, archive: Path) -> float | None:
-    """`path/to.json#a.b.c` -> the value at that key, or None."""
+    """`path/to.json#a.b.c` -> the value at that key, or None.
+
+    THE PATH MUST STAY INSIDE THE ARCHIVE. An absolute path resolved happily,
+    so a binding could cite a file that no clone of this repository contains
+    and the gate would certify the chain -- a green tick on a provenance
+    claim that nobody else can follow. The value still has to exist in the
+    archive to pass the membership test, so this was never a way to inject an
+    arbitrary number; it was a way to manufacture its pedigree.
+    """
     if "#" not in ref:
         return None
     rel, key = ref.split("#", 1)
-    doc = _load(archive / rel.strip())
+    rel = rel.strip()
+    target = (archive / rel).resolve()
+    if Path(rel).is_absolute() or not target.is_relative_to(archive.resolve()):
+        return None
+    doc = _load(target)
     if doc is None:
         return None
     cur = doc
     for part in key.strip().split("."):
         if isinstance(cur, list):
             try:
-                cur = cur[int(part)]
-                continue
-            except (ValueError, IndexError):
+                i = int(part)
+            except ValueError:
                 return None
+            # A NEGATIVE INDEX IS NOT A CITATION. `per_day.-1.n_positive`
+            # names whichever row happens to be last, so the binding follows
+            # the data instead of pinning a claim to it -- append a day and
+            # the "cited" value changes with no edit to the prose.
+            if i < 0 or i >= len(cur):
+                return None
+            cur = cur[i]
+            continue
         if not isinstance(cur, dict) or part not in cur:
             return None
         cur = cur[part]
@@ -308,7 +457,7 @@ def resolve_source(ref: str, archive: Path) -> float | None:
 
 def derived_accounts_for(tok: str, values: list[float], named: dict) -> bool:
     """Does the marker account for this specific token?"""
-    if tok.rstrip("0").rstrip(".") in named:
+    if _norm(tok) in named:
         return True
     try:
         t = float(tok)
@@ -576,7 +725,13 @@ def marker_report(rows: list[dict], docs: list[Path]) -> int:
             mk = DERIVED.search(re.sub(r"`[^`]*`", " ", line))
             if not mk:
                 continue
-            toks = document_tokens(line)
+            # FROM THE PROSE, like the gate. This read the whole line, so a
+            # marker's own reason text supplied tokens the marker was then
+            # judged against -- `3.16 = 0.00243/0.00077, ...` reported that
+            # the line needed a reason for 0.00077, a number that appears
+            # nowhere in its prose. The report and `check()` have to agree
+            # about what a claim on a line IS, or one of them is lying.
+            toks = document_tokens(re.sub(r"<!--.*?-->", " ", line))
             dvals, dnamed, _ = derived_reasons(mk.group("body"))
             # WITHOUT the marker's own accounting. Asking "is this value
             # supported, counting the marker that exempts it?" makes every
@@ -785,7 +940,7 @@ def check(rows: list[dict], docs: list[Path]) -> int:
             retracted.append((re.compile(e["pattern"]), e))
 
     bad = missing = unprovenanced = stale_lineage = revived = unlisted = 0
-    seen = exempt = 0
+    seen = exempt = named_exempt = 0
     label = _labels(docs)
     for d in docs:
         if not d.exists():
@@ -821,7 +976,14 @@ def check(rows: list[dict], docs: list[Path]) -> int:
             # the moment the meter ticked, under a gate reporting zero
             # disagreements. Money and durations are published claims like any
             # other.
-            pairs = document_tokens(line)
+            # FROM THE PROSE, NOT THE WHOLE LINE. The source gate strips
+            # comments before its presence test; this one did not, so
+            # `<!-- derived: 43.90/1 -->` satisfied its own
+            # appears-on-this-line requirement out of the digits inside the
+            # comment. The fix for "a claim cannot be its own evidence" had
+            # landed in exactly one of the two checks.
+            prose_only = re.sub(r"<!--.*?-->", " ", line)
+            pairs = document_tokens(prose_only)
             # A BOUND CLAIM IS CHECKED AGAINST ITS OWN SOURCE, not against
             # whether the number happens to exist somewhere in 101 manifests.
             sm = SOURCED.search(line)
@@ -847,10 +1009,24 @@ def check(rows: list[dict], docs: list[Path]) -> int:
                 # reads the whole line, so the citation's own digits satisfied
                 # the presence test and the check passed while the prose said
                 # something else entirely. A claim cannot be its own evidence.
-                prose = re.sub(r"<!--.*?-->", " ", line)
-                if not any(abs(float(t) - got) <= tol
-                           for t, _c in document_tokens(prose)
-                           if re.fullmatch(r"-?\d+(?:\.\d+)?", t)):
+                # A PLAIN NUMERIC SCAN, not the publication extractor.
+                # `document_tokens` exists to FIND CLAIMS WORTH CHECKING, so
+                # it deliberately ignores bare integers -- which meant a
+                # source binding naming one ("350 <- ...#alerts@50_head")
+                # could never satisfy its own presence test, and the only
+                # reason no shipped binding hit it was that none named an
+                # integer. Asking "does this number appear in this sentence"
+                # is a different and simpler question.
+                shown = [float(t.replace(",", ""))
+                         for t in re.findall(r"-?\d[\d,]*(?:\.\d+)?",
+                                             prose_only)]
+                # A PERCENT FORM IS THE SAME CLAIM. Prose `2.571%` against a
+                # stored 0.02571 was a false failure: document_tokens already
+                # computes the /100 candidates and the presence test threw
+                # them away, so an honest citation had to be written in the
+                # artifact's units to pass.
+                if not any(abs(f - got) <= tol or abs(f / 100 - got) <= tol
+                           or abs(f * 100 - got) <= tol for f in shown):
                     print(f"  {label[d]}:{n}  {val} is bound to {ref} and the "
                           f"artifact agrees, but no value on this line is "
                           f"{val} -- the prose moved away from its citation")
@@ -867,6 +1043,22 @@ def check(rows: list[dict], docs: list[Path]) -> int:
                 print(f"  {label[d]}:{n}  derived marker item is neither "
                       f"arithmetic nor `<value> = <reason>`: {bad_item!r}")
                 bad += 1
+            # ARITHMETIC THAT DOES NO WORK IS NOT A DERIVATION.
+            #
+            # `mk.group("body")` is OPTIONAL in `DERIVED`, so a bare
+            # `<!-- derived -->` made this raise AttributeError and abandon
+            # every remaining document -- 30 lines above the branch that
+            # prints a polite finding for exactly that case. Introduced by the
+            # commit that added this block, and no test covered it.
+            if mk and mk.group("body"):
+                for item in mk.group("body").split(";"):
+                    item = item.strip()
+                    if not _ARITH.fullmatch(item):
+                        continue
+                    objection = arithmetic_objection(item, known)
+                    if objection:
+                        print(f"  {label[d]}:{n}  {objection}")
+                        bad += 1
             # THE ARITHMETIC IS A CLAIM ABOUT THIS LINE, so check it against
             # the line. Without this the marker was decoration: changing the
             # headline from 1.16x-1.26x to 1.99x-2.26x while leaving the
@@ -893,6 +1085,10 @@ def check(rows: list[dict], docs: list[Path]) -> int:
             for tok, cands in pairs:
                 if mk and derived_accounts_for(tok, dvals, dnamed):
                     exempt += 1
+                    # A NAMED exemption rests on a prose reason no machine
+                    # reads. Counted separately so the summary can say how
+                    # much of the green tick is human assertion.
+                    named_exempt += _norm(tok) in dnamed
                     continue
                 seen += 1
                 # THE UNION ACROSS CANDIDATE FORMS, not whichever one a set
@@ -955,6 +1151,18 @@ def check(rows: list[dict], docs: list[Path]) -> int:
           f"{unprovenanced} without provenance; {stale_lineage} from a "
           f"superseded lineage; {unlisted} from an unregistered lineage; "
           f"{revived} retracted; {missing} missing")
+    # AND SAY WHAT THIS CANNOT SEE. A whole table of numbers computed on the
+    # wrong alert unit -- transaction instead of account-day, every value
+    # inflated 3.2x -- passed this gate cleanly at "1269 values, 0 findings",
+    # because each one traced correctly to a real field in a real artifact.
+    # Provenance discipline cannot detect a wrong estimand, and a confident
+    # green summary that does not say so supplies false assurance at the exact
+    # moment scepticism is called for.
+    print("  NOT checked here: that a value measures what its sentence says "
+          "it measures (unit/estimand -- see check_units.py), that a named "
+          f"marker's stated reason is true ({named_exempt} named exemption(s) "
+          "rest on prose alone), or that a comparison has the power to "
+          "support the word it is used with.")
     return bad + missing + unprovenanced + stale_lineage + revived + unlisted
 
 

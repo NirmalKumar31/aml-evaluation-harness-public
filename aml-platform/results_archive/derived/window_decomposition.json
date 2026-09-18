@@ -300,6 +300,8 @@
  },
  "bundle_decomposition": {
   "large_lgbm_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how each published budget metric divides between the volume-regime days and the generator's wind-down, per archived bundle. A decomposition of an observed number, not an estimate of anything about a population.",
    "segment_boundary_index": 31,
    "segment_boundary_day": "2022-11-07",
    "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
@@ -331,6 +333,8 @@
    "precision_pooled@200": 0.41991
   },
   "large_lgbm_s1": {
+   "alert_unit": "account-day",
+   "estimand": "how each published budget metric divides between the volume-regime days and the generator's wind-down, per archived bundle. A decomposition of an observed number, not an estimate of anything about a population.",
    "segment_boundary_index": 31,
    "segment_boundary_day": "2022-11-07",
    "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
@@ -362,6 +366,8 @@
    "precision_pooled@200": 0.39569
   },
   "large_lgbm_s2": {
+   "alert_unit": "account-day",
+   "estimand": "how each published budget metric divides between the volume-regime days and the generator's wind-down, per archived bundle. A decomposition of an observed number, not an estimate of anything about a population.",
    "segment_boundary_index": 31,
    "segment_boundary_day": "2022-11-07",
    "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
@@ -393,6 +399,8 @@
    "precision_pooled@200": 0.43889
   },
   "large_sorted_lgbm_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how each published budget metric divides between the volume-regime days and the generator's wind-down, per archived bundle. A decomposition of an observed number, not an estimate of anything about a population.",
    "segment_boundary_index": 31,
    "segment_boundary_day": "2022-11-07",
    "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
@@ -424,6 +432,8 @@
    "precision_pooled@200": 0.43379
   },
   "large_sorted_lgbm_s1": {
+   "alert_unit": "account-day",
+   "estimand": "how each published budget metric divides between the volume-regime days and the generator's wind-down, per archived bundle. A decomposition of an observed number, not an estimate of anything about a population.",
    "segment_boundary_index": 31,
    "segment_boundary_day": "2022-11-07",
    "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
@@ -455,6 +465,8 @@
    "precision_pooled@200": 0.35773
   },
   "large_sorted_lgbm_s2": {
+   "alert_unit": "account-day",
+   "estimand": "how each published budget metric divides between the volume-regime days and the generator's wind-down, per archived bundle. A decomposition of an observed number, not an estimate of anything about a population.",
    "segment_boundary_index": 31,
    "segment_boundary_day": "2022-11-07",
    "segment_boundary_source": "fallback: positive-count decline (raw volume unavailable)",
@@ -486,6 +498,8 @@
    "precision_pooled@200": 0.40928
   },
   "medium_baseline_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how each published budget metric divides between the volume-regime days and the generator's wind-down, per archived bundle. A decomposition of an observed number, not an estimate of anything about a population.",
    "segment_boundary_index": 7,
    "segment_boundary_day": "2022-09-17",
    "segment_boundary_source": "HI-Medium transaction-volume collapse",
@@ -517,6 +531,8 @@
    "precision_pooled@200": 0.48423
   },
   "medium_gbdt_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how each published budget metric divides between the volume-regime days and the generator's wind-down, per archived bundle. A decomposition of an observed number, not an estimate of anything about a population.",
    "segment_boundary_index": 7,
    "segment_boundary_day": "2022-09-17",
    "segment_boundary_source": "HI-Medium transaction-volume collapse",
@@ -548,6 +564,8 @@
    "precision_pooled@200": 0.80173
   },
   "small_gbdt_s0": {
+   "alert_unit": "account-day",
+   "estimand": "how each published budget metric divides between the volume-regime days and the generator's wind-down, per archived bundle. A decomposition of an observed number, not an estimate of anything about a population.",
    "segment_boundary_index": 6,
    "segment_boundary_day": "2022-09-11",
    "segment_boundary_source": "HI-Small transaction-volume collapse",
@@ -579,18 +597,20 @@
    "precision_pooled@200": 0.56946
   }
  },
- "code_git_sha": "23d70e6e0c3da1672e3e2c335ea98244b1fc919d",
+ "code_git_sha": "6afe21c5237bf034b511faa639467eb8ad992832",
  "generator_script": "aml-platform/scripts/window_volume.py",
- "generator_sha256": "a24c45726044608d4de60d371b915feffbe9c49cd5b84cfccf064f0f4899c3bb",
+ "generator_sha256": "c6693e788381475fd0478341401e2ec10d8594fc15c3c7973827720d057f654a",
  "generator_matches_commit": true,
- "code_tree_sha256": "0a4c4323ad9337c28efb35874fba22cf0f4dc8b85fb77ab2650596ad49c1f4f2",
+ "code_tree_sha256": "6f5347a93ea1e5878014646653291db946befa8d8548a7fd8cf6cc2e591f2c67",
  "code_tree_matches_commit": true,
+ "generator_blob_oid": "4e3c7e2ea5551c9e25945a4b83927299740c9b6d",
+ "package_tree_oid": "b2cbe23795b2e960f1a3350e582bd1efb50481f5",
  "provenance_scope": [
   "aml-platform/src",
   "aml-platform/scripts"
  ],
  "scope_clean": true,
- "generated_at": "2026-09-16T20:57:31Z",
+ "generated_at": "2026-09-17T23:00:20Z",
  "python_version": "3.12.3",
  "platform": "macOS-26.5.2-arm64-arm-64bit",
  "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",

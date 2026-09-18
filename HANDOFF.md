@@ -22,11 +22,11 @@ Every technical blocker any of them raised is closed; what is left needs a
 person rather than a commit, and is listed at the bottom.
 
 ```text
-repo      github.com/NirmalKumar31/aml-evaluation-harness-public   [PUBLIC, v0.1.0]
+repo      github.com/NirmalKumar31/aml-evaluation-harness-public   [PUBLIC, v0.1.1]
           github.com/NirmalKumar31/aml-evaluation-harness   [PRIVATE, dev archive]
 branch    main · ci + gates verified locally at this commit;
           the image job runs only in CI
-tests     416 collected · lint clean   (generated: results_archive/derived/release_facts.json)
+tests     420 collected · lint clean   (generated: results_archive/derived/release_facts.json)
 numbers   every published value traces to an artifact, from a canonical
           lineage, and is not on the retraction registry. The COUNT is not
           restated here -- it moves whenever a document does, and it was
@@ -143,7 +143,7 @@ evidence that the assertions are the right ones.
 | **A 32-feature logistic reaches `precision@50 = 0.57060` on HI-Medium**, against an eight-seed GBDT mean of **0.82480** (range 0.59144–0.89815). No claim is made about what *share* of it a linear model reaches: that fraction has no measured denominator | `results_archive/gold/eval_Medium/baseline/` and `eval_Medium/seed{0..7}/` |
 | **Every budget metric recomputes from 1.3 MB**, no dataset needed | `results_archive/replay/` + `scripts/verify_replay_bundle.py` |
 | A naive split reports **AP +40%**, of which **47% is composition (prevalence) and 53% score distribution** | `paper/RESULTS_split_inflation.md` |
-| **No per-structure detection claim is made.** The published 3.05× (p=0.0008) is retracted — its H0 assumed one rate per ring — and the ensemble has never been tested under a like-for-like null. A single-seed diagnostic on `medium_gbdt_s0` gives p = 0.46633 and establishes nothing about the ensemble <!-- historical --> | `results_archive/derived/typology_null.json` |
+| **No per-structure detection claim is made.** The published 3.05× (p=0.0008) is retracted — its H0 assumed one rate per ring — and the ensemble has never been tested under a like-for-like null. A single-seed diagnostic on `medium_gbdt_s0` gives p = 0.45661 and establishes nothing about the ensemble. One per-typology deviation survives Holm at 20000 draws (FAN-IN, p_holm 0.04048, interval [0.0355, 0.04545]) <!-- historical --> | `results_archive/derived/typology_null.json` |
 | `ring_recall` needs a null — and the first null was wrong. Against a within-day permutation: lift **0.9497**, p **1.000** for *more* rings than chance, lower-tail p **< 0.001**, which is the floor 1,000 permutations can express | `large_sorted_lgbm_s{0,1,2}` |
 
 ### The rule this project adopted, the hard way
@@ -239,6 +239,21 @@ sequence, including a failure table that is the most useful part of it.
 
 ## The public release, 2026-09-17
 
+**v0.1.1** at `2ffe3a5f` is current: signed tag, GitHub Release, and `ci`,
+`gates` and `image` green on that exact commit. `links` is **not** evidence:
+it is a weekly, deliberately non-blocking job that ends in `exit 0`, so it
+reports broken external links and cannot fail. Citing it alongside three real
+gates implied a fourth guarantee that does not exist. v0.1.0
+(`fa50490`) remains tagged as the first release; it was superseded rather than
+moved, because retagging a published SHA is worse than publishing a second
+tag. `CITATION.cff` is stamped inside v0.1.1, which v0.1.0's was not.
+
+What v0.1.1 corrected, all from an audit of v0.1.0: the segmented categorical
+experiment (which had never run at all), the typology report's use of a
+single-seed diagnostic to speak about the withdrawn ensemble, two wrong cells
+in the Holm column, and this snapshot's claim to offer replay verification it
+withholds.
+
 `https://github.com/NirmalKumar31/aml-evaluation-harness-public` · tag
 **v0.1.0** (signed) at commit `fa50490`, with ci + gates + image green on that
 exact SHA. `main` is protected: the three checks are required, force-push and
@@ -249,7 +264,7 @@ vulnerability reporting are all enabled.
 It is a CLEAN SNAPSHOT with two commits of history, not this repository. The
 nine row-level replay bundles are withheld while the CDLA question is open;
 `results_archive/replay_inventory.json` ships in their place. Verified from a
-clean clone: 384 passed, 31 skipped, `make release-check` green, packaging and
+clean clone: 387 passed, 32 skipped, `make release-check` green, packaging and
 Bicep green, full-history gitleaks clean, 53 bandit findings matching the
 baseline.
 
@@ -385,9 +400,12 @@ best thing in the repo.
    release container before teardown**, so the artifact now carries a full
    40-character commit, generator hash, package-tree hash, environment-lock
    hash, repo-relative input identities and parameters — where it previously
-   had a commit and nothing else. `scope_clean` is null because a container
-   has no git checkout; the commit is injected and the tree hash covers it
-   independently. The numbers reproduced exactly
+   had a commit and nothing else. `scope_clean` is **true**, not null: the
+   container now runs against a git checkout cloned from a bundle, with
+   `PYTHONPATH` pointing at that checkout rather than at the package baked
+   into the image — so the generator and the implementation it imports come
+   from the same commit. Earlier runs recorded null here, and this sentence
+   still explained why long after the cause was fixed. <!-- historical --> The numbers reproduced exactly
    (`results_archive/derived/categorical_ablation_medium.json`): `precision@50`
    is 0.57060 hashed, 0.57639 with the categoricals dropped, and 0.57639
    one-hot. The linear-baseline headline does not depend on the encoding.
@@ -413,9 +431,13 @@ best thing in the repo.
 - That detection is structure-dependent **at all** — retracted, and not
   replaced: the ensemble result has never been tested under a like-for-like
   null, and the single-seed diagnostic is a diagnostic. Against the within-day
-  permutation null the spread is the 53.5th percentile of chance
-  (p = 0.46633), and no per-typology ordering is established either: six of
-  eight concentration intervals span 1 and none survives Holm. The raw rates
+  permutation null the spread is the 54.3rd percentile of chance
+  (p = 0.45661). No per-typology ORDERING is established — six of eight
+  concentration intervals span 1 — but at 50000 draws ONE deviation now
+  survives Holm: FAN-IN is covered at 0.594 of its own null, p_holm = 0.04048.
+  The previous run used 400 draws, where the smallest attainable Holm value
+  over eight tests was 0.01995 and FAN-IN's raw p rested on four draws, so  <!-- derived: 0.01995 = eight tests over 401 draws, the Holm floor of the superseded 400-draw run. Not an artifact value, because that run is not archived and should not be -->
+  "none survives Holm" was a statement about the draw count. The raw rates
   track exposure to the wind-down. The ordering also does not replicate
   between rungs (p ≈ 0.014 against perfect replication)
 - That more training data improves detection (four confounds vary at once)

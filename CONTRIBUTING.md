@@ -34,7 +34,7 @@ load-bearing.
 ```bash
 cd aml-platform
 make setup          # venv + pinned deps
-make test           # 416 tests collected; the pass/skip split depends on
+make test           # 420 tests collected; the pass/skip split depends on
                     # which data-dependent intermediates exist locally
                     # contract tests whose built intermediates are
                     # absent from a fresh checkout (NOT Azure extras)

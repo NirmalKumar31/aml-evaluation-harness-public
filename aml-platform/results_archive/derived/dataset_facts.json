@@ -66,18 +66,20 @@
   "Reinvestment"
  ],
  "pct_rows_in_zero_positive_formats": 9.61,
- "code_git_sha": "09dbe48c2b429c7868a87c36917c1a781e4daa33",
+ "code_git_sha": "4b583103dc359ff1ec76508580ac434a04a19ac6",
  "generator_script": "aml-platform/scripts/measure_dataset_facts.py",
  "generator_sha256": "eb1cab78805dfc15c794a5bfbbefc6c96f855af96bc378123efd293da2dccc05",
  "generator_matches_commit": true,
- "code_tree_sha256": "74c336ed3557320e4a50de2a20ca9a9ee923c1df30fd9b0a7eb782367cc06941",
+ "code_tree_sha256": "6f5347a93ea1e5878014646653291db946befa8d8548a7fd8cf6cc2e591f2c67",
  "code_tree_matches_commit": true,
+ "generator_blob_oid": "e1ed87e3b32d4ed49786f6e326f1237c33f49d17",
+ "package_tree_oid": "b2cbe23795b2e960f1a3350e582bd1efb50481f5",
  "provenance_scope": [
   "aml-platform/src",
   "aml-platform/scripts"
  ],
  "scope_clean": true,
- "generated_at": "2026-09-15T06:45:40Z",
+ "generated_at": "2026-09-17T23:19:12Z",
  "python_version": "3.12.3",
  "platform": "macOS-26.5.2-arm64-arm-64bit",
  "env_lock_sha256": "d6e4994e6a8fa2d79a7b7e2fe20e4943ec80911b6d8ebaba7aa6d125d8d02e08",
@@ -94,6 +96,6 @@
  "parameters": {
   "src": "data/HI-Medium_Trans.csv"
  },
- "written_at": "2026-09-15T06:45:40Z",
+ "written_at": "2026-09-17T23:19:12Z",
  "source_csv": "data/HI-Medium_Trans.csv"
 }

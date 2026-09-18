@@ -1,4 +1,4 @@
-.PHONY: demo get-data verify-data setup test lint release-check package-smoke lock lock-hashes docker-build leak-sweep model-stability ingest patterns reconcile splits sweep features train evaluate leaks all full clean
+.PHONY: demo replay-demo get-data verify-data setup test lint release-check package-smoke lock lock-hashes docker-build leak-sweep model-stability ingest patterns reconcile splits sweep features train evaluate leaks all full clean
 
 # Default rung = HI-Medium (the working file). Override with: make VARIANT=Small ...
 VARIANT ?= Medium
@@ -39,6 +39,23 @@ setup:
 # The numbers it prints are meaningless by construction and it says so.
 demo:
 	$(PY) -m aml.cli demo --dest $(D)/demo
+
+# NO-DATA REPLAY, DEMONSTRABLE WITHOUT THE DATASET.
+#
+# The archived bundles are withheld from the public snapshot while the CDLA
+# question is unreviewed, and the README therefore said no-data replay
+# verification "is not available" there. That was false about the MECHANISM,
+# which is the differentiator: this target generates a synthetic corpus, cuts a
+# bundle from it, and recomputes every published budget metric from the bundle
+# alone -- about 0.03 MB, no AMLworld bytes, nothing licensed.
+replay-demo:
+	$(PY) -m aml.cli demo --dest $(D)/replay-demo > /dev/null
+	$(PY) scripts/make_replay_bundle.py --features $(D)/replay-demo/features \
+	  --splits $(D)/replay-demo/splits \
+	  --scores $(D)/replay-demo/models/gbdt_test_scores.parquet \
+	  --dest $(D)/replay-demo/bundle --data-origin synthetic > /dev/null
+	$(PY) scripts/verify_replay_bundle.py --bundle $(D)/replay-demo/bundle \
+	  --manifest $(D)/replay-demo/models/manifest.json
 
 # The published results need the real dataset, which is not redistributable.
 get-data:
@@ -173,7 +190,10 @@ release-check:
 	    -k "derived_artifact_names or refuses_when_the_code"
 	@echo "== replay bundles recompute the published metrics ==" && \
 	  .venv/bin/pytest -q -k replay
+	@echo "== no-data replay works without the dataset ==" && $(MAKE) replay-demo
 	@echo "== published numbers ==" && $(PY) scripts/make_tables.py --check --gate
+	@echo "== budget metrics agree on their alert unit ==" && \
+	  $(PY) scripts/check_units.py
 	@echo "== published counts ==" && $(PY) scripts/release_facts.py --verify-artifact && \
 	  $(PY) scripts/release_facts.py --check --gate
 	@echo "== links and table structure ==" && $(PY) scripts/check_links.py ..

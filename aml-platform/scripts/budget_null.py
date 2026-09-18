@@ -201,7 +201,19 @@ def null_bounds(pop: pd.DataFrame, thin_from, budgets=BUDGETS) -> dict:
     day = pd.to_datetime(pop["day"]).dt.date.to_numpy()
     P = pop["n_positive"].to_numpy().astype(float)
     head = day < thin_from
-    out = {"days": len(P), "head_days": int(head.sum()),
+    out = {"alert_unit": "account-day",
+           # WHAT THIS NUMBER IS, stated in the artifact rather than inferred
+           # from its key. Provenance cannot detect a wrong estimand, and this
+           # project spent a day proving that: a table of lifts traced
+           # correctly to a real artifact while measuring transactions where
+           # the headline measured account-days.
+           "estimand": (
+               "the precision@k a UNIFORMLY RANDOM ranker attains on the "
+               "evaluated ring-aware test split -- the slot-weighted mean of "
+               "daily account-day prevalence, bracketed because a truncated "
+               "day bounds its population rather than fixing it. It is a "
+               "property of the SPLIT, not of any model."),
+           "days": len(P), "head_days": int(head.sum()),
            "tail_days": int((~head).sum()), "thin_from": str(thin_from),
            "n_positive_total": int(P.sum())}
 
@@ -250,6 +262,65 @@ def null_bounds(pop: pd.DataFrame, thin_from, budgets=BUDGETS) -> dict:
         nb = np.less_equal(N, b)
         out[f"nonbinding_days@{b}"] = int(nb.sum())
         out[f"nonbinding_day_list@{b}"] = [str(d) for d in day[nb]]
+    return out
+
+
+def nonbinding_from_bundle(bundle: Path, budgets=(10, 50, 200)) -> dict:
+    """Non-binding days for one bundle, WITHOUT the raw file.
+
+    A day is non-binding at budget k when it holds no more account-days than
+    k. Every ranker then alerts that day's entire population, so precision on
+    it equals its prevalence for any ranker and it carries no information
+    about the ranking at all -- which is why this project's own rule is to
+    exclude such days and bracket rather than point (`docs/LIMITATIONS.md`
+    section 1).
+
+    THAT RULE WAS APPLIED TO TWO RUNGS AND NOT TO THE THIRD. `null_bounds`
+    runs only where the raw CSV is present, because bounding N_d on a
+    TRUNCATED day needs it -- so HI-Large, whose raw file is 18 GB and is not
+    kept, had no non-binding accounting in any artifact or any document. It is
+    the worst of the three rungs (28 of 97 days at k=50, carrying 16.2% of
+    every alert) and it supplies six of the nine archived bundles.
+
+    Identifying non-binding days needs no raw file. The bundle holds each
+    day's top `max_budget` rows plus every ring account-day, so a day whose
+    highest rank is strictly BELOW the cap was written in full and its N_d is
+    exactly that highest rank -- the same rule this module already states. At
+    k equal to the cap the question is not answerable, which is why the
+    budgets here stay under it and the truncated days are counted separately.
+    """
+    ad = pd.read_parquet(bundle / "account_days_topk.parquet")
+    cap = json.loads((bundle / "bundle.json").read_text())["max_budget"]
+    mx = ad.groupby("day")["rank"].max()
+    n_days = int(mx.size)
+    out = {
+        "alert_unit": "account-day",
+        "n_days": n_days,
+        "max_budget": cap,
+        "days_provably_written_in_full": int((mx < cap).sum()),
+        "days_truncated_at_the_cap": int((mx >= cap).sum()),
+        "rule": "a day is non-binding at k when N_d <= k; N_d is known only "
+                "for days whose highest rank is strictly below max_budget, so "
+                "budgets at or above the cap are not reported",
+    }
+    pos = pd.read_parquet(bundle / "per_day_positives.parquet")
+    total_pos = int(pos.positive_account_days.sum())
+    for b in budgets:
+        if b >= cap:
+            continue
+        nb = mx[mx <= b]
+        days = set(nb.index)
+        alerts_all = int((ad["rank"] <= b).sum())
+        # On a non-binding day every account-day is alerted, so the day's own
+        # contribution is its whole population.
+        alerts_nb = int(nb.sum())
+        p_nb = int(pos[pos.day.isin(days)].positive_account_days.sum())
+        out[f"nonbinding_days@{b}"] = int(nb.size)
+        out[f"nonbinding_day_share@{b}"] = round(nb.size / n_days, 5)
+        out[f"nonbinding_alert_share@{b}"] = (
+            round(alerts_nb / alerts_all, 5) if alerts_all else None)
+        out[f"nonbinding_positive_share@{b}"] = (
+            round(p_nb / total_pos, 5) if total_pos else None)
     return out
 
 
@@ -331,6 +402,12 @@ def main(argv=None) -> int:
             "count. `nonbinding_day_list@k` names days where N_d <= k, on "
             "which precision@k equals the day's prevalence for every ranker."),
         "budgets": list(BUDGETS),
+        # EVERY ARCHIVED BUNDLE, including the rungs whose raw file is absent.
+        # This is the accounting HI-Large never had.
+        "nonbinding_by_bundle": {
+            d.name: nonbinding_from_bundle(d)
+            for d in sorted((root / "results_archive/replay").iterdir())
+            if (d / "account_days_topk.parquet").exists()},
         "rungs": facts,
     }
     from aml.manifest import generator_provenance

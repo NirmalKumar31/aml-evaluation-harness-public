@@ -177,7 +177,7 @@ Read-only queries on 2026-09-15 found:
 
 - resource group `aml-rg` still exists with 10 resources;
 - `aml-vm` is **running**;
-- public IP `52.188.117.210` remains attached;
+- a static public IP remains attached (address redacted: it is the live VM's, and this file ships publicly);
 - the custom TCP/22 rule is `Deny` from `*`;
 - no NAT gateway exists in the live group;
 - no `Microsoft.DevTestLab/schedules` shutdown resource exists;

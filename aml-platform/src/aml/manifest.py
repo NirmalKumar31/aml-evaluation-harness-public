@@ -44,7 +44,19 @@ def git_sha() -> str:
     for anything whose numbers will be published.
     """
     injected = os.environ.get("AML_GIT_SHA", "").strip()
-    if injected:
+    # A SENTINEL IS NOT A SHA, and this returned one ahead of the repository.
+    # The release image bakes `AML_GIT_SHA=unknown` into its environment, so a
+    # run inside the container recorded `code_git_sha: "unknown"` while
+    # `git rev-parse HEAD` in the same working directory resolved the commit
+    # perfectly -- the injection point, which exists to SUPPLY provenance a
+    # container lacks, was suppressing provenance it had. The artifact then
+    # carried `scope_clean: true` beside an unnamed commit, because
+    # `dirty_within` asks git directly and got a real answer: an affirmative
+    # cleanliness claim about a commit the same file declines to name. It also
+    # forced `generator_matches_commit` and `code_tree_matches_commit` to
+    # null, since both need a resolvable commit -- which is exactly the
+    # "grandfathered provenance" the release checklist demands be closed.
+    if injected and injected.lower() not in _NOT_A_SHA:
         return injected
     sha = _git_sha_from_repo()
     if sha == "unknown" and os.environ.get("AML_REQUIRE_PROVENANCE") == "1":
@@ -54,11 +66,39 @@ def git_sha() -> str:
     return sha
 
 
+# Values that mean "nobody knew", whoever wrote them. Treated as absent.
+_NOT_A_SHA = frozenset({"unknown", "none", "null", "nil", "n/a", "-"})
+
+
 def _git_sha_from_repo() -> str:
+    """The commit of the repository that tracks THIS PACKAGE, or "unknown".
+
+    ⛔ THIS ASKED ABOUT THE PROCESS WORKING DIRECTORY. `git rev-parse HEAD`
+    with no `-C` answers about wherever the process happens to be standing, so
+    a run whose cwd was an unrelated git repository stamped THAT repository's
+    HEAD as the provenance of this code. While the `unknown` sentinel
+    short-circuited ahead of it the branch was mostly unreachable; removing
+    that short-circuit made it the default path inside the release container,
+    which is exactly where provenance matters most. A plausible wrong
+    40-character sha is far worse than "unknown", because "unknown" is
+    detectable and `AML_REQUIRE_PROVENANCE=1` fires on it, while a real sha
+    from the wrong repository passes every downstream check.
+
+    So: ask about the package directory, and require that the repository
+    actually TRACKS this package. An installed copy sitting inside somebody
+    else's checkout is not provenance.
+    """
+    pkg = Path(__file__).resolve().parent
     try:
+        tracked = subprocess.run(
+            ["git", "-C", str(pkg), "ls-files", "--error-unmatch",
+             Path(__file__).name],
+            capture_output=True)
+        if tracked.returncode != 0:
+            return "unknown"
         return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL
-        ).decode().strip()
+            ["git", "-C", str(pkg), "rev-parse", "HEAD"],
+            stderr=subprocess.DEVNULL).decode().strip()
     except Exception:  # noqa: BLE001 - best effort; not being in a git checkout
         return "unknown"      # is normal in a container, and must not fail a run
 
@@ -364,6 +404,36 @@ def _full_sha(sha: str) -> str:
 PKG_GIT_PREFIX = "aml-platform/src/aml"
 
 
+def git_oid(repo_relative: str, commit: str = "HEAD") -> str | None:
+    """`git rev-parse <commit>:<path>` -- a CONTENT-ADDRESSED id, or None.
+
+    WHY THIS AND NOT THE COMMIT SHA. A commit sha only resolves in a clone
+    that has that commit. The public snapshot of this project shares no
+    history with the development archive -- a force-push orphaned the base --
+    so every recorded `code_git_sha` is unresolvable there: 13 of 13 derived
+    artifacts, in the only repository a reader can clone.
+
+    A blob or tree OID is the sha1 of the CONTENT, so it is identical in any
+    repository holding the same bytes, with or without shared history. A
+    reader verifies an artifact by running the same `git rev-parse` in their
+    own clone and comparing one string. That is a provenance claim they can
+    actually check, and it costs one call per artifact.
+
+    It is also strictly stronger than `code_tree_sha256` for the generator:
+    that hash covers `src/aml` only, so a modified generator over an
+    unmodified package still read "verified".
+    """
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(Path(__file__).resolve().parent),
+             "rev-parse", f"{commit}:{repo_relative}"],
+            capture_output=True, text=True)
+    except OSError:
+        return None
+    oid = out.stdout.strip()
+    return oid if out.returncode == 0 and re.fullmatch(r"[0-9a-f]{40}", oid) else None
+
+
 def tree_hash_at(commit: str, prefix: str = PKG_GIT_PREFIX) -> str | None:
     """`tree_hash()` recomputed from git objects at `commit`, or None.
 
@@ -665,6 +735,10 @@ def generator_provenance(script: str | Path, *,
         # answer was no, which the regression test rejects.
         "code_tree_sha256": tree_now,
         "code_tree_matches_commit": tree_matches,
+        # CONTENT-ADDRESSED, so a reader can check these in a clone that has
+        # none of this repository's history. See `git_oid`.
+        "generator_blob_oid": git_oid(rel),
+        "package_tree_oid": git_oid(PKG_GIT_PREFIX),
         # WHAT WAS REQUIRED TO BE CLEAN, recorded so a reader knows how wide
         # the guarantee is rather than having to infer it.
         "provenance_scope": list(scope),

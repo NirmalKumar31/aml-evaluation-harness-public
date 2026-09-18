@@ -687,39 +687,84 @@ matters, because it averages the volume days with the wind-down. The claim
 pooled numbers for several rounds. **It is withdrawn, and the segmented
 measurement contradicts it.**
 
-#### On the volume days the encoding does matter, and not consistently
+#### ⛔ And that segmented table was measured on the WRONG ALERT UNIT
 
-`precision@50` on the head segment, against a random ranker on that same
-segment (`by_segment` in both ablation artifacts):
+The version published here ranked **transaction rows**, while every other
+budget metric in this repository goes through `to_account_days`. An
+account-day is positive if *any* of that account's transactions was
+laundering, so account-day prevalence is strictly the higher: the head-segment
+null came out at 0.00077 against the **0.00243** `budget_null.py` computes for  <!-- derived: 0.00077 = a WITHDRAWN transaction-unit figure this paragraph exists to narrate. Deliberately in no artifact -- the artifact was regenerated on the account-day unit and these values exist nowhere else -->
+the same rung and the same segment, and every lift in the table was inflated
+by about 3.16x. It read 26.135 / 33.5965 / 37.3338 on HI-Medium and  <!-- derived: 3.16 = 0.00243/0.00077, the inflation factor of the withdrawn unit; 26.135 = a WITHDRAWN transaction-unit figure this paragraph exists to narrate. Deliberately in no artifact -- the artifact was regenerated on the account-day unit and these values exist nowhere else; 33.5965 = the same; 37.3338 = the same -->
+34.2174 / 15.204 / 19.0135 on HI-Small, and it was presented as a  <!-- derived: 34.2174 = a WITHDRAWN transaction-unit figure this paragraph exists to narrate. Deliberately in no artifact -- the artifact was regenerated on the account-day unit and these values exist nowhere else; 15.204 = the same; 19.0135 = the same -->
+decomposition of an account-day headline.
 
-| arm | HI-Medium lift | HI-Small lift |
-|---|---:|---:|
-| categoricals dropped | 26.135 | 34.2174 |
-| hashed into 1000 buckets | 33.5965 | 15.204 |
-| one-hot, train-only vocabulary | 37.3338 | 19.0135 |
+The artifact ended up carrying `precision@50` twice, at two units, under one
+key name — 0.57060 account-day beside 0.48858 transaction, in the same arm.  <!-- derived: 0.48858 = a WITHDRAWN transaction-unit figure this paragraph narrates. Deliberately in no artifact -->
+And the consequence landed on a published figure: the transaction-unit pooled
+lift for the *linear* arm, 1.7798x, sits inside the published account-day  <!-- derived: 1.7798 = a WITHDRAWN transaction-unit figure this paragraph narrates. Deliberately in no artifact -->
+range for the *GBDT*, 1.79x–1.94x.  <!-- derived: 0.88079/0.49147; 0.88079/0.45392 --> `make_tables.UNITS` bound `precision@50` to
+`acct-day` the entire time and referenced it exactly once, in an f-string that
+prints a table column. `scripts/check_units.py` now refuses a budget metric
+whose unit is undeclared or disagrees across artifacts.
 
-Two things follow, and only two. **The arms are not equivalent**: they span a
-43% relative range on HI-Medium where the pooled figures agreed to 1%, so the
-pooled agreement was agreement about the window, exactly as suspected. And
-**the direction does not replicate**: dropping the categoricals is the *worst*
-arm on HI-Medium and the *best* on HI-Small. One seed, one model family, two
-rungs that disagree — so this establishes that the encoding affects the
-volume-segment headline, and it does **not** establish which encoding to
-prefer.
+#### On the volume days, recomputed on the alert unit — and the design has no power
 
-This is what the `--thin-from` path was for, and it could not produce it: the
-path crashed on its first line for as long as it existed (`m is slice(None)`,
-an identity comparison between two distinct slice objects) and no test ever
-called the function. Fixed, tested against a hand-computed frame, and rerun on
-the cloud VM.
+`precision@k` on the head segment against a random ranker on that same
+segment, with the **true-positive count** beside every rate, because that is
+the whole content of the comparison:
 
-⚠️ That is **evidence against** the hash-geometry concern; it does not close
-it. This paragraph said the concern "is answered: it is not", four paragraphs
-above the note explaining that the artifact has partial provenance and must
-not be used to close the question — a cross-check pointed out that a document
-cannot hold both. One run, one seed, one rung, collisions unmeasured, and no
-package-tree hash to show which code produced it. Closing it means the rerun
-named in the release checklist. <!-- historical -->
+| arm | Medium @50 | Medium @200 | Small @50 | Small @200 |
+|---|---:|---:|---:|---:|
+| categoricals dropped | 14 / 350 | 58 / 1400 | 14 / 300 | 48 / 1200 |
+| hashed into 1000 buckets | 15 / 350 | 67 / 1400 | 22 / 300 | **66 / 1200** |
+| one-hot, train-only vocabulary | **18 / 350** | **75 / 1400** | **30 / 300** | 62 / 1200 |
+| lift range across arms | 16.46x–21.16x | 17.05x–22.04x | 17.25x–36.97x | 14.79x–20.33x |
+
+**One-hot leads in three of the four cells and the fourth reverses.** On
+HI-Small at k=200 the hash beats one-hot, 66 against 62. An earlier draft of
+this section claimed the ordering was "monotone and identical across both
+rungs" — that was read off k=50 alone, which is the same budget-selection
+error this experiment exists to expose, one level up.
+
+**And the design cannot settle it, at any effect size.** The arms rank the
+same account-days of the same days under the same split, so this is a *paired*
+comparison and Fisher on two proportions is the wrong test. It is also not
+paired at the alert: the head segment is **7 days** on HI-Medium and **6** on
+HI-Small, and within a day all three arms re-rank one population, so the
+discordant alerts cluster by day and their signs come from one per-day score
+reshuffle. Treating 22 correlated alerts as 22 independent observations is
+anti-conservative, and by a factor that is not a constant: across the twelve
+matched comparisons the day-blocked p-value is between **0.93x** and **27.78x**  <!-- derived: 0.125/0.1338; 0.6875/0.02475 -->
+the alert-level one. On the comparison this section leads with -- dropped
+against one-hot at k=50 on HI-Small -- McNemar reads 0.01659 and the
+day-blocked test reads 0.21875. An earlier version of this paragraph said
+"roughly eightfold", which spliced two p-values from *different* pairs. <!-- historical -->
+
+The bound is the finding. Blocking on the day fixes the randomization set at
+`2**d` sign assignments, of which exactly two are at least as extreme as a
+unanimous result — so **no** test at this blocking, sign or permutation or
+signed-rank, can return below `2 x 0.5**d`. That floor is **0.015625** at  <!-- derived: 0.015625 = the smallest two-sided p-value any day-blocked test can attain on 7 paired days, 2/2**7. A property of the DESIGN, in no artifact -->
+seven days and **0.03125** at six, and after Holm across the six pairwise  <!-- derived: 0.03125 = the same quantity on 6 paired days, 2/2**6. In no artifact -->
+comparisons, **0.094** and **0.1875**. Neither rung can reach 0.05 on this  <!-- derived: 0.09375 = the seven-day floor after Holm over six comparisons, 6 * 2/2**7. Design arithmetic, in no artifact; 0.1875 = the same for six days, 6 * 2/2**6 -->
+design even with a perfect, unanimous result. Nothing survives Holm on either
+rung as measured, and nothing could have.
+
+The artifact reports both blocked tests, because the sign test discards
+magnitude: it counts only the direction of each day's net, so a day that moved
+by seven alerts weighs the same as one that moved by one. On HI-Medium that
+puts the best comparison at 1.0 where the exact sign-flip permutation on the
+same day-level nets gives **0.1875**. Same floor, strictly more power, same
+conclusion.
+
+**So: no encoding is shown to be better than any other on the volume segment,
+and this design cannot show one.** What the segmentation *did* establish is
+the thing worth carrying, and it is a per-rung statement: on HI-Medium the
+three pooled figures agree to **1%** while the head-segment lifts span
+16.46x–21.16x, and on HI-Small the pooled figures span **5.6%** against head
+lifts of 17.25x–36.97x. Either way the pooled agreement was agreement about
+the window. Settling the encoding question needs a budget that binds on enough
+days to have power — not more seeds at k=50.
 
 On **average precision** the categoricals matter a great deal — removing them
 halves it (1.98×) — and one-hot beats the hash by 5%. So the hashed encoding
@@ -734,7 +779,7 @@ categorical columns are encoded.**
 open.** `categorical_ablation_medium.json` was regenerated on the cloud VM
 inside the release container and records a full 40-character commit, generator
 hash, package-tree hash, environment-lock hash, repo-relative input identities
-and parameters. `scope_clean` is null because a container has no git checkout.
+and parameters, with `scope_clean` **true** — the container runs against a git checkout cloned from a bundle rather than the package baked into the image. This line read "null because a container has no git checkout" for as long as that was true and for some hours after it stopped being. <!-- historical -->
 One caveat that "full provenance" should not paper over: the transformed
 feature inputs are identified by path and size, not by content hash — the RAW
 dataset files are strongly pinned, but the derived feature table is not. The
@@ -768,7 +813,7 @@ rows) carry **zero** positives, which is why the feature is informative at all.
   `subsample_for_bin` defaulting to 200,000 and no bagging or feature fraction
   set. Tree construction is deterministic once the bins are fixed. So the 8
   seeds are **8 quantile-estimation draws**, and the A/B sign tests
-  (p=0.0078, p=0.0156) use bin-edge resampling as their error term. <!-- derived: 2/2**8; 2/2**7 -->
+  (p=0.0078, p=0.0156) use bin-edge resampling as their error term. <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact and cannot be; 0.0156 = the smallest two-sided sign-test p-value attainable on 7 paired observations, 2/2**7. A property of the DESIGN, not a measurement -->
 
   That still supports an exact test — the draws are i.i.d., the subsample
   indices depend only on row count, which is identical across arms, so the
@@ -779,7 +824,7 @@ rows) carry **zero** positives, which is why the feature is informative at all.
 - **The sign test is at its power floor, and that makes the multiplicity
   family determinative.** An exact two-sided sign test on 8 paired
   observations has a **minimum attainable p-value of 0.0078125**; on 7, after
-  dropping a tie, it is 0.015625. <!-- derived: 2/2**7 -->
+  dropping a tie, it is 0.015625. <!-- derived: 0.015625 = the smallest two-sided sign-test p-value attainable on 7 paired observations, 2/2**7. A property of the DESIGN, not a measurement -->
   The two reported p-values are not effect sizes, they are the floor — no
   effect, however large, can do better at this n.
 
@@ -836,16 +881,35 @@ rows) carry **zero** positives, which is why the feature is informative at all.
   own sign reversal:
 
   ```text
-  spread, HI-Medium   observed 3.46875   null median 3.42745   p = 0.46633
-                      the observed value is the 53.5th percentile of chance
+  spread, HI-Medium   observed 3.46875   null median 3.4131    p = 0.45661
+                      the observed value is the 54.2nd percentile of chance
+                      20000 draws
   ```
 
-  And no per-typology ordering survives either: six of eight
-  `ring_coverage_concentration` intervals span 1, none is distinguishable
-  after Holm, and P(the two typologies at the ends of the apparent
+  And no per-typology ORDERING survives either: six of eight
+  `ring_coverage_concentration` intervals span 1, and P(the two typologies at the ends of the apparent
   "inversion" land that way under H0) is 0.485. An earlier correction read an
   ordering off those ratios without an interval and called it an inversion --
-  the same mistake, one level down. 14 of 529
+  the same mistake, one level down.
+
+  ⛔ **And "none survives Holm" was itself a statement about the draw count.**
+  That sentence stood here while the null ran at **400** draws, where the
+  smallest Holm value attainable over eight tests is 0.01995 and FAN-IN's raw  <!-- derived: 0.01995 = eight tests over 401 draws, the Holm floor of the superseded 400-draw run. Not an artifact value, because that run is not archived and should not be -->
+  p rested on **four** draws -- a Monte-Carlo interval on its adjusted p
+  straddled 0.05, so the simulation could not distinguish the conclusion from
+  its own opposite. Rerun at 50000 draws, FAN-IN's raw p is 0.00506 on 252
+  draws and its Holm value is **0.04048**, with a Monte-Carlo interval of
+  [0.0355, 0.04545] that clears 0.05 entirely: one of the eight deviations
+  survives the family correction, and it is a *deficit* -- FAN-IN rings are
+  covered at 0.594 of their own null, not above it. 20000 draws were not
+  enough to say so: there the adjusted interval was [0.0354, 0.0518],
+  straddling the threshold, and the artifact recorded the run as unresolved
+  and named the 32512 draws needed. Single-seed, and on one
+  archived replay, but no longer a null result. The artifact now records the
+  integer count behind every p-value and the smallest Holm value the draw
+  count can reach, so this failure mode is visible without recomputing it.
+
+  14 of 529
   rings end on a day where the budget exceeds the population — all 14
   GATHER-SCATTER — and this repository has documented that defect for
   `precision@k` since §1 without ever applying it to `ring_recall`.
@@ -991,9 +1055,29 @@ state it.
 - ⛔ **removed from this list.** It read "a linear baseline already <!-- historical -->
   reaches precision@50 = 0.5706 at the top of the ranking" — a pooled level. That is a
   pooled level on a two-regime window and beats a random ranker by only
-  1.16x-1.26x; §1 retracts it. What is claimable is the volume-segment lift:
-  **17.6x** for the linear baseline and **310.3x** for the boosted model, both  <!-- derived: 0.04286/0.00244; 0.75714/0.00244 -->
-  against a null of 0.00243-0.00244.
+  1.16x-1.26x; §1 retracts it. What is claimable is the volume-segment lift,
+  **with its ceiling**: **17.6x** for the linear baseline and **310.3x** for the boosted model,  <!-- derived: 0.04286/0.00244; 0.75714/0.00244 -->
+  against a null of 0.00243-0.00244
+- ⚠️ **and that pair means less than it looks.** Every head day holds far more
+  positives than the budget has slots, so all **350** head alert slots are  <!-- source: 350 <- derived/window_decomposition.json#bundle_decomposition.medium_gbdt_s0.ceiling_count_head@50 -->
+  fillable with positives and a perfect ranker would reach precision 1.0. The
+  largest lift attainable on that segment is therefore **409.8x**, the  <!-- derived: 1/0.00244 -->
+  reciprocal base rate — a property of IBM's generator, not of any ranker. The
+  two lifts above are the head precisions 0.75714 and 0.04286 rescaled by that
+  one constant, and nothing more. In counts: the boosted model takes **265** of  <!-- source: 265 <- derived/window_decomposition.json#bundle_decomposition.medium_gbdt_s0.true_positives_head@50 -->
+  those slots and the linear baseline **15**. Quote the counts, or the  <!-- source: 15 <- derived/window_decomposition.json#bundle_decomposition.medium_baseline_s0.true_positives_head@50 -->
+  precisions against their ceiling, but do not quote a lift without saying what
+  bounds it. This project invented `recall_ceiling@k` for exactly this reason
+  and then published precision lifts without one.
+
+**Not claimable:**
+
+<!-- THIS HEADER WAS MISSING, and its absence inverted the section. The four
+     bullets below sat directly under "Claimable:", so the file the README
+     twice cites as "what may and may not be claimed" listed "anything about
+     detecting money laundering in the real world" as CLAIMABLE. It shipped in
+     the public v0.1.1 tag. A reviewer who opens one page opens this one. -->
+
 - anything about detecting money laundering in the real world
 - that graph features do not help AML
 - that any typology is harder than another

@@ -68,13 +68,37 @@ def _script(name: str) -> Path:
     raise FileNotFoundError(f"scripts/{name} not found from {here}")
 
 
-# Artifacts that predate the package-tree check and cannot be regenerated
-# here. Each one says so in its own `metadata_migration_note`; the exemption is
-# by name so that adding to this list is a deliberate act rather than a silence.
-GRANDFATHERED_NO_TREE_HASH = {
-    # Ran on the cloud VM against HI-Medium features that are not on this
-    # machine. Its generator blob and full commit SHA do verify.
-    "categorical_ablation_medium.json",
+# ⛔ ONE SET WAS DOING TWO JOBS, and that is how a wrong-unit artifact
+# survived. `GRANDFATHERED_NO_TREE_HASH` is named for artifacts that predate
+# the package-tree check -- but it was ALSO consulted by the staleness check,
+# so naming a file here excused it from "your generator has changed since this
+# was generated" as well. `categorical_ablation_medium.json` sat in it, and
+# went on reporting a transaction-unit null of 0.00077 for hours after
+# `segment_metrics` was rewritten, without the suite noticing.
+#
+# Two sets now, because they are two different claims. An artifact may
+# legitimately lack a tree hash; nothing may legitimately be stale.
+GRANDFATHERED_NO_TREE_HASH: set[str] = set()
+
+# Artifacts knowingly generated from a generator that has since changed. This
+# should be EMPTY. An entry is a promise to rerun, not a waiver: it means a
+# published number was produced by code that is no longer in the tree.
+STALE_GENERATOR_ACCEPTED: set[str] = set()
+
+# ⛔ THIS SET SAID FOUR ARTIFACTS COULD NOT BE REGENERATED HERE, AND THEY
+# COULD. The comment read "each needs the dataset ... cannot be closed on a
+# machine that does not hold the CSVs" -- on a machine holding
+# HI-Medium_Trans.csv (3.03 GB), HI-Small_Trans.csv (475 MB) and all three
+# Patterns files. Seventeen minutes of local compute was described as
+# impossible, which is how an exemption set becomes a place to put things
+# rather than a record of a constraint. All four are now regenerated.
+#
+# One entry remains, and its reason is a real constraint rather than an
+# inconvenience: `cost.json` is a live billing snapshot whose final value does
+# not exist until the resource group is torn down (release checklist item 16).
+# Regenerating it now would pin a number that is still moving.
+NO_CONTENT_ADDRESSED_OID = {
+    "cost.json",
 }
 
 
@@ -683,13 +707,42 @@ def test_average_precision_carries_its_unit():
     """AP is computed on TRANSACTIONS; every budget metric is computed on
     ACCOUNT-DAYS. The README reported 'average_precision 0.3149' beside
     'precision@50 0.9062' as though they shared a denominator. The suffix makes
-    the unit travel with the number into every manifest and table."""
-    import inspect
+    the unit travel with the number into every manifest and table.
 
-    from aml.eval import metrics
-    src = inspect.getsource(metrics.evaluate)
-    assert '"average_precision__txn"' in src
-    assert '"average_precision":' not in src, "unsuffixed key is ambiguous"
+    ⛔ THIS TEST ASSERTED A SUBSTRING. It read
+    `inspect.getsource(metrics.evaluate)` and checked that the text
+    `"average_precision__txn"` appeared somewhere in it -- so it verified
+    SPELLING in one function, not that the number carries the unit its name
+    claims. A value computed on the wrong unit under the right key name passed
+    it, which is exactly the defect that shipped in the segmented ablation and
+    went public. It now RUNS `evaluate` on a frame where transactions and
+    account-days disagree, and pins the value to an independent computation.
+    """
+    import datetime as _dt
+
+    from sklearn.metrics import average_precision_score
+
+    from aml.eval.metrics import evaluate
+    # A frame on which the two units DISAGREE: four transactions on one day
+    # over seven accounts, two on the next over four.
+    te = pd.DataFrame({
+        "event_date": pd.to_datetime([_dt.date(2022, 9, 15)] * 4
+                                     + [_dt.date(2022, 9, 16)] * 2),
+        "is_laundering": [1, 0, 0, 0, 1, 1],
+        "sender_id": ["A", "A", "D", "F", "H", "J"],
+        "receiver_id": ["B", "C", "E", "G", "I", "K"],
+        "ring_id": ["r1", None, None, None, None, None],
+    })
+    score = np.array([0.9, 0.8, 0.2, 0.1, 0.9, 0.8])
+    m = evaluate(te, score, budgets=(2,), per_typology=False, n_permutations=0)
+
+    assert "average_precision__txn" in m, "the suffixed key is missing"
+    assert "average_precision" not in m, "unsuffixed key is ambiguous"
+    # THE VALUE, on the unit the suffix claims: AP over the six TRANSACTIONS.
+    want = average_precision_score(te.is_laundering.to_numpy(), score)
+    assert abs(m["average_precision__txn"] - want) < 1e-12, (
+        f"average_precision__txn is {m['average_precision__txn']}, but AP over "
+        f"transactions is {want} -- the suffix says txn, the number does not")
 
 
 def test_ring_recall_is_reported_against_a_size_matched_null():
@@ -763,13 +816,42 @@ def test_ring_coverage_is_measured_on_account_days_not_transactions():
     `100 - typology_coverage_pct` -- algebraically the negation of a metric
     that already existed, adding no information at all, while its own comment
     claimed to describe account-days.
-    """
-    import inspect
 
-    from aml.eval import metrics
-    src = inspect.getsource(metrics.evaluate)
-    assert "pct_positive_acct_days_without_ring" in src
-    assert "pct_positives_without_ring" not in src, "that was 100 - coverage"
+    ⛔ AND THIS ASSERTED A SUBSTRING TOO -- that the key name appears in
+    `inspect.getsource(metrics.evaluate)`. It could not tell whether the value
+    was computed over account-days, transactions, or anything else, which is
+    the single thing its own docstring says matters. It now runs the metric on
+    a hand-counted frame.
+    """
+    import datetime as _dt
+
+    from aml.eval.metrics import evaluate
+    # A FRAME ON WHICH THE TWO UNITS GIVE DIFFERENT ANSWERS, which is the only
+    # kind that can detect the substitution. Account C sends two laundering
+    # transactions on one day, so it is ONE positive account-day but TWO
+    # positive transactions.
+    te = pd.DataFrame({
+        "event_date": pd.to_datetime([_dt.date(2022, 9, 15)] * 3
+                                     + [_dt.date(2022, 9, 16)]),
+        "is_laundering": [1, 1, 1, 0],
+        "sender_id": ["A", "C", "C", "F"],
+        "receiver_id": ["B", "D", "E", "G"],
+        "ring_id": ["r1", None, None, None],
+    })
+    score = np.array([0.9, 0.8, 0.7, 0.1])
+    m = evaluate(te, score, budgets=(2,), per_typology=False, n_permutations=0)
+
+    assert "pct_positive_acct_days_without_ring" in m
+    assert "pct_positives_without_ring" not in m, "that was 100 - coverage"
+    # HAND-COUNTED. Positive ACCOUNT-DAYS are A, B (ring r1) and C, D, E (no
+    # ring): 3 of 5 without a ring, 60.00%. Over TRANSACTIONS it is 2 of 3,
+    # 66.67% -- the substitution this metric was corrected for. Asserting 60
+    # therefore fails if the computation moves back to transactions, which the
+    # substring assertion this replaced could never have detected.
+    assert abs(m["pct_positive_acct_days_without_ring"] - 60.0) < 0.01, (
+        f"got {m['pct_positive_acct_days_without_ring']}; on this frame 3 of 5 "
+        f"positive ACCOUNT-DAYS carry no ring label (over transactions it "
+        f"would be 66.67)")
 
 
 def test_spread_reports_robust_variability_not_only_the_range():
@@ -1933,11 +2015,55 @@ def test_release_metadata_does_not_claim_a_release_that_does_not_exist():
     cff = (root / "CITATION.cff").read_text()
     tags = subprocess.run(["git", "-C", str(root), "tag", "--list"],
                           capture_output=True, text=True).stdout.split()
+    def field(text, name):
+        for ln in text.splitlines():
+            if ln.strip().startswith(f"{name}:"):
+                return ln.split(":", 1)[1].strip().strip("'\"")
+        return None
+
     if not tags:
-        for field in ("date-released:", "version:"):
-            assert not any(ln.strip().startswith(field)
-                           for ln in cff.splitlines()), (
-                f"CITATION.cff sets {field} but the repository has no tag")
+        for name in ("date-released", "version"):
+            assert field(cff, name) is None, (
+                f"CITATION.cff sets {name}: but the repository has no tag")
+        return
+
+    # ⛔ AND THERE WAS NO `else`, SO THIS ASSERTED NOTHING IN THE NORMAL CASE.
+    # Tags exist in every real checkout and in the public repository, so the
+    # whole test was inert there -- while `docs/RELEASE_CHECKLIST.md` cites it
+    # as the evidence for its release-metadata gate. A guard that cannot fail
+    # where it matters is worse than no guard, because it is also an alibi.
+    #
+    # The defect it missed: `git show v0.1.0:CITATION.cff` carries NO version
+    # at all, because the stamping commit landed after the tag was cut. A tag
+    # is immutable, so the file inside it is what a citation tool reads.
+    assert field(cff, "version") is not None, (
+        "the repository has tags, so CITATION.cff must declare a version")
+    assert field(cff, "date-released") is not None, (
+        "the repository has tags, so CITATION.cff must declare date-released")
+
+    def tagver(t):
+        return t.lstrip("v")
+
+    latest = max(tags, key=lambda t: [int(x) for x in tagver(t).split(".")
+                                      if x.isdigit()])
+    assert field(cff, "version") == tagver(latest), (
+        f"CITATION.cff declares version {field(cff, 'version')!r} but the "
+        f"most recent tag is {latest!r}. A reader resolving the citation gets "
+        f"a version that does not match what they can download.")
+
+    # EVERY TAG'S OWN TREE. This is the check that catches an immutable
+    # release describing itself as a different release.
+    for t in tags:
+        blob = subprocess.run(
+            ["git", "-C", str(root), "show", f"{t}:CITATION.cff"],
+            capture_output=True, text=True)
+        if blob.returncode != 0:
+            continue                      # tag predates the file
+        inside = field(blob.stdout, "version")
+        assert inside in (None, tagver(t)), (
+            f"tag {t} contains CITATION.cff declaring version {inside!r}. "
+            f"Tags are immutable, so this cannot be corrected in place -- it "
+            f"has to be recorded, and a later tag has to carry the fix.")
 
 
 def test_published_counts_match_the_generated_release_facts():
@@ -2050,7 +2176,7 @@ def test_every_derived_artifact_names_a_generator_that_exists_at_its_commit():
     if not derived:
         pytest.skip("no derived artifacts in this checkout")
 
-    problems, unverifiable = [], []
+    problems, unverifiable, verified = [], [], []
     for f in derived:
         d = json.loads(f.read_text())
         if not isinstance(d, dict):
@@ -2116,7 +2242,7 @@ def test_every_derived_artifact_names_a_generator_that_exists_at_its_commit():
             known = subprocess.run(["git", "-C", str(root), "cat-file", "-e", sha],
                                    capture_output=True).returncode == 0
             if not known:
-                unverifiable.append(f"{f.name}: commit {sha[:12]} not in this clone")
+                unverifiable.append((f.name, sha, d.get("code_tree_sha256")))
                 continue
             problems.append(f"{f.name}: {script} does not exist at {sha[:12]}")
             continue
@@ -2127,13 +2253,112 @@ def test_every_derived_artifact_names_a_generator_that_exists_at_its_commit():
                 f"{f.name}: {script} at {sha[:12]} hashes to {got[:12]}, "
                 f"but the artifact records {recorded[:12]} -- it was generated "
                 f"from a version of the generator that commit does not contain")
+        else:
+            verified.append(f.name)
+
+    # ⛔ THE ESCAPE HATCH PASSED HAVING CHECKED NOTHING, in the only
+    # repository a reader can clone. The public snapshot shares NO history
+    # with this archive -- a force-push orphaned the base -- so it is a FULL
+    # clone in which every recorded commit is unresolvable: 13 of 13 artifacts
+    # landed here and the test reported success. "Shallow clone" was the
+    # documented reason, and it was not the situation.
+    #
+    # THE PUBLIC FALLBACK. `code_tree_sha256` needs no history: `tree_hash()`
+    # hashes every .py in the installed `aml` package off the filesystem, so
+    # any clone can recompute it. An artifact whose recorded tree hash equals
+    # this clone's package hash IS verified -- and it answers the question a
+    # reader actually has, "did this number come from the code I am looking
+    # at?", better than a commit sha they cannot resolve.
+    # CONTENT-ADDRESSED PROVENANCE, which is the only kind that resolves in a
+    # clone with no shared history. `git rev-parse HEAD:<path>` is the sha1 of
+    # the bytes, so a reader compares one string in their own checkout. This
+    # is strictly stronger than `code_tree_sha256` for the generator, which
+    # covers `src/aml` only -- a modified generator over an unmodified package
+    # read "verified" under that hash alone.
+    from aml.manifest import PKG_GIT_PREFIX, git_oid, tree_hash
+
+    pkg_oid = git_oid(PKG_GIT_PREFIX)
+    oid_problems, oid_ok = [], []
+    for f in derived:
+        d = json.loads(f.read_text())
+        if not isinstance(d, dict) or not d.get("generator_script"):
+            continue
+        rec_gen, rec_pkg = d.get("generator_blob_oid"), d.get("package_tree_oid")
+        if rec_gen is None and rec_pkg is None:
+            if f.name not in NO_CONTENT_ADDRESSED_OID:
+                oid_problems.append(
+                    f"{f.name}: records no generator_blob_oid -- regenerate it, "
+                    f"or name it in NO_CONTENT_ADDRESSED_OID with the reason")
+            continue
+        want_gen = git_oid(d["generator_script"])
+        if want_gen is None:
+            # ⛔ AND THIS SKIPPED SILENTLY ON A RENAME. `git_oid` returns None
+            # both when there is no git at all (fine, the walk-up handles it)
+            # and when the PATH does not exist at HEAD -- so renaming a
+            # generator turned its verification off rather than failing it.
+            # Distinguish the two.
+            if git_oid(PKG_GIT_PREFIX) is not None:
+                oid_problems.append(
+                    f"{f.name}: names generator {d['generator_script']}, which "
+                    f"does not exist at HEAD -- it was renamed or removed, and "
+                    f"the artifact's content-addressed provenance cannot be "
+                    f"resolved")
+            continue
+        if rec_gen != want_gen:
+            oid_problems.append(
+                f"{f.name}: generator_blob_oid {str(rec_gen)[:12]} but "
+                f"{d['generator_script']} at HEAD is {want_gen[:12]} -- the "
+                f"generator's CONTENT has changed since this was written")
+        elif rec_pkg is not None and pkg_oid is not None and rec_pkg != pkg_oid:
+            oid_problems.append(
+                f"{f.name}: package_tree_oid {str(rec_pkg)[:12]} but the "
+                f"package at HEAD is {pkg_oid[:12]}")
+        else:
+            oid_ok.append(f.name)
+    assert not oid_problems, (
+        "content-addressed provenance does not resolve:\n  "
+        + "\n  ".join(oid_problems))
+    # THE EXEMPTION SETS ARE BUDGETS, NOT DOORS. Every one of them has grown
+    # silently before: GRANDFATHERED_NO_TREE_HASH was reused as a staleness
+    # waiver and excused a wrong-unit artifact for hours. A ceiling turns
+    # "add a name to the set" into a decision someone has to argue for.
+    assert len(NO_CONTENT_ADDRESSED_OID) <= 1, (
+        f"{len(NO_CONTENT_ADDRESSED_OID)} artifacts are exempt from "
+        f"content-addressed provenance; the budget is 1, and it is a "
+        f"promise to regenerate where the data lives")
+    assert not STALE_GENERATOR_ACCEPTED, (
+        f"{sorted(STALE_GENERATOR_ACCEPTED)} are published from a generator "
+        f"that has since changed; this set must stay empty")
+    assert len(GRANDFATHERED_NO_TREE_HASH) <= 1, (
+        f"{sorted(GRANDFATHERED_NO_TREE_HASH)} lack a package-tree hash")
+    if oid_ok:
+        print(f"\nprovenance verified by CONTENT-ADDRESSED oid "
+              f"({len(oid_ok)} artifact(s)): " + ", ".join(oid_ok))
+
+    here = tree_hash()
+    by_tree, still = [], []
+    for name, sha, tree in unverifiable:
+        (by_tree if tree and tree == here else still).append(
+            f"{name}: commit {sha[:12]} not in this clone"
+            + ("" if tree else ", and no code_tree_sha256 to fall back on"))
+    verified += [x.split(":")[0] for x in by_tree]
+
     assert not problems, "derived artifacts with invalid provenance:\n  " + \
         "\n  ".join(problems)
-    if unverifiable:
-        # Not a failure, but not silence either: a run that verified nothing
-        # should say so rather than reporting a pass.
-        print("\nprovenance NOT verified (shallow clone):\n  "
-              + "\n  ".join(unverifiable))
+    if by_tree:
+        print(f"\nprovenance verified by PACKAGE TREE HASH {here[:12]} "
+              f"(commit not resolvable here):\n  " + "\n  ".join(by_tree))
+    if still:
+        print("\nprovenance NOT verified:\n  " + "\n  ".join(still))
+    # A FULL CLONE THAT CAN VERIFY NOTHING IS NOT A SHALLOW CLONE.
+    shallow = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "--is-shallow-repository"],
+        capture_output=True, text=True).stdout.strip() == "true"
+    assert shallow or verified, (
+        f"this is not a shallow clone, yet not one of {len(unverifiable)} "
+        f"derived artifact(s) could have its provenance verified -- neither "
+        f"by commit nor by package tree hash ({here[:12]}). That is the state "
+        f"the public snapshot shipped in, under a passing test.")
 
 
 # ---------------------------------------------------------------------------
@@ -5554,14 +5779,14 @@ def test_no_derived_artifact_is_stale_against_its_generator_at_head():
         if not path.exists():
             continue
         actual = hashlib.sha256(path.read_bytes()).hexdigest()
-        if actual != rec and art.name not in GRANDFATHERED_NO_TREE_HASH:
+        if actual != rec and art.name not in STALE_GENERATOR_ACCEPTED:
             stale.append(f"{art.name}: records {rec[:12]} for {gen}, "
                          f"which now hashes to {actual[:12]}")
     assert not stale, (
         "these derived artifacts were generated by a version of their "
         "generator that no longer exists -- rerun them:\n  " + "\n  ".join(stale)
         + "\n(GRANDFATHERED artifacts that genuinely cannot be rerun belong in "
-        "GRANDFATHERED_NO_TREE_HASH with a reason, not in silence.)")
+        "STALE_GENERATOR_ACCEPTED with a reason, not in silence.)")
 
 
 def test_holm_adjusted_p_values_are_monotone_and_from_unrounded_inputs():
@@ -5756,46 +5981,327 @@ def test_the_segmented_ablation_path_actually_runs():
     It also advertised "plus the random null" and computed none, and the
     caller formatted the nested `by_segment` dict with `:.5f`.
 
-    This exercises the real function on a frame whose answer is known: two
-    head days at prevalence 0.5 and two tail days at prevalence 1.0, with a
-    perfect ranker, so every precision is 1.0 and the null is the
-    slot-weighted prevalence of each segment.
+    ⛔ AND THE VERSION THAT REPLACED IT MEASURED THE WRONG UNIT, which the
+    previous version of THIS TEST could not detect, because it built a frame
+    with only `event_date` and `is_laundering` -- one row per unit -- so
+    transactions and account-days coincided by construction. Its own comment
+    then called the rows "account-days". A test named for a unit asserted
+    spelling, and the defect it was named after shipped and went public.
+
+    So the frame below is chosen to make the two units DISAGREE. Four
+    head-day transactions over seven distinct accounts give transaction
+    prevalence 1/4 and account-day prevalence 2/7, and the test pins the
+    account-day figure and explicitly rejects the transaction one.
     """
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
     import datetime as _dt
 
     import categorical_ablation as ca
-    days = ([_dt.date(2022, 9, 15)] * 4 + [_dt.date(2022, 9, 16)] * 4
-            + [_dt.date(2022, 9, 18)] * 2 + [_dt.date(2022, 9, 19)] * 2)
+
+    HEAD, TAIL = _dt.date(2022, 9, 15), _dt.date(2022, 9, 18)
+    # Head day: 4 transactions, 1 laundering, over 7 distinct accounts.
+    # Tail day: 2 transactions, both laundering, over 4 distinct accounts.
     te = pd.DataFrame({
-        "event_date": pd.to_datetime(days),
-        # head days: half positive. tail days: all positive.
-        "is_laundering": [1, 1, 0, 0] * 2 + [1, 1] + [1, 1],
+        "event_date": pd.to_datetime([HEAD] * 4 + [TAIL] * 2),
+        "is_laundering": [1, 0, 0, 0, 1, 1],
+        "sender_id":   ["A", "A", "D", "F", "H", "J"],
+        "receiver_id": ["B", "C", "E", "G", "I", "K"],
+        "ring_id": [None] * 6,
     })
-    # A perfect ranker: positives score highest within each day.
-    scores = np.array([0.9, 0.8, 0.2, 0.1] * 2 + [0.9, 0.8] + [0.9, 0.8])
+    # A perfect ranker: the laundering transaction scores highest on its day.
+    scores = np.array([0.9, 0.8, 0.2, 0.1, 0.9, 0.8])
 
-    out = ca.segment_metrics(te, scores, budgets=(2,), thin_from=_dt.date(2022, 9, 17))
+    out, state = ca.segment_metrics(te, scores, budgets=(2,), thin_from=TAIL)
 
-    # It runs at all -- this is the regression.
     assert out, "segment_metrics returned nothing"
+    assert out["alert_unit"] == "account-day", (
+        "the artifact must DECLARE its alert unit; check_units.py compares "
+        "budget metrics across artifacts and refuses to do so blind")
     for key in ("precision@2", "precision@2_head", "precision@2_tail"):
         assert key in out, f"{key} missing; the pooled/segment split did not run"
-    # A perfect ranker at k=2 takes both positives on every day.
-    assert out["precision@2"] == 1.0
+
+    # ACCOUNT-DAYS, hand-counted. Head day: A and B are positive (A sent the
+    # laundering transaction, B received it), C/D/E/F/G are not -- 7
+    # account-days, 2 positive. Tail day: H/I/J/K, all 4 positive.
+    assert out["alerts@2_head"] == 2 and out["alerts@2_tail"] == 2
+    assert out["alerts@2"] == 4
+    assert out["tp@2_head"] == 2 and out["tp@2_tail"] == 2
     assert out["precision@2_head"] == 1.0
     assert out["precision@2_tail"] == 1.0
-    assert out["alerts@2"] == 8 and out["alerts@2_head"] == 4
-    assert out["alerts@2_tail"] == 4
+    assert out["precision@2"] == 1.0
 
-    # AND THE NULL IT PROMISES. Head days hold 4 account-days at prevalence
-    # 0.5, so a random ranker filling 2 slots expects 0.5; tail days are all
-    # positive, so it expects 1.0.
-    assert "precision_null@2_head" in out, "the promised random null is absent"
-    assert abs(out["precision_null@2_head"] - 0.5) < 1e-9
+    # THE NULL IS ON ACCOUNT-DAYS, AND THAT IS THE POINT. A random ranker
+    # filling 2 of the head day's 7 account-days expects 2/7 = 0.28571. The
+    # transaction-level answer is 1/4 = 0.25, and the shipped defect was
+    # exactly this substitution -- at HI-Medium it put the head null at
+    # 0.00077 where budget_null.py computes 0.00243, inflating every
+    # published lift by 3.16x.
+    assert abs(out["precision_null@2_head"] - 2 / 7) < 1e-5, (
+        f"head null {out['precision_null@2_head']} is not the account-day "
+        f"figure 2/7")
+    assert abs(out["precision_null@2_head"] - 0.25) > 1e-3, (
+        "the head null equals the TRANSACTION prevalence -- segment_metrics "
+        "has reverted to ranking rows instead of account-days")
     assert abs(out["precision_null@2_tail"] - 1.0) < 1e-9
     # The pooled null sits between them, which is the whole point: a pooled
     # level cannot separate the encoding question from the window.
-    assert 0.5 < out["precision_null@2"] < 1.0
-    assert abs(out["precision_lift@2_head"] - 2.0) < 1e-4
+    assert 2 / 7 < out["precision_null@2"] < 1.0
+
+    # THE CEILING, so a lift cannot be read as unbounded. Both segments hold
+    # at least `b` positives, so a perfect ranker attains precision 1.0 and
+    # the lift ceiling is the reciprocal null.
+    assert out["precision_ceiling@2_head"] == 1.0
+    assert abs(out["precision_efficiency@2_head"] - 1.0) < 1e-9
+    assert abs(out["precision_lift@2_head"] - 7 / 2) < 1e-4
+    assert abs(out["precision_lift_ceiling@2_head"] - 7 / 2) < 1e-4
     assert abs(out["precision_lift@2_tail"] - 1.0) < 1e-4
+
+    # AND THE PAIRED STATE, which the withdrawn table had no way to produce.
+    assert state["n_head_positives"] == 2
+    paired = ca.paired_head_tests({"a": state, "b": state}, (2,))
+    r = paired["a_vs_b@2"]
+    assert r["n_discordant"] == 0 and r["p_exact_mcnemar"] == 1.0, (
+        "an arm compared against itself must be perfectly concordant")
+
+    # Two arms that genuinely disagree. Arm "a" catches both head positives
+    # and arm "b" catches neither, so b=2, c=0 and exact two-sided McNemar is
+    # 2 * P(X <= 0) = 2 * (1/2)**2 = 0.5 -- which is also the point: a
+    # perfectly one-sided split of TWO discordant units cannot reach 0.05.
+    # That is why pairing made the withdrawn encoding comparison worse rather
+    # than better; a net of 3 alerts has no route to significance.
+    other = dict(state, caught={2: ~state["caught"][2]})
+    r2 = ca.paired_head_tests({"a": state, "b": other}, (2,))["a_vs_b@2"]
+    assert r2["n_discordant"] == 2 and r2["caught_by_a_only"] == 2, r2
+    assert abs(r2["p_exact_mcnemar"] - 0.5) < 1e-9, (
+        f"exact McNemar on b=2, c=0 is 0.5; got {r2}")
+
+
+def test_no_data_replay_verification_is_demonstrable_without_the_dataset(tmp_path):
+    """The differentiator has to be executable in a clone that has no data.
+
+    The archived bundles are withheld from the public snapshot while the CDLA
+    question is unreviewed, and the README said no-data replay verification
+    "is not available" there as a result. That was false about the MECHANISM,
+    which is the part that is arguably novel: a reviewer recomputing published
+    budget metrics from a small bundle rather than from 180M rows. Only the
+    AMLworld-derived ROWS are withheld.
+
+    So this generates a synthetic corpus, cuts a bundle from it, and recomputes
+    every metric the run manifest publishes -- the full chain, no dataset, and
+    it must come out to zero mismatches. If the chain breaks, the claim that
+    the mechanism works is no longer supported by anything.
+
+    It also pins the licence field, which was a string constant naming IBM
+    AMLworld: a bundle containing no AMLworld bytes carried that sentence, so
+    the one field a reader consults to decide whether a bundle is
+    redistributable could not distinguish the two.
+    """
+    root = Path(__file__).resolve().parents[2]
+    scripts, py = root / "scripts", sys.executable
+
+    def run(*args):
+        r = subprocess.run([py, *args], cwd=root, capture_output=True,
+                           text=True, timeout=900)
+        assert r.returncode == 0, f"{args[0]} exited {r.returncode}\n{r.stderr[-2000:]}"
+        return r.stdout
+
+    demo = tmp_path / "demo"
+    run("-m", "aml.cli", "demo", "--dest", str(demo))
+    bundle = tmp_path / "bundle"
+    run(str(scripts / "make_replay_bundle.py"),
+        "--features", str(demo / "features"), "--splits", str(demo / "splits"),
+        "--scores", str(demo / "models" / "gbdt_test_scores.parquet"),
+        "--dest", str(bundle), "--data-origin", "synthetic")
+
+    meta = json.loads((bundle / "bundle.json").read_text())
+    assert meta["data_origin"] == "synthetic"
+    # THE CLAIM OF DERIVATION, not the token -- the synthetic text mentions
+    # AMLworld precisely to say no bytes of it are present.
+    assert "derived from the IBM AMLworld dataset" not in meta["licence_status"], (
+        "a bundle built from the synthetic demo corpus is claiming to be "
+        "derived from IBM AMLworld; licence_status was a constant")
+    assert "NOT DERIVED FROM ANY LICENSED DATASET" in meta["licence_status"]
+    assert "no third-party data licence applies" in meta["licence_status"]
+
+    out = run(str(scripts / "verify_replay_bundle.py"),
+              "--bundle", str(bundle),
+              "--manifest", str(demo / "models" / "manifest.json"))
+    assert "0 mismatch(es)" in out, out[-2000:]
+    # AND IT MUST HAVE COMPARED SOMETHING. Printing "0 mismatch(es)" having
+    # skipped every metric is how this script used to report success on a
+    # bundle it had not checked.
+    m = re.search(r"(\d+) metric\(s\) compared", out)
+    assert m and int(m.group(1)) >= 20, (
+        f"expected the manifest to publish many budget metrics; got {out[-800:]}")
+
+
+def test_the_replay_verifier_refuses_budgets_the_bundle_cannot_answer(tmp_path):
+    """Past `max_budget` the bundle is truncated, and the answer is wrong.
+
+    `account_days_topk.parquet` holds each day's top `max_budget` rows plus
+    every ring account-day. For a budget above that cap, `rank <= b` counts a
+    partial alert set, so precision is computed over rows that are not the
+    ones a real budget would have alerted -- and the script printed a
+    confident number anyway, because it never read the field.
+    `budget_null.py` reads it twice and reasons explicitly about which days
+    were written in full.
+
+    The second half matters more once a bundle ships publicly, because
+    outsiders choose their own budgets: skipping every metric via
+    `want is None` and reporting "0 mismatch(es)" certified a bundle that had
+    not been checked at all.
+    """
+    root = Path(__file__).resolve().parents[2]
+    bundles = sorted((root / "results_archive" / "replay").glob("*/bundle.json"))
+    if not bundles:
+        pytest.skip("replay bundle not archived in this checkout")
+    b = bundles[0].parent
+    cap = json.loads((b / "bundle.json").read_text())["max_budget"]
+
+    r = subprocess.run(
+        [sys.executable, str(root / "scripts" / "verify_replay_bundle.py"),
+         "--bundle", str(b), "--manifest", str(b / "bundle.json"),
+         "--budgets", str(cap * 2)],
+        cwd=root, capture_output=True, text=True, timeout=300)
+    assert r.returncode == 1, (
+        f"a budget above max_budget={cap} must be refused, got "
+        f"{r.returncode}: {r.stdout[-600:]}{r.stderr[-600:]}")
+    assert "max_budget" in (r.stdout + r.stderr)
+
+    # A budget the bundle CAN answer, against a manifest that publishes none
+    # of those metrics: nothing is compared, and that is not success.
+    r2 = subprocess.run(
+        [sys.executable, str(root / "scripts" / "verify_replay_bundle.py"),
+         "--bundle", str(b), "--manifest", str(b / "bundle.json"),
+         "--budgets", str(cap)],
+        cwd=root, capture_output=True, text=True, timeout=300)
+    assert r2.returncode == 2, (
+        f"comparing zero metrics must not exit 0; got {r2.returncode}")
+    assert "NOTHING WAS COMPARED" in r2.stdout
+
+
+def test_the_provenance_injection_point_does_not_suppress_real_provenance():
+    """`AML_GIT_SHA=unknown` beat a working `git rev-parse HEAD`.
+
+    The variable exists because the release container excludes `.git`, so a
+    run inside it has no repository to ask and every HI-Large manifest
+    recorded `code_git_sha: "unknown"`. The image therefore sets the variable
+    at build time -- and the build that produced `aml:rel` had nothing to put
+    in it, so it baked in the literal string `unknown`.
+
+    `git_sha()` returned any non-empty injected value ahead of the repository.
+    So a run in the container against a mounted git checkout recorded
+    `"unknown"` while `git rev-parse HEAD` in the same working directory
+    resolved the commit. Measured on the cloud VM: the artifact came back with
+    `code_git_sha: "unknown"` and `scope_clean: true` -- an affirmative
+    cleanliness claim beside a commit the same file declines to name, because
+    `dirty_within` asks git directly and got a real answer. It also forced
+    `generator_matches_commit` and `code_tree_matches_commit` to null, since
+    both need a resolvable commit, which is precisely the grandfathered
+    provenance the release checklist demands be closed.
+
+    An injection point that can overwrite a correct answer with "nobody knew"
+    is worse than no injection point.
+    """
+    from aml.manifest import _NOT_A_SHA
+
+    real = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
+                          text=True, cwd=Path(__file__).resolve().parents[2])
+    if real.returncode != 0:
+        pytest.skip("not a git checkout, so there is no real sha to prefer")
+    head = real.stdout.strip()
+
+    for sentinel in sorted(_NOT_A_SHA):
+        env = dict(os.environ, AML_GIT_SHA=sentinel)
+        got = subprocess.run(
+            [sys.executable, "-c", "from aml.manifest import git_sha; print(git_sha())"],
+            capture_output=True, text=True, env=env,
+            cwd=Path(__file__).resolve().parents[2]).stdout.strip()
+        assert got == head, (
+            f"AML_GIT_SHA={sentinel!r} produced {got!r}; a sentinel must not "
+            f"override the repository, which says {head[:12]}")
+
+    # A REAL injected sha must still win -- that is the whole point of the
+    # variable, for runs that genuinely have no repository.
+    injected = "0123456789abcdef0123456789abcdef01234567"
+    got = subprocess.run(
+        [sys.executable, "-c", "from aml.manifest import git_sha; print(git_sha())"],
+        capture_output=True, text=True,
+        env=dict(os.environ, AML_GIT_SHA=injected),
+        cwd=Path(__file__).resolve().parents[2]).stdout.strip()
+    assert got == injected, f"an injected sha must be honoured; got {got!r}"
+
+    # And no artifact may pair an affirmative scope_clean with an unnamed
+    # commit, which is the contradiction this defect produced.
+    root = Path(__file__).resolve().parents[1].parent
+    for f in sorted((root / "results_archive" / "derived").glob("*.json")):
+        d = json.loads(f.read_text())
+        if not isinstance(d, dict):
+            continue
+        if d.get("scope_clean") is True:
+            assert d.get("code_git_sha") not in (None, *_NOT_A_SHA), (
+                f"{f.name} claims scope_clean=true but records "
+                f"code_git_sha={d.get('code_git_sha')!r} -- clean relative to "
+                f"what commit?")
+
+
+def test_a_derived_marker_cannot_manufacture_its_own_value():
+    """`arithmetic_objection` had no test, and broke three times in one day.
+
+    A `<!-- derived: ... -->` marker exempts a value from the membership
+    check, so whatever it accepts is published unchecked. Each round of
+    hardening was verified by hand against the attack of the moment and then
+    walked through by the next audit:
+
+      round 1  `1.99/1`            dividing by one is a universal exemption
+      round 2  `199/100`           the /100 operand image legitimised the
+                                   very number being claimed
+      round 3  `37/2`, `81/5`      small integers were unconditionally free,
+                                   so any p/q with p,q <= 100 was reachable
+      round 4  `0.00243*25*75/14`  one bound operand plus UNBOUNDED small
+                                   integers reached 180 of 200 randomly
+                                   chosen four-decimal values in (0,1)
+      round 4  `/ 100.0`, `/(50*2)` the power-of-ten rule matched spelling,
+                                   not the divisor
+
+    The rules are only as good as the cases pinned here, so the cases live
+    here rather than in a transcript.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+    import make_tables as mt
+
+    known = mt._known_values(mt.collect(mt.ARCHIVE))
+
+    must_object = [
+        "1.99/1", "2.26/1", "812.44/1",          # returns its own operand
+        "37/2", "81/5", "100/50",                 # small integers only
+        "0.00243*25*75/14", "0.00243*79*81",      # one bound operand + a dial
+        "0.00243/100", "0.00243/ 100.0",          # unit conversion, two ways
+        "0.00243/(50*2)", "0.00243/1000",         # ... and two more
+        "43.90/1",                                # unbound operand
+    ]
+    for expr in must_object:
+        assert mt.arithmetic_objection(expr, known) is not None, (
+            f"{expr!r} is accepted as a derivation; it can manufacture a "
+            f"published value out of nothing that is bound to a measurement")
+
+    # AND THE LIVE CORPUS MUST STILL PASS. A rule that rejects everything is
+    # not a gate either; these are the shapes real markers take.
+    must_pass = [
+        "0.57060/0.49147",                        # a lift over its null
+        "0.88079/0.45392",
+        "4465985/7",                              # a count over a day count
+        "1 + 156/250",
+        "(0.03238-0.02374)/((0.03238+0.02374+0.02973)/3)",
+        "0.00506*9",                              # a Holm multiplier
+    ]
+    for expr in must_pass:
+        assert mt.arithmetic_objection(expr, known) is None, (
+            f"{expr!r} is refused, but it is the shape a legitimate marker "
+            f"takes: {mt.arithmetic_objection(expr, known)}")
+
+    # The divisor test is about the VALUE, not how it is spelled.
+    for spelling in ("x/100", "x/ 100.0", "x/(50*2)", "x/(10**2)"):
+        assert mt._divides_by_power_of_ten(spelling.replace("x", "0.5")), spelling
+    assert mt._divides_by_power_of_ten("0.5/7") is None
+    assert mt._divides_by_power_of_ten("0.5/0.00244") is None

@@ -317,7 +317,7 @@ release gate and make the opening data statement precise.
 The repository tracks:
 
 - `aml-platform/.coverage`, a 52 KB SQLite database containing absolute local
-  paths such as `/Users/nirmalkumar/Possible Projects/...`;
+  paths such as `/Users/<user>/Possible Projects/...`;
 - 32 files under `aml-platform/build/lib/aml/`, totaling about 308 KB;
 - stale duplicate code in that build tree: `io.py`, `leakproof/sweep.py`, and
   `models/train.py` differ from `src/aml`.

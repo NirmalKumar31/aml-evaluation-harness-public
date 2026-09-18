@@ -105,8 +105,8 @@ Separately measured: with row order held fixed, repeated fits are **bit-identica
 | channel | real AP ratio | placebo AP ratio | paired diff | sign test | verdict |
 |---|---|---|---|---|---|
 | `reversed_window` | 1.007 [0.936, 1.107] | 0.940 [0.854, 0.999] | +0.067 | 6/8, p=0.29 | **not detected** <!-- historical --> |
-| `future_counterparty` | 1.201 [1.038, 1.322] | 0.995 [0.982, 1.022] | +0.207 | 8/8, **p=0.0078** | **detected** <!-- derived: 2/2**8 --> <!-- historical --> |
-| `target` (positive control) | 3.553 [3.272, 3.918] | 0.993 [0.882, 1.069] | +2.559 | 8/8, **p=0.0078** | **detected** <!-- derived: 2/2**8 --> <!-- historical --> |
+| `future_counterparty` | 1.201 [1.038, 1.322] | 0.995 [0.982, 1.022] | +0.207 | 8/8, **p=0.0078** | **detected** <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact --> <!-- historical --> |
+| `target` (positive control) | 3.553 [3.272, 3.918] | 0.993 [0.882, 1.069] | +2.559 | 8/8, **p=0.0078** | **detected** <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact --> <!-- historical --> |
 
 Two independent decision rules — strict non-overlap of the marginal ranges, and an exact paired sign test — agree on all three channels.
 
@@ -121,7 +121,7 @@ runs clearing 1.50, out of 8
   target                 8/8      range 3.272 - 3.918   <!-- historical -->
 ```
 
-`future_counterparty` is real leakage: 8/8 paired positive on AP (p=0.0078) *and* 8/8 on error-reduction (p=0.0078). **Yet not one of eight runs would have tripped the 1.50 rule.** The threshold's sensitivity to this channel is zero.  <!-- derived: 2/2**8 -->
+`future_counterparty` is real leakage: 8/8 paired positive on AP (p=0.0078) *and* 8/8 on error-reduction (p=0.0078). **Yet not one of eight runs would have tripped the 1.50 rule.** The threshold's sensitivity to this channel is zero.  <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact; 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact -->
 
 The project believed its harness worked because its positive control was extreme — a label-derived feature scores 3.5×, so it clears any threshold. A validated positive control demonstrates the harness is *not blind*. It does not establish the harness is *sensitive enough for the leaks you actually have*, and here it was not. <!-- derived: 3.5 = the canonical positive-control AP ratio 3.4508, rounded to one decimal in this sentence -->
 
@@ -133,9 +133,9 @@ On AP it is undetectable. On the budget-constrained metric it is consistently ha
 
 ```text
 paired error_reduction@50 (real minus placebo, same seed)
-  reversed_window       mean -0.249    0/8 positive    p = 0.0078  (negative direction)  <!-- derived: 2/2**8 -->
-  future_counterparty   mean +0.243    8/8 positive    p = 0.0078  <!-- derived: 2/2**8 -->
-  target                mean +0.886    8/8 positive    p = 0.0078  <!-- derived: 2/2**8 -->
+  reversed_window       mean -0.249    0/8 positive    p = 0.0078  (negative direction)  <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact -->
+  future_counterparty   mean +0.243    8/8 positive    p = 0.0078  <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact -->
+  target                mean +0.886    8/8 positive    p = 0.0078  <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact -->
 ```
 
 All eight seeds show the real forward-looking columns degrading top-of-ranking detection *relative to permuted versions of the same columns*. This is a reproducible effect, not noise, and it is invisible to AP.
@@ -171,7 +171,7 @@ target                detected    detected
 ## 7. Limitations
 
 - One dataset rung (HI-Small), one cut point, one model family. The 46.10% noise floor is specific to this configuration and should not be quoted as a general figure. (This line said 22% until an audit noticed it was still quoting the superseded 1.1.0 sweep. <!-- historical -->)
-- 8 seeds floors the two-sided sign test at p=0.0078. More seeds would tighten it; 8 was chosen for compute, not for power.  <!-- derived: 2/2**8 -->
+- 8 seeds floors the two-sided sign test at p=0.0078. More seeds would tighten it; 8 was chosen for compute, not for power.  <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact -->
 - The placebo controls for column count and marginal distribution. It does not control for the *correlation structure between leak columns and honest features*, which the §4 hypothesis suggests may matter.
 - HI-Medium confirmation not yet run.
 - ⚠️ **There is no honest-but-informative control arm, and the verdict rule

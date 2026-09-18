@@ -22,6 +22,24 @@ TOL = 1e-9
 
 
 def recompute(bundle: Path, budgets) -> dict:
+    # THE BUNDLE IS TRUNCATED, AND ASKING PAST THE TRUNCATION IS NOT A
+    # QUESTION IT CAN ANSWER. `account_days_topk.parquet` holds each day's
+    # top `max_budget` rows plus every ring account-day, so `rank <= b` for
+    # b > max_budget silently counts a partial alert set and reports a
+    # confident precision from it. `budget_null.py` reads this field twice
+    # and reasons explicitly about which days were written in full; this
+    # script -- whose docstring promises that passing it makes "a reviewer can
+    # check our numbers on a laptop" a fact -- never read it at all.
+    meta = json.loads((bundle / "bundle.json").read_text())
+    cap = meta.get("max_budget")
+    if cap is not None:
+        over = [b for b in budgets if b > cap]
+        if over:
+            raise SystemExit(
+                f"budgets {over} exceed this bundle's max_budget={cap}. The "
+                f"top-k extract does not contain the rows those budgets would "
+                f"alert, so every metric at them would be understated. Pass "
+                f"--budgets values <= {cap}.")
     ad = pd.read_parquet(bundle / "account_days_topk.parquet")
     per_day = pd.read_parquet(bundle / "per_day_positives.parquet")
     total_pos = int(per_day.positive_account_days.sum())
@@ -67,17 +85,28 @@ def main(argv=None) -> int:
     got = recompute(a.bundle, budgets)
 
     bad = 0
+    compared = []
     print(f"{'metric':34s} {'published':>13s} {'from bundle':>13s}   delta")
     for k in sorted(got):
         want = published.get(k)
         if want is None:
             continue
+        compared.append(k)
         delta = abs(float(want) - float(got[k]))
         flag = "" if delta <= TOL else "   <-- MISMATCH"
         bad += delta > TOL
         print(f"{k:34s} {float(want):13.6f} {float(got[k]):13.6f}   "
               f"{delta:.2e}{flag}")
-    print(f"\n{bad} mismatch(es)")
+    # COMPARING NOTHING IS NOT PASSING. `want is None` skips a metric the
+    # manifest does not publish, which is right -- but when it skipped ALL of
+    # them the script still printed "0 mismatch(es)" and exited 0. Asked for
+    # budgets no manifest carries, it certified a bundle it had not checked.
+    if not compared:
+        print(f"\nNOTHING WAS COMPARED. The manifest publishes none of the "
+              f"metrics recomputed at budgets {budgets}, so this run verifies "
+              f"nothing. Check --manifest and --budgets.")
+        return 2
+    print(f"\n{len(compared)} metric(s) compared; {bad} mismatch(es)")
     return 1 if bad else 0
 
 

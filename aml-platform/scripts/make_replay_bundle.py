@@ -60,8 +60,31 @@ def account_day_table(ad, rk, keep, transaction_unit: bool = False):
     return top
 
 
+# The licence posture is a property of where the rows CAME FROM, and it was a
+# string constant. A bundle built from `aml demo` -- 3,116 rows this repository
+# generates itself, containing no AMLworld bytes at all -- was stamped
+# "derived from the IBM AMLworld dataset", so the one field a reader would
+# consult to decide whether a bundle is redistributable could not tell the two
+# apart. An explicit argument, because guessing at a legal field is worse than
+# either answer.
+DATA_ORIGIN = {
+    "amlworld": "UNREVIEWED. These are row-level outputs derived from the IBM "
+                "AMLworld dataset ({fields}). The project position is that "
+                "they are CDLA 'Results' rather than redistributed data, and "
+                "that position has NOT been reviewed by a lawyer. See "
+                "DATA_LICENSE.md. Do not rely on this field as a permission.",
+    "synthetic": "NOT DERIVED FROM ANY LICENSED DATASET. These are row-level "
+                 "outputs ({fields}) computed from the synthetic corpus this "
+                 "repository generates itself (`aml demo`). No AMLworld bytes "
+                 "are present and no third-party data licence applies. This "
+                 "bundle exists to demonstrate that the replay MECHANISM "
+                 "verifies published metrics without the dataset.",
+}
+
+
 def build(features: str, splits: str, scores: str, dest: Path,
-          max_budget: int = MAX_BUDGET, transaction_unit: bool = False) -> dict:
+          max_budget: int = MAX_BUDGET, transaction_unit: bool = False,
+          data_origin: str = "amlworld") -> dict:
     from aml.eval.metrics import _ranks, _ring_structure, to_account_days
     from aml.models.train import load_test
 
@@ -215,17 +238,12 @@ def build(features: str, splits: str, scores: str, dest: Path,
         # fact, in a machine-readable field -- while DATA_LICENSE.md called the
         # very same question an unreviewed interpretation. Two documents in one
         # repository cannot disagree about whether something has been decided.
-        "licence_status": "UNREVIEWED. These are row-level outputs derived from "
-                          "the IBM AMLworld dataset (day, opaque account code, "
-                          "label, score, rank, opaque transaction index, "
-                          "ring linkage"
-                          + (", per-transaction score and label"
-                             if transaction_unit else "")
-                          + "). The project position is "
-                          "that they are CDLA 'Results' rather than "
-                          "redistributed data, and that position has NOT been "
-                          "reviewed by a lawyer. See DATA_LICENSE.md. Do not "
-                          "rely on this field as a permission.",
+        "data_origin": data_origin,
+        "licence_status": DATA_ORIGIN[data_origin].format(
+            fields="day, opaque account code, label, score, rank, opaque "
+                   "transaction index, ring linkage"
+                   + (", per-transaction score and label"
+                      if transaction_unit else "")),
         "files": {f: {"sha256": sha256_file(dest / f),
                       "bytes": (dest / f).stat().st_size} for f in files},
     }
@@ -281,6 +299,11 @@ def main(argv=None) -> int:
                          "disclosure and add per-transaction labels, and the "
                          "CDLA status of the existing rows is unreviewed. See "
                          "DATA_LICENSE.md before turning this on.")
+    ap.add_argument("--data-origin", choices=sorted(DATA_ORIGIN),
+                    default="amlworld",
+                    help="where the rows came from. Decides `licence_status`, "
+                         "which was a constant naming IBM AMLworld even for "
+                         "bundles built from the synthetic demo corpus.")
     a = ap.parse_args(argv)
 
     # FAIL FAST. The scope guard also runs when the artifact is
@@ -288,7 +311,8 @@ def main(argv=None) -> int:
     from aml.manifest import require_clean_scope
     require_clean_scope()
     meta = build(a.features, a.splits, a.scores, a.dest, a.max_budget,
-                 transaction_unit=a.transaction_unit)
+                 transaction_unit=a.transaction_unit,
+                 data_origin=a.data_origin)
     total = sum(f["bytes"] for f in meta["files"].values())
     print(json.dumps({k: v for k, v in meta.items() if k != "files"}, indent=1))
     print(f"bundle: {total/1e6:.2f} MB from {meta['n_account_days_total']:,} "

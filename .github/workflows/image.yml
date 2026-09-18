@@ -217,6 +217,7 @@ jobs:
               "no exposure measured in this checkout",
               "no gold archive in this checkout",
               "no replay bundles in this checkout",
+              "not a git checkout, so there is no real sha to prefer",
               "package source not present",
               "patterns absent; exposure correctly not computed",
               "release facts not generated in this checkout",

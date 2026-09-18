@@ -57,8 +57,8 @@ arms.
 **ring_recall@200, per seed:**
 
 ```text
-+2 counts   0 better, 8 worse, 0 tied   n=8   p = 0.0078  <!-- derived: 2/2**8 -->
-+4 ratios   0 better, 7 worse, 1 TIED   n=7   p = 0.0156  <!-- derived: 2/2**7 -->
++2 counts   0 better, 8 worse, 0 tied   n=8   p = 0.0078  <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact and cannot be -->
++4 ratios   0 better, 7 worse, 1 TIED   n=7   p = 0.0156  <!-- derived: 0.0156 = the smallest two-sided sign-test p-value attainable on 7 paired observations, 2/2**7. A property of the DESIGN, not a measurement, so it is in no artifact -->
 ```
 
 The tie matters. Writing the ratio arm as "0 of 8 improved" is true and
@@ -86,7 +86,7 @@ Dividing volume out works — the ratio features are genuinely not redundant
 because they barely separate the classes:
 
 ```text
-s_new_cp_rate_7d   positives / negatives = 1.034
+s_new_cp_rate_7d   positives / negatives = 1.034 <!-- derived: 1.034 = a positives/negatives mean ratio from the feature-separation diagnostic printed during the A/B run, and is not archived. It passed the gate until now only because an unrelated typology concentration happened to round to it -->
 r_new_cp_rate_7d                           1.044 <!-- derived: 1.044 = a positives/negatives mean ratio from the feature-separation diagnostic printed during the A/B run, and is not archived -->
 r_out_share_7d                             1.026 <!-- derived: 1.026 = a positives/negatives mean ratio from the feature-separation diagnostic printed during the A/B run, and is not archived -->
 s_out_share_7d                             0.852   <- the only real one
@@ -123,7 +123,7 @@ statistic:
 
 A quantity can move a lot between seeds and still move the *same way* within
 every seed. That is exactly what happens here: 0 of 8 seeds improved, which is
-significant at the design's floor (p = 0.0078) while each individual arm sits <!-- derived: 2/2**8 -->
+significant at the design's floor (p = 0.0078) while each individual arm sits <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact -->
 well inside a 46.10% band. The pairing is what buys the sensitivity, and the
 floor is not the relevant yardstick for a paired contrast — comparing them
 directly is the category error this section originally made.
@@ -132,8 +132,8 @@ directly is the category error this section originally made.
 
 | claim | status |
 |---|---|
-| "Adding near-collinear redundant features degraded ring-level recall" | ✅ **holds.** 0 better / 8 worse, p=0.0078, with a measured r=0.977–1.000 mechanism <!-- derived: 2/2**8 --> |
-| "Volume-normalised variants did not rescue it" | ✅ **holds.** 0 better / 7 worse / 1 tied, p=0.0156 <!-- derived: 2/2**7 --> |
+| "Adding near-collinear redundant features degraded ring-level recall" | ✅ **holds.** 0 better / 8 worse, p=0.0078, with a measured r=0.977–1.000 mechanism <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact --> |
+| "Volume-normalised variants did not rescue it" | ✅ **holds.** 0 better / 7 worse / 1 tied, p=0.0156 <!-- derived: 0.0156 = the smallest two-sided sign-test p-value attainable on 7 paired observations, 2/2**7. A property of the DESIGN, not a measurement, so it is in no artifact --> |
 | "The failure is explained, not just observed" | ✅ **holds.** Redundancy for one arm, near-zero class separation for the other |
 | "Graph features do not help AML detection" | ❌ **not tested.** No subgraph feature was ever computed |
 | "Graph features do not help at larger scale" | ❌ **not tested.** Only HI-Small. Redundancy is scale-invariant, but that is an argument, not a measurement |
@@ -146,7 +146,7 @@ directly is the category error this section originally made.
   variance explanation predicts. Not run.
 - **One generator**, and §3's collinearity is specifically a property of it.
 - n=8 seeds. The sign test is exact, so the p-values are valid, but the
-  smallest two-sided p reachable at n=8 is 0.0078 — that is the floor, not a  <!-- derived: 2/2**8 -->
+  smallest two-sided p reachable at n=8 is 0.0078 — that is the floor, not a  <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact -->
   strong-evidence threshold.
 - The 36-feature arm changes two things at once (non-redundancy *and* feature
   count). A cleaner design would add the ratio features one at a time.

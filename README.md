@@ -1,64 +1,41 @@
 # Alert-Budget-Aware Evaluation for Transaction Monitoring
 
-A measurement harness for anti-money-laundering models on IBM's **AMLworld**
-synthetic benchmark, and a set of findings about how much a reported detection
-number depends on choices that usually go unstated.
+**On IBM's AMLworld benchmark, most of a reported detection score is handed
+over by the data rather than earned by the model.** The generator stops
+mid-test-window: daily volume falls from 3,021,866 transactions to 7, and the
+laundering share rises from 0.0008 to 0.4286. Pool that window and a uniformly
+random ranker already scores `precision@50` between **0.45392 and 0.49147** —
+the published logistic model's 0.57060 beats it by only **1.16×–1.26×**. <!-- derived: 0.57060/0.49147; 0.57060/0.45392 -->
 
-**The contribution is evaluation methodology, not detection performance.** Every
-number here is a claim about a simulator; AMLworld is synthetic, from a single
-generator, never validated against real transactions.
+Restrict to the seven days the generator was still running and the comparison
+starts to mean something:
 
-## What this found, in five lines
+| ranker, 50 alerts/day | `precision@50` | vs the null | of the attainable |
+|---|---:|---:|---:|
+| uniformly random | 0.00243–0.00244 | 1× | — |
+| logistic regression, 32 features | 0.04286 | **17.6×** | 4.3% <!-- derived: 0.04286/0.00244 --> |
+| gradient-boosted trees, same features | 0.75714 | **310.3×** | 75.7% <!-- derived: 0.75714/0.00244 --> |
 
-1. **This benchmark's published test window is not an evaluation set.** Its
-   second half is a generator shutdown: volume falls 637,998× while prevalence <!-- derived: 4465985/7 -->
-   rises to 1.0, so a uniformly random ranker scores `precision@50` between
-   **0.45392 and 0.49147**, and on three of nineteen days the budget exceeds
-   the entire population — there, every ranker scores identically by
-   construction.
-2. **A null must be computed on the evaluated population, and conditioned on
-   the right thing.** Getting that wrong reversed one published conclusion's
-   sign, and left a second claim resting on an H0 the data falsifies.
-3. **A non-binding day biases a *lift* toward 1 and a *spread* upward.** Same
-   defect, opposite directions — it understated this project's headline, and
-   inflates any spread statistic whose maximum sits on the affected group.
-4. **A metric can be traceable, reproducible and still measure the wrong
-   thing.** The per-structure "difficulty" result published here was withdrawn
-   after its null was shown to be false — and the replacement was withdrawn
-   too, twice, for measuring a different model, a different budget and a
-   different ring population. Nothing about laundering structure is claimed
-   from this benchmark now; see `paper/RESULTS_typology.md`.
-5. **Provenance discipline caught none of these.** Every one was caught by a
-   control or by a gate that executes something. Hashes prove what was run,
-   never that it measured the right quantity.
+⚠️ **Read the last column, not the middle one.** Every head day holds more
+positives than the budget has slots, so a perfect ranker would score 1.0 and
+the largest lift attainable is **409.8×** — the reciprocal base rate, a <!-- derived: 1/0.00244 -->
+property of the generator rather than of any ranker. And the budget binds hard
+either way: at 50 alerts/day no model can exceed **4.73%** recall, because
+only 858 of 18,130 positive account-days are reachable.
 
-Each is a link away in [`aml-platform/paper/`](aml-platform/paper/README.md),
-with what may and may not be claimed in
-[`docs/LIMITATIONS.md`](aml-platform/docs/LIMITATIONS.md). The corrections
-behind them are in [`CHANGELOG.md`](CHANGELOG.md), deliberately not here.
+Verify the machinery in about eight seconds, with no dataset and no AMLworld
+bytes:
 
-## Glossary
+```bash
+cd aml-platform && make setup && make replay-demo   # 42 metrics, 0 mismatches
+```
 
-The terms the rest of this page assumes.
-
-| term | meaning |
-|---|---|
-| **rung** | one of the three AMLworld sizes: HI-Small (5.1M transactions), HI-Medium (31.9M), HI-Large (179.7M). They are **independent generator runs, not nested subsets** |
-| **ring** | a labelled laundering pattern from the generator — a group of transactions forming one scheme. Roughly 17 account-days each on HI-Medium |
-| **account-day** | the alert unit: one `(account, calendar-day)` pair. What an investigator is assumed to open |
-| **alert budget** | how many account-days a team can review per day. Renews daily |
-| **recall ceiling** | the highest recall a budget permits, whatever the model does. `sum_d min(positives_that_day, budget) / total_positives` |
-| **manifest** | the JSON every stage writes: its config, inputs, code hashes, outputs and their checksums |
-| **lineage** | a named run whose manifests back a published number. `results_archive/CANONICAL.json` marks each one canonical, supporting or superseded, and an unlisted lineage is **refused** |
-| **estimand** | the quantity a metric is meant to estimate — as opposed to the number it computes. The distinction is this project's main finding |
-| **permutation null** | what a metric would read if the thing being tested were shuffled. Here: ring-transaction scores permuted *within a day* |
-| **replay bundle** | ~9 MB of per-day top-k rows that recompute a published budget metric with no dataset download |
-| **prevalence** | the share of a day's account-days that involve laundering. Runs 0.001926 to 1.0 across the evaluated test split, which is the whole problem <!-- derived: 0.001926 = the minimum daily account-day prevalence in the evaluated window, read off the per-day table in budget_null.json rather than stored as a field --> |
-| **`recall_efficiency@k`** | `recall@k` divided by its ceiling — what fraction of the attainable you got |
-| **`ring_recall@k`** | the share of laundering *rings* with at least one member alerted. Not `recall` — a ring gets one draw per member-day |
-| **lift** | an observed value divided by what a stated null would give. Levels mean little here; lift is the number to read |
-| **sign test** | counts how many paired arms moved the same way. On 8 pairs its smallest possible p-value is 0.0078 <!-- derived: 2/2**8 --> |
-| **FIU** | Financial Intelligence Unit — a national agency that sees cross-bank flows a single bank cannot |
+AMLworld is synthetic, from a single generator, never validated against real
+transactions — **every number here is a claim about a simulator**, and the
+contribution is evaluation methodology, not detection performance. What may
+and may not be claimed:
+[`docs/LIMITATIONS.md`](aml-platform/docs/LIMITATIONS.md). What was retracted
+along the way: [`CHANGELOG.md`](CHANGELOG.md), and the summary below.
 
 ## The headline
 
@@ -153,10 +130,13 @@ rates, the second at the wrong budget on a model outside the ensemble.
 **The ensemble result has never been tested under a valid like-for-like null**,
 and is withdrawn for that reason rather than replaced. A single-seed
 diagnostic on one archived replay (`medium_gbdt_s0`, `ring_recall@50`) gives an
-observed spread of 3.46875 at the 53.5th percentile of its own within-day
-permutation null, p = 0.46633. <!-- source: 0.46633 <- derived/typology_null.json#permutation_spread_Medium.p_value -->
+observed spread of 3.46875 at the 54.3rd percentile of its own within-day
+permutation null, p = 0.45661, over 50000 draws. <!-- source: 0.45661 <- derived/typology_null.json#permutation_spread_Medium.p_value -->
 **That is a diagnostic on one seed, and it establishes neither the ensemble
-result nor any general conclusion about laundering structure.** See
+result nor any general conclusion about laundering structure.** One
+per-typology deviation does survive Holm at that draw count — FAN-IN is
+covered at 0.594 of its own null, p_holm = 0.04048 — and the previous 400-draw
+run could not have found it. See
 [`paper/RESULTS_typology.md`](aml-platform/paper/RESULTS_typology.md).
 
 **6. A metric can be right, traceable, and still measure the wrong thing.**
@@ -185,7 +165,7 @@ exchangeability assumption, not causal effects.
 cd aml-platform
 make setup          # venv + locked dependencies
 make demo           # generates a corpus, runs every stage, ~30 seconds
-make test           # 416 tests collected; pass and skip counts vary by
+make test           # 420 tests collected; pass and skip counts vary by
                     # environment (data-dependent contract tests)
 ```
 
@@ -213,13 +193,26 @@ What ships in their place is
 names, row counts and per-file sha256, so you can see exactly what is missing
 and verify a regenerated copy against it.
 
-**So in this snapshot, no-data replay verification is not available.** The
-commands below need the bundles; without them they **skip**, and say so:
-**10 skips** reading `replay bundle not archived in this checkout` and **3**
-reading `no replay bundles in this checkout`. Those are documented skips, not
-passes — the suite reports **385 passed / 31 skipped** in this snapshot
-against **399 / 17** in the development archive, and every one of the 31 names
-the input it is missing.
+**The MECHANISM is verifiable here; the archived rows are not.** Only the
+AMLworld-derived rows are withheld, so no-data replay itself runs anywhere:
+
+```bash
+cd aml-platform && make replay-demo    # ~8 s, no dataset, no AMLworld bytes
+```
+
+It generates a synthetic corpus, cuts a bundle from it, and recomputes every
+published budget metric from that bundle alone — **42 metrics, 0 mismatches**,
+about 0.03 MB. That is the whole differentiator, demonstrated without anything
+licensed. An earlier version of this paragraph said no-data replay
+verification "is not available" in the snapshot, which was false about the
+mechanism and true only of the rows. <!-- historical -->
+
+The commands below, which replay the **archived** bundles, do need them;
+without them they **skip** and name the missing input (`replay bundle not
+archived in this checkout`, `no replay bundles in this checkout`). Those are
+documented skips, not passes. Pass and skip totals move whenever a test is
+added, so this page does not pin them — run `make test` and compare against
+`results_archive/derived/release_facts.json`, which is generated and gated.
 
 To get them, obtain AMLworld from its official source and regenerate:
 
@@ -331,6 +324,58 @@ cannot fit in 31; LightGBM needs 14.9 GB.
 | current state and open decisions | [`HANDOFF.md`](HANDOFF.md) |
 | which run backs which number | [`docs/RESULT_LINEAGE.md`](aml-platform/docs/RESULT_LINEAGE.md) |
 | the cloud runbook and its costs | [`docs/RUNBOOK_cloud.md`](aml-platform/docs/RUNBOOK_cloud.md) |
+
+## How this project got things wrong
+
+1. **This benchmark's published test window is not an evaluation set.** Its
+   second half is a generator shutdown: volume falls 637,998× while prevalence <!-- derived: 4465985/7 -->
+   rises to 1.0, so a uniformly random ranker scores `precision@50` between
+   **0.45392 and 0.49147**, and on three of nineteen days the budget exceeds
+   the entire population — there, every ranker scores identically by
+   construction.
+2. **A null must be computed on the evaluated population, and conditioned on
+   the right thing.** Getting that wrong reversed one published conclusion's
+   sign, and left a second claim resting on an H0 the data falsifies.
+3. **A non-binding day biases a *lift* toward 1 and a *spread* upward.** Same
+   defect, opposite directions — it understated this project's headline, and
+   inflates any spread statistic whose maximum sits on the affected group.
+4. **A metric can be traceable, reproducible and still measure the wrong
+   thing.** The per-structure "difficulty" result published here was withdrawn
+   after its null was shown to be false — and the replacement was withdrawn
+   too, twice, for measuring a different model, a different budget and a
+   different ring population. Nothing about laundering structure is claimed
+   from this benchmark now; see `paper/RESULTS_typology.md`.
+5. **Provenance discipline caught none of these.** Every one was caught by a
+   control or by a gate that executes something. Hashes prove what was run,
+   never that it measured the right quantity.
+
+Each is a link away in [`aml-platform/paper/`](aml-platform/paper/README.md),
+with what may and may not be claimed in
+[`docs/LIMITATIONS.md`](aml-platform/docs/LIMITATIONS.md). The corrections
+behind them are in [`CHANGELOG.md`](CHANGELOG.md), deliberately not here.
+
+## Glossary
+
+The terms the rest of this page assumes.
+
+| term | meaning |
+|---|---|
+| **rung** | one of the three AMLworld sizes: HI-Small (5.1M transactions), HI-Medium (31.9M), HI-Large (179.7M). They are **independent generator runs, not nested subsets** |
+| **ring** | a labelled laundering pattern from the generator — a group of transactions forming one scheme. Roughly 17 account-days each on HI-Medium |
+| **account-day** | the alert unit: one `(account, calendar-day)` pair. What an investigator is assumed to open |
+| **alert budget** | how many account-days a team can review per day. Renews daily |
+| **recall ceiling** | the highest recall a budget permits, whatever the model does. `sum_d min(positives_that_day, budget) / total_positives` |
+| **manifest** | the JSON every stage writes: its config, inputs, code hashes, outputs and their checksums |
+| **lineage** | a named run whose manifests back a published number. `results_archive/CANONICAL.json` marks each one canonical, supporting or superseded, and an unlisted lineage is **refused** |
+| **estimand** | the quantity a metric is meant to estimate — as opposed to the number it computes. The distinction is this project's main finding |
+| **permutation null** | what a metric would read if the thing being tested were shuffled. Here: ring-transaction scores permuted *within a day* |
+| **replay bundle** | ~9 MB of per-day top-k rows that recompute a published budget metric with no dataset download |
+| **prevalence** | the share of a day's account-days that involve laundering. Runs 0.001926 to 1.0 across the evaluated test split, which is the whole problem <!-- derived: 0.001926 = the minimum daily account-day prevalence in the evaluated window, read off the per-day table in budget_null.json rather than stored as a field --> |
+| **`recall_efficiency@k`** | `recall@k` divided by its ceiling — what fraction of the attainable you got |
+| **`ring_recall@k`** | the share of laundering *rings* with at least one member alerted. Not `recall` — a ring gets one draw per member-day |
+| **lift** | an observed value divided by what a stated null would give. Levels mean little here; lift is the number to read |
+| **sign test** | counts how many paired arms moved the same way. On 8 pairs its smallest possible p-value is 0.0078 <!-- derived: 0.0078 = the smallest two-sided sign-test p-value attainable on 8 paired observations, 2/2**8. A property of the DESIGN, not a measurement, so it is in no artifact and cannot be --> |
+| **FIU** | Financial Intelligence Unit — a national agency that sees cross-bank flows a single bank cannot |
 
 ## Layout
 

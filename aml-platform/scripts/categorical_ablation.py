@@ -42,6 +42,25 @@ def segment_metrics(te, scores, budgets, thin_from) -> dict:
     about the window, not about the encoding. The encoding question needs the
     volume segment and a null on that segment.
 
+    ⛔ AND THE FIRST WORKING VERSION ANSWERED IT IN THE WRONG UNIT. It ranked
+    TRANSACTION rows -- `te.is_laundering`, ranked within `event_date` --
+    while every published budget metric in this repository goes through
+    `to_account_days`. The two are not interchangeable: an account-day is
+    positive if ANY of that account's transactions was laundering, so
+    account-day prevalence is strictly the higher, and this function's head
+    segment reported a null of 0.00077 where `budget_null.py` computes
+    0.00243 for the same rung and the same segment -- a factor of 3.16. Every
+    lift it produced was inflated by about that much; `docs/LIMITATIONS.md`
+    published them as a decomposition of an ACCOUNT-DAY headline; and the
+    artifact ended up carrying `precision@50` twice, at two different units,
+    under one key name. `make_tables.UNITS` held the correct unit for
+    `precision@50` the entire time and used it only to format a table column.
+
+    The test written to guard the repaired function could not see it either:
+    it built a frame with no account column at all, so transactions and
+    account-days coincided by construction -- and its own comment called the
+    rows account-days.
+
     THREE DEFECTS THIS FUNCTION SHIPPED WITH, none of which any test executed:
 
       1. `m is slice(None)` compared the IDENTITY of two separately
@@ -59,26 +78,49 @@ def segment_metrics(te, scores, budgets, thin_from) -> dict:
     arm's level is reported against what chance gives on that segment rather
     than against 1.0 or against the pooled figure.
     """
+    import hashlib
+
     import pandas as pd
 
-    day = pd.to_datetime(te.event_date).dt.date.to_numpy()
-    y = te.is_laundering.to_numpy()
+    from aml.eval.metrics import to_account_days
+
+    # THE ALERT UNIT, not the row. This is the same call `evaluate` makes, so
+    # these segments decompose the published headline rather than a quantity
+    # that merely shares its name.
+    ad = to_account_days(te, scores)
+    day = pd.to_datetime(ad.day).dt.date.to_numpy()
+    y = ad.y.to_numpy()
+    scores = ad.score.to_numpy()
     head = day < thin_from
     # `None` as the sentinel for "no mask". A slice object cannot be used here
     # -- see defect 1 above.
     segments = (("", None), ("_head", head), ("_tail", ~head))
-    out: dict = {}
+    # DECLARED, not inferred. `check_units.py` refuses to compare a budget
+    # metric across artifacts that do not agree on what an alert is.
+    out: dict = {"alert_unit": "account-day"}
+    # ONCE. The within-day rank does not depend on the budget, and this was
+    # inside the budget loop -- a full groupby-rank over every account-day per
+    # budget, on a frame with 27.8M rows at the largest rung.
+    r = (pd.DataFrame({"d": day, "s": scores})
+         .groupby("d")["s"].rank(ascending=False, method="first").to_numpy())
     for b in budgets:
-        r = (pd.DataFrame({"d": day, "s": scores})
-             .groupby("d")["s"].rank(ascending=False, method="first").to_numpy())
         top = r <= b
         for lab, m in segments:
             sel = top if m is None else (top & m)
             n = int(sel.sum())
             if not n:
                 continue
-            out[f"precision@{b}{lab}"] = round(float(y[sel].mean()), 5)
+            tp = int(y[sel].sum())
+            out[f"precision@{b}{lab}"] = round(tp / n, 5)
             out[f"alerts@{b}{lab}"] = n
+            # THE SUPPORT, published beside the rate. The withdrawn version of
+            # this table reported a "43% relative spread" across encodings
+            # whose entire content was three alerts -- 7, 9 and 10 true
+            # positives out of 350 -- and no reader could recover that from a
+            # precision quoted to five decimals. Fisher two-sided on the
+            # extremes was p = 0.62; one arm's binomial sd was 2.96 hits,
+            # larger than the whole spread.
+            out[f"tp@{b}{lab}"] = tp
 
             # THE NULL, on the same segment and the same slots.
             #
@@ -89,7 +131,7 @@ def segment_metrics(te, scores, budgets, thin_from) -> dict:
             # comparable to the level above.
             keep = np.ones_like(day, dtype=bool) if m is None else m
             frame = pd.DataFrame({"d": day[keep], "y": y[keep]})
-            per_day = frame.groupby("d")["y"].agg(["size", "mean"])
+            per_day = frame.groupby("d")["y"].agg(["size", "sum", "mean"])
             slots = np.minimum(per_day["size"].to_numpy(), b)
             if slots.sum():
                 null = float((slots * per_day["mean"].to_numpy()).sum()
@@ -97,6 +139,175 @@ def segment_metrics(te, scores, budgets, thin_from) -> dict:
                 out[f"precision_null@{b}{lab}"] = round(null, 5)
                 out[f"precision_lift@{b}{lab}"] = (
                     round(out[f"precision@{b}{lab}"] / null, 4) if null else None)
+                # AND THE CEILING THE LIFT IS MEASURED AGAINST. A precision
+                # lift cannot exceed `ceiling/null`, and on the head segment
+                # every day holds far more positives than slots, so the
+                # ceiling is 1.0 and the bound is the reciprocal base rate --
+                # a property of the generator, not of the ranker. Published
+                # bare, "310.3x" reads as unbounded when 75.7% of it is
+                # 1/prevalence. This project invented `recall_ceiling@k` for
+                # precisely this reason and then published precision lifts
+                # without one.
+                best = float(np.minimum(per_day["sum"].to_numpy(), b).sum()
+                             / slots.sum())
+                out[f"precision_ceiling@{b}{lab}"] = round(best, 5)
+                out[f"precision_efficiency@{b}{lab}"] = (
+                    round(out[f"precision@{b}{lab}"] / best, 4) if best else None)
+                out[f"precision_lift_ceiling@{b}{lab}"] = round(best / null, 4)
+
+    # THE PAIRED STATE, for a paired comparison. See `paired_head_tests`.
+    hp = head & (y == 1)
+    key = np.stack([day[hp].astype("U10"),
+                    ad.acct.to_numpy()[hp].astype("U24")], axis=1)
+    state = {"order_sha": hashlib.sha256(key.tobytes()).hexdigest()[:16],
+             "n_head_positives": int(hp.sum()),
+             # THE DAY, because the day is the independent unit. See
+             # `paired_head_tests`.
+             "day": day[hp].astype("U10"),
+             "caught": {b: (r <= b)[hp] for b in budgets}}
+    return out, state
+
+
+def paired_head_tests(states: dict, budgets) -> dict:
+    """Exact McNemar between the arms, on the head segment's positives.
+
+    THE ARMS ARE NOT INDEPENDENT SAMPLES. They rank the same account-days, of
+    the same days, under the same split, differing only in how two columns are
+    encoded -- so comparing their precisions with Fisher's exact test treats a
+    paired design as unpaired. Under pairing the quantities that matter are
+    the DISCORDANT counts: `b` positives caught by the first arm and missed by
+    the second, `c` the reverse. Exact McNemar is a two-sided binomial test on
+    b out of b + c.
+
+    The withdrawn version of this table never computed them, so nothing in the
+    artifact could show a reader that the comparison had no power. Recording
+    them does not rescue the result -- pairing makes a three-alert difference
+    WORSE, because a net of 3 cannot reach p < 0.25 under any pairing, which
+    removes the "Fisher is conservative, something may be there" escape. It is
+    simply the test this design calls for, and it costs two integers.
+    """
+    import itertools
+    from math import comb
+
+    shas = {st["order_sha"] for st in states.values()}
+    if len(shas) != 1:
+        return {"status": "the arms are not row-aligned, so no paired test is "
+                          "possible", "order_shas": sorted(shas)}
+    out = {"order_sha": shas.pop(),
+           "test": "exact two-sided McNemar on head-segment positives (unit: "
+                   "account-day), AND an exact sign test blocked on the day, "
+                   "which is the independent unit. Prefer the blocked test, "
+                   "and read `smallest_p_attainable_by_design` before "
+                   "reading any p-value here.",
+           "n_head_positives":
+               next(iter(states.values()))["n_head_positives"]}
+    raw_p: dict[str, float] = {}
+    raw_perm: dict[str, float] = {}
+    for bud in budgets:
+        for x, y in itertools.combinations(sorted(states), 2):
+            cx, cy = states[x]["caught"][bud], states[y]["caught"][bud]
+            b, c = int((cx & ~cy).sum()), int((~cx & cy).sum())
+            nd = b + c
+            p = 1.0 if not nd else min(
+                1.0, 2.0 * sum(comb(nd, i) for i in range(min(b, c) + 1))
+                / 2 ** nd)
+
+            # ⚠️ AND THE ALERT IS NOT THE INDEPENDENT UNIT. The head segment
+            # is a handful of days -- seven on HI-Medium, six on HI-Small --
+            # and within a day all three arms re-rank the SAME population, so
+            # the discordant alerts cluster by day and their signs are driven
+            # by one per-day score reshuffle. An exact binomial over alerts
+            # treats 22 correlated observations as 22 independent ones and is
+            # anti-conservative.
+            #
+            # Blocking on the day gives an honest test and, more usefully, an
+            # honest BOUND: with d days a two-sided sign test cannot go below
+            # 2 * 0.5**d, so at seven days the floor is 0.0156 and after Holm
+            # over six comparisons 0.094. Neither rung can reach 0.05 at the
+            # correct blocking unit even with a perfect, unanimous result.
+            # That bound is the finding; the alert-level p is a footnote.
+            days = states[x]["day"]
+            per_day = {}
+            for dd in np.unique(days):
+                m = days == dd
+                per_day[str(dd)] = int((cx & ~cy)[m].sum()) - int((~cx & cy)[m].sum())
+            fx = sum(1 for v in per_day.values() if v > 0)
+            fy = sum(1 for v in per_day.values() if v < 0)
+            nz = fx + fy
+            p_day = 1.0 if not nz else min(
+                1.0, 2.0 * sum(comb(nz, i) for i in range(min(fx, fy) + 1))
+                / 2 ** nz)
+
+            # AND THE SAME BLOCKING, WITHOUT THROWING AWAY THE MAGNITUDE. The
+            # sign test uses only the direction of each day's net, so a day
+            # that moved by 7 alerts counts the same as one that moved by 1 --
+            # on HI-Medium that put the best comparison at p = 1.0 while an
+            # exact sign-flip permutation on the day-level nets gives 0.1875.
+            # Same randomization set, same floor (2 * 0.5**d, because exactly
+            # two of the 2**d assignments are at least as extreme), strictly
+            # more power. Exhaustive: d <= 7 here, so 128 assignments.
+            nets = list(per_day.values())
+            obs = abs(sum(nets))
+            total = 0
+            for mask in range(2 ** len(nets)):
+                flipped = sum(v if mask >> i & 1 else -v
+                              for i, v in enumerate(nets))
+                total += abs(flipped) >= obs - 1e-12
+            p_perm = total / 2 ** len(nets) if nets else 1.0
+            out[f"{x}_vs_{y}@{bud}"] = {
+                f"caught_by_{x}_only": b, f"caught_by_{y}_only": c,
+                "n_discordant": nd, "p_exact_mcnemar": round(p, 5),
+                "n_head_days": len(per_day),
+                f"days_favouring_{x}": fx, f"days_favouring_{y}": fy,
+                "p_sign_test_blocked_by_day": round(p_day, 5),
+                "p_permutation_blocked_by_day": round(p_perm, 5),
+                # FROM THE DESIGN, NOT THE REALISED DATA. This used `nz`,
+                # the number of days that happened to split -- so the "floor"
+                # moved between comparisons of one identical design (0.03125,
+                # 0.0625, 0.125 across six cells) and was post hoc. The bound
+                # a reader needs is the one the design fixes in advance: with
+                # d head days, a two-sided sign test cannot go below
+                # 2 * 0.5**d whatever the data does.
+                "smallest_p_attainable_by_design": round(
+                    min(1.0, 2.0 * 0.5 ** len(per_day)) if per_day else 1.0, 5),
+                "smallest_p_attainable_given_the_ties_observed": round(
+                    min(1.0, 2.0 * 0.5 ** nz) if nz else 1.0, 5),
+                "net_by_day": per_day}
+            raw_p[f"{x}_vs_{y}@{bud}"] = p
+            raw_perm[f"{x}_vs_{y}@{bud}"] = p_perm
+
+    # HOLM, OVER THE WHOLE FAMILY. Three arms at two budgets is six tests,
+    # and quoting the smallest uncorrected p from six is how a null result
+    # becomes a finding. Computed from the UNROUNDED p-values with a running
+    # maximum, which is the part this project has previously got wrong twice.
+    # FROM THE UNROUNDED VALUES, which this comment already claimed and the
+    # code did not do: it read back `out[...]["p_exact_mcnemar"]`, which had
+    # already been rounded to five decimals one block earlier. The same defect
+    # the typology null carried, reintroduced here on the day it was fixed
+    # there.
+    def holm(raw: dict, key: str) -> float | None:
+        order = sorted(raw, key=lambda k: raw[k])
+        running = 0.0
+        for rank, name in enumerate(order):
+            running = max(running, min(1.0, raw[name] * (len(order) - rank)))
+            out[name][key] = round(float(running), 5)
+        return min((out[k][key] for k in order), default=None)
+
+    # BOTH FAMILIES, because this block tells the reader to prefer the blocked
+    # test and then corrected only the alert-level one. Holm over a test the
+    # artifact says to ignore is an adjusted p-value for the wrong question.
+    smallest_alert = holm(raw_p, "p_holm")
+    smallest_blocked = holm(raw_perm, "p_holm_blocked")
+    out["n_tests_in_family"] = len(raw_p)
+    out["smallest_p_holm"] = smallest_alert
+    out["smallest_p_holm_blocked"] = smallest_blocked
+    out["n_significant_after_holm_at_0.05"] = sum(
+        v["p_holm_blocked"] < 0.05 for v in out.values()
+        if isinstance(v, dict) and "p_holm_blocked" in v)
+    out["n_significant_note"] = (
+        "counted on the DAY-BLOCKED permutation test, which is the one this "
+        "block says to prefer. `p_holm` adjusts the alert-level McNemar "
+        "values and is kept only so the two can be compared.")
     return out
 
 
@@ -107,9 +318,14 @@ def fit_arm(Xtr, ytr, Xte, te, cols, seed, budgets):
     clf.fit(Xtr, ytr)
     score = clf.predict_proba(Xte)[:, 1]
     m = evaluate(te, score, budgets=budgets, per_typology=False, n_permutations=0)
-    return {k: m[k] for k in
-            ("average_precision__txn", "precision@50", "recall@50",
-             "recall_efficiency@50", "ring_recall@200") if k in m}, score
+    # DECLARED at the arm, because these come from `evaluate` and are
+    # account-day metrics. `average_precision__txn` carries its own unit in
+    # its name and `ring_recall@200` is counted per ring; check_units.py
+    # honours both, and it is the alert unit that has to be stated.
+    return {"alert_unit": "account-day",
+            **{k: m[k] for k in
+               ("average_precision__txn", "precision@50", "recall@50",
+                "recall_efficiency@50", "ring_recall@200") if k in m}}, score
 
 
 def main(argv=None) -> int:
@@ -160,6 +376,13 @@ def main(argv=None) -> int:
                # indistinguishable from their provenance alone.
                parameters={"features": a.features, "splits": a.splits,
                            "seed": a.seed, "thin_from": a.thin_from}),
+           "estimand": (
+               "whether the volume-segment precision@k of a linear model on "
+               "these 32 features depends on how the two categorical columns "
+               "are encoded. The arms differ ONLY in that encoding; the unit "
+               "is the account-day throughout, which is the unit every other "
+               "budget metric in this repository uses. An earlier version "
+               "ranked transaction rows and reported lifts inflated ~3.16x."),
            "seed": a.seed,
            "n_train": len(ytr), "n_test": len(te),
            "categorical_features": CATEGORICAL, "arms": {}}
@@ -199,10 +422,14 @@ def main(argv=None) -> int:
     if a.thin_from:
         import datetime as _dt
         thin = _dt.date.fromisoformat(a.thin_from)
+        states = {}
         for name, sc in (("full", s_full), ("no_categorical", s_nocat),
                          ("onehot", s_onehot)):
-            out["arms"][name]["by_segment"] = segment_metrics(
-                te, sc, budgets, thin)
+            seg, states[name] = segment_metrics(te, sc, budgets, thin)
+            out["arms"][name]["by_segment"] = seg
+        # THE PAIRED COMPARISON, once, across arms. Per-arm levels cannot say
+        # whether the arms differ; only the discordant counts can.
+        out["paired_head_tests"] = paired_head_tests(states, budgets)
         out["thin_from"] = a.thin_from
     else:
         out["by_segment_note"] = (

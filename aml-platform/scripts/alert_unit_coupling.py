@@ -81,7 +81,17 @@ def measure(bundle: Path, budgets=BUDGETS) -> dict:
     rt = pd.read_parquet(rtf) if rtf.exists() else None
     has_txn = "argmax_txn_id" in ad.columns
 
-    out = {"has_transaction_identity": bool(has_txn)}
+    # THE ALERTING unit is the account-day; the ring-transaction counts
+    # here are consequences of an account-day budget, and are named to say
+    # so. Declared because this file exists to study that very coupling.
+    out = {"alert_unit": "account-day",
+           "estimand": (
+               "how many distinct ring TRANSACTIONS an account-day alert "
+               "budget actually touches, and how often both endpoints of a "
+               "ring transaction are attributable. The alerting unit is the "
+               "account-day throughout; the transaction counts are "
+               "consequences of that budget, not a second alert unit."),
+           "has_transaction_identity": bool(has_txn)}
     for b in budgets:
         top = ad[ad["rank"] <= b]
         if top.empty:

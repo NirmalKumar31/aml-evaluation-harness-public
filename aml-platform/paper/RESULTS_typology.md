@@ -20,9 +20,10 @@
 > | | |
 > |---|---:|
 > | observed spread, this seed | 3.46875 |
-> | permutation null, median | 3.42745 |
-> | permutation null, 95th percentile | 4.60417 |
-> | **P(null ≥ observed)** | **0.46633** <!-- source: 0.46633 <- derived/typology_null.json#permutation_spread_Medium.p_value --> |
+> | permutation null, median | 3.4131 |
+> | permutation null, 95th percentile | 4.56 |
+> | **P(null ≥ observed)** | **0.45661** <!-- source: 0.45661 <- derived/typology_null.json#permutation_spread_Medium.p_value --> |
+> | draws | 50000 |
 >
 > ⚠️ **This does not establish the ensemble result, and it does not establish
 > any conclusion about laundering structure.** It is a different model, a
@@ -33,31 +34,58 @@
 > (`src/aml/eval/metrics.py:794`). One seed is not eight, and an ordinary
 > result on one seed is not evidence about the ensemble.
 >
-> **And no per-typology ordering survives either.** Each typology's
-> `ring_coverage_concentration` — observed ring recall over its own null —
-> with a 95% interval from the same draws:
+> **And one per-typology deviation survives Holm — which the 400-draw run could
+> not have found.** Each typology's `ring_coverage_concentration` — observed ring
+> recall over its own null — with a 95% interval and the draw count behind each
+> p-value:
 >
-> | typology | observed | null | concentration | 95% CI | Holm p | source |
-> |---|---:|---:|---:|---|---:|---|
-> | FAN-IN | 0.21622 | 0.36095 | 0.599 | [0.4706, 0.8421] | 0.0798 | <!-- source: 0.599 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.FAN-IN.concentration; 0.0798 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.FAN-IN.p_holm --><!-- derived: 0.36095 = the within-day permutation null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence; 0.599 = observed divided by that null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence --> |
-> | SCATTER-GATHER | 0.41667 | 0.55446 | 0.7515 | [0.625, 0.8929] | 0.10474 | <!-- source: 0.7515 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.SCATTER-GATHER.concentration; 0.10474 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.SCATTER-GATHER.p_holm --><!-- derived: 0.55446 = the within-day permutation null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence; 0.7515 = observed divided by that null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence --> |
-> | BIPARTITE | 0.22951 | 0.27434 | 0.8366 | [0.6087, 1.2727] | 1.0 | <!-- source: 0.8366 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.BIPARTITE.concentration; 1.0 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.BIPARTITE.p_holm --><!-- derived: 0.27434 = the within-day permutation null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence; 0.8366 = observed divided by that null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence --> |
-> | STACK | 0.38182 | 0.43305 | 0.8817 | [0.7, 1.1667] | 1.0 | <!-- source: 0.8817 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.STACK.concentration; 1.0 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.STACK.p_holm --><!-- derived: 0.43305 = the within-day permutation null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence; 0.8817 = observed divided by that null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence --> |
-> | GATHER-SCATTER | 0.75 | 0.81883 | 0.9159 | [0.8333, 1.0] | 0.5985 | <!-- source: 0.9159 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.GATHER-SCATTER.concentration; 0.5985 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.GATHER-SCATTER.p_holm --><!-- derived: 0.81883 = the within-day permutation null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence; 0.9159 = observed divided by that null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence --> |
-> | RANDOM | 0.28947 | 0.27987 | 1.0343 | [0.7857, 1.4691] | 1.0 | <!-- source: 1.0343 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.RANDOM.concentration; 1.0 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.RANDOM.p_holm --><!-- derived: 0.27987 = the within-day permutation null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence; 1.0343 = observed divided by that null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence --> |
-> | FAN-OUT | 0.33846 | 0.32031 | 1.0567 | [0.8148, 1.5714] | 1.0 | <!-- source: 1.0567 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.FAN-OUT.concentration; 1.0 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.FAN-OUT.p_holm --><!-- derived: 0.32031 = the within-day permutation null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence; 1.0567 = observed divided by that null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence --> |
-> | CYCLE | 0.38462 | 0.30429 | 1.264 | [0.9677, 1.875] | 0.5985 | <!-- source: 1.264 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.concentration; 0.5985 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.p_holm --><!-- derived: 0.30429 = the within-day permutation null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence; 1.264 = observed divided by that null. Concentration is observed/null by definition, so any two of these three columns determine the third. All three are printed because a ratio without its operands cannot be checked -- not as independent evidence --> |
-> | CYCLE | 0.38462 | 0.30429 | 1.264 | [0.9677, 1.875] | 0.5985 | <!-- source: 1.264 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.concentration; 0.5985 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.p_holm --><!-- derived: 0.30429 = this typology's within-day permutation null. Concentration is observed/null, so any two of the three columns determine the third -- that is the definition, not independent evidence --> |
-> | CYCLE | 0.38462 | 0.30429 | 1.264 | [0.9677, 1.875] | 0.5985 | <!-- source: 1.264 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.concentration; 0.5985 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.p_holm --><!-- derived: 0.38462/1.264 --> |
-> | CYCLE | 0.38462 | 0.30429 | 1.264 | [0.9677, 1.875] | 0.5985 | <!-- source: 1.264 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.concentration; 0.5985 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.p_holm --> |
-> | CYCLE | 0.3846 | 0.3043 | 1.264 | [0.9677, 1.875] | 0.5985 | <!-- source: 1.264 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.concentration; 0.5985 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.p_holm --> |
+> | typology | observed | null | concentration | 95% CI | draws ≥ obs | Holm p |
+> |---|---:|---:|---:|---|---:|---:|
+> | FAN-IN | 0.21622 | 0.36403 | 0.594 | [0.4706, 0.8] | 252 | 0.04048 <!-- source: 0.594 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.FAN-IN.concentration; 0.04048 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.FAN-IN.p_holm --> |
+> | SCATTER-GATHER | 0.41667 | 0.54963 | 0.7581 | [0.641, 0.9259] | 1080 | 0.15134 <!-- source: 0.7581 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.SCATTER-GATHER.concentration; 0.15134 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.SCATTER-GATHER.p_holm --> |
+> | BIPARTITE | 0.22951 | 0.27408 | 0.8374 | [0.6087, 1.2727] | 20451 | 1.0 <!-- source: 0.8374 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.BIPARTITE.concentration; 1.0 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.BIPARTITE.p_holm --> |
+> | STACK | 0.38182 | 0.43548 | 0.8768 | [0.7, 1.1667] | 22251 | 1.0 <!-- source: 0.8768 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.STACK.concentration; 1.0 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.STACK.p_holm --> |
+> | GATHER-SCATTER | 0.75 | 0.82141 | 0.9131 | [0.8333, 1.0] | 4711 | 0.56543 <!-- source: 0.9131 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.GATHER-SCATTER.concentration; 0.56543 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.GATHER-SCATTER.p_holm --> |
+> | RANDOM | 0.28947 | 0.27937 | 1.0362 | [0.7857, 1.4667] | 44161 | 1.0 <!-- source: 1.0362 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.RANDOM.concentration; 1.0 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.RANDOM.p_holm --> |
+> | FAN-OUT | 0.33846 | 0.32295 | 1.048 | [0.7857, 1.5714] | 38550 | 1.0 <!-- source: 1.048 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.FAN-OUT.concentration; 1.0 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.FAN-OUT.p_holm --> |
+> | CYCLE | 0.38462 | 0.30553 | 1.2589 | [0.9677, 1.7647] | 5144 | 0.56543 <!-- source: 1.2589 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.concentration; 0.56543 <- derived/typology_null.json#permutation_spread_Medium.per_typology_concentration.CYCLE.p_holm --> |
 >
-> **Six of eight intervals span 1, and after Holm across eight tests nothing
-> is distinguishable from 1 at all.** An earlier version of this banner read
-> the ordering off these ratios and called it an inversion. It is not one:
-> P(GATHER-SCATTER lands below CYCLE under H0) is **0.485**, a coin flip. <!-- historical -->
-> Publishing an ordering without an interval is the mistake this whole
-> document exists to record, and it was made once more in the correction.
+> ⚠️ **This ran at 400 draws and said the opposite, and at 20000 it could not
+> say.** At 400 the smallest attainable Holm value over eight tests was 0.01995  <!-- derived: 0.01995 = eight tests over 401 draws, the Holm floor of the superseded 400-draw run. Not an artifact value, because that run is not archived and should not be -->
+> and FAN-IN's raw p rested on FOUR draws. At 20000 its Holm value was 0.04048
+> with a Monte-Carlo interval of [0.0354, 0.0518] — straddling 0.05 — so the
+> artifact recorded the run as unresolved and named the 32512 draws needed. At
+> 50000 the raw p is 0.00506 on 252 draws, the Holm value is
+> **0.04048**, and its interval is [0.0355, 0.04545], entirely below the
+> threshold. 6 of eight intervals still span 1 and 1 of eight survives Holm.
+>
+> ⚠️ **The multiplier is 8, and the finding dies at 10.** It is declared in the
+> artifact as `holm_family`, which is the only thing that makes it a
+> pre-specification rather than a choice: FAN-IN's raw p is 0.00506, so eight
+> tests give 0.04048 and nine give 0.04554, but **ten give 0.05060** and the  <!-- derived: 0.00506*9; 0.00506*10 -->
+> result is gone. This file carries other p-values -- the spread null and
+> `exposure_vs_detection` -- and adding two of them is enough. An earlier
+> version of this paragraph said the flip came at eleven tests and quoted
+> 0.0600 and 0.0763; those were the superseded 20000-draw values and the gate  <!-- historical --><!-- derived: 0.0600 = a WITHDRAWN figure this sentence narrates, from the superseded 20000-draw run. Deliberately in no artifact; 0.0763 = the same -->
+> could not catch them, because a named marker's stated reason rests on prose
+> alone. Report this finding with its family size or not at all.
+>
+> **What the deficit is, and is not.** FAN-IN's concentration is 0.594: the
+> ranker's alerts land on 16 of 74 FAN-IN rings where a ring-blind reshuffle
+> of its own per-day scores lands on about 27. Its FAN-IN hits **pile into
+> fewer distinct rings** than chance would scatter them. That is NOT a
+> statement that FAN-IN is harder to detect, and not that the model is worse
+> than chance at finding rings -- `src/aml/eval/metrics.py:640` renames the
+> metric precisely to stop that reading, and an earlier version of this
+> paragraph made it anyway ("caught LESS than chance predicts"). It is one  <!-- historical -->
+> archived replay of one fit, and it is the only per-typology effect that
+> clears the family correction at all.
+>
+> An earlier version of this banner read an ordering off these ratios and called
+> it an inversion. It is not one: P(GATHER-SCATTER lands below CYCLE under H0) is
+> **0.485**, a coin flip. Publishing an ordering without an interval is the  <!-- historical -->
+> mistake this whole document exists to record, and it was made once more in the
+> correction.
 >
 > ⚠️ **And "concentration below 1" does not mean "worse than chance".** The
 > null conditions on the model's **own** per-day multiset of ring-transaction
@@ -302,7 +330,7 @@ only replication showed which parts of it were real.
 
 ## 6. How this was almost published wrong
 
-The first version of this number was **single-seed** and gave a 4.6× spread with
+The first version of this number was **single-seed** and gave a 4.6× spread with  <!-- derived: 4.6 = the withdrawn single-seed spread this section exists to narrate. Deliberately in no artifact -->
 FAN-IN at 14.9% as the headline blind spot. Both parts were wrong: the spread
 was inflated by taking extremes from one noisy run, and the blind spot was an
 artifact of one dataset rung.

@@ -398,7 +398,8 @@ def permutation_spread_null(patterns_dir: Path, bundle: Path, budget: int,
         r_lo = obs[i] / np.percentile(col, 97.5) if np.percentile(col, 97.5) else np.nan
         r_hi = obs[i] / np.percentile(col, 2.5) if np.percentile(col, 2.5) else np.nan
         centred = np.abs(col / null_rate[i] - 1.0) if null_rate[i] else np.zeros_like(col)
-        pv = (1 + int((centred >= abs(ratio[i] - 1.0)).sum())) / (n_draws + 1)
+        beyond = int((centred >= abs(ratio[i] - 1.0)).sum())
+        pv = (1 + beyond) / (n_draws + 1)
         raw_p[name] = float(pv)          # UNROUNDED, for the adjustment
         per[name] = {
             "observed": round(float(obs[i]), 5),
@@ -406,7 +407,18 @@ def permutation_spread_null(patterns_dir: Path, bundle: Path, budget: int,
             "concentration": round(float(ratio[i]), 4),
             "ci95": [round(float(r_lo), 4), round(float(r_hi), 4)],
             "p_two_sided": round(pv, 5),
-            "distinguishable_from_1": bool(r_lo > 1.0 or r_hi < 1.0),
+            # THE INTEGER BEHIND THE p-VALUE. At 400 draws the smallest
+            # attainable p is 1/401 and FAN-IN's 0.00998 rests on four draws,
+            # so a p quoted to five decimals asserts a precision the
+            # simulation does not have. Publishing the count makes that
+            # visible without a reader having to invert the arithmetic.
+            "n_draws_at_or_beyond": beyond,
+            "p_mc_se": round(float((pv * (1 - pv) / n_draws) ** 0.5), 5),
+            # RENAMED. This was `distinguishable_from_1`, which reads as
+            # significance -- and it was True for exactly the two typologies
+            # that FAIL Holm (p_holm 0.0798 and 0.10474). It is a statement
+            # about one unadjusted interval and nothing more.
+            "ci95_excludes_1": bool(r_lo > 1.0 or r_hi < 1.0),
         }
     # Holm, because eight ratios are eight tests.
     #
@@ -434,9 +446,48 @@ def permutation_spread_null(patterns_dir: Path, bundle: Path, budget: int,
         per[a]["p_holm"] <= per[b]["p_holm"] + 1e-12
         for a, b in itertools.pairwise(order)), \
         "Holm-adjusted p-values must be monotone in the ordered raw p-values"
-    n_sig = sum(1 for v in per.values() if v["p_holm"] < 0.05)
+    # FROM THE UNROUNDED ADJUSTMENT. Counting on `per[...]["p_holm"]` counts
+    # the DISPLAY form, which is the same mistake as computing Holm from
+    # rounded inputs, one step later. No attainable value currently sits in
+    # the ambiguous band, so this changed nothing -- which is why it survived.
+    holm_unrounded: dict[str, float] = {}
+    running_u = 0.0
+    for rank, name in enumerate(order):
+        running_u = max(running_u, min(1.0, raw_p[name] * (len(order) - rank)))
+        holm_unrounded[name] = running_u
+    n_sig = sum(1 for v in holm_unrounded.values() if v < 0.05)
+    spans_one = sum(1 for v in per.values() if not v["ci95_excludes_1"])
+    # AND WHETHER THE SIMULATION COULD HAVE SAID OTHERWISE. With k tests the
+    # smallest Holm value reachable at all is k/(n_draws+1); if that is not
+    # comfortably below 0.05 then "nothing survives Holm" is a statement about
+    # the draw count, not about the typologies.
+    holm_floor = len(order) / (n_draws + 1)
+    # ⚠️ AND THE FLOOR IS THE WRONG TEST OF RESOLVED-NESS. It only says the
+    # grid is fine enough to EXPRESS a small value; it says nothing about
+    # whether the value actually measured is separated from 0.05. FAN-IN's
+    # p_holm came out 0.0436 against a threshold of 0.05 with a Monte-Carlo
+    # standard error that puts the adjusted interval at roughly [0.035,
+    # 0.051] -- straddling the threshold -- while `holm_conclusion_is_resolved`
+    # read `true` off a floor of 0.0004. Resolved means the INTERVAL clears
+    # the threshold.
+    best = order[0]
+    k_tests = len(order)
+    p0 = raw_p[best]
+    se0 = (p0 * (1 - p0) / n_draws) ** 0.5
+    holm_ci = [max(0.0, min(1.0, (p0 - 1.96 * se0) * k_tests)),
+               max(0.0, min(1.0, (p0 + 1.96 * se0) * k_tests))]
+    resolved = holm_ci[1] < 0.05 or holm_ci[0] > 0.05
 
     return {
+        "estimand": (
+               "ring_coverage_concentration per typology: the share of a "
+               "typology's rings the ranker covers, divided by what a WITHIN-"
+               "DAY permutation of ring-transaction scores gives it. Below 1 "
+               "means the alerts concentrate into fewer distinct rings than a "
+               "ring-blind reassignment of the same scores -- it is NOT a "
+               "statement that the model is worse than chance at finding "
+               "rings, and metrics.py:640 renames the metric to stop that "
+               "reading."),
         "budget": budget,
         "draws": n_draws,
         "observed_spread": round(observed, 5),
@@ -445,7 +496,34 @@ def permutation_spread_null(patterns_dir: Path, bundle: Path, budget: int,
         "p_value": round((1 + int((spread >= observed).sum())) / (n_draws + 1), 5),
         "observed_percentile": round(float(100 * (spread < observed).mean()), 1),
         "per_typology_concentration": per,
-        "n_distinguishable_from_1_after_holm": n_sig,
+        "n_significant_after_holm_at_0.05": n_sig,
+        "smallest_p_holm": round(min(holm_unrounded.values()), 5),
+        "smallest_p_holm_attainable_at_this_draw_count": round(holm_floor, 5),
+        "smallest_p_holm_mc_ci95": [round(holm_ci[0], 5), round(holm_ci[1], 5)],
+        # TRUE only when the Monte-Carlo interval on the smallest adjusted
+        # p-value falls entirely on one side of 0.05. At 20000 draws it does
+        # not, so the FAN-IN result is inside simulation error and must be
+        # reported as such rather than as a significant finding.
+        "holm_conclusion_is_resolved": bool(resolved),
+        "draws_needed_to_resolve_at_0.05": (
+            None if resolved else
+            int((1.96 ** 2) * p0 * (1 - p0) / ((0.05 / k_tests - p0) ** 2)) + 1
+            if p0 < 0.05 / k_tests else None),
+        # THE FAMILY IS A CHOICE, AND IT DECIDES THE ANSWER. This artifact
+        # carries more p-values than these eight; multiplying by 11 gives
+        # 0.0600 and by 14 gives 0.0763, so a reader could move FAN-IN across
+        # 0.05 without doing anything dishonest. The multiplier is fixed here,
+        # in the artifact, as the eight per-typology concentration tests --
+        # declared rather than chosen after seeing the result.
+        "holm_family": {
+            "n_tests": k_tests,
+            "definition": "the per-typology ring_coverage_concentration tests "
+                          "in this block, one per typology present",
+            "members": list(order),
+            "note": "other p-values in this file (the spread null, "
+                    "exposure_vs_detection) are separate pre-specified "
+                    "questions and are NOT in this family",
+        },
         # THE TWO SIDES ARE NOT THE SAME BASIS, AND SAYING SO IS THE POINT.
         #
         # The withdrawn 3.05x is an EIGHT-SEED score-averaged ensemble read
@@ -485,17 +563,50 @@ def permutation_spread_null(patterns_dir: Path, bundle: Path, budget: int,
                 "3.05x figure is withdrawn because its H0 is false -- not "
                 "because a valid null was computed for it"),
         },
-        "interpretation": (
-            "`concentration` is `ring_coverage_concentration` computed per "
-            "typology: observed ring recall over a within-day permutation null "
-            "that conditions on the model's own per-day score multiset. Below 1 "
-            "means the alerts concentrate into FEWER DISTINCT RINGS than a "
-            "ring-blind reassignment of the same scores -- NOT that the model "
-            "is worse than chance at finding rings (see metrics.py:640). Six "
-            "of eight intervals span 1 and nothing survives Holm, so no "
-            "per-typology ordering is established here either; the spread "
-            "p-value above is the finding, and it is a null result."),
+        # GENERATED FROM THE NUMBERS, never written alongside them. This
+        # string has now been stale TWICE: it read "nothing survives Holm, and
+        # it is a null result" after the draw count rose from 400 to 20000 and
+        # one deviation did survive, and it then read "its Monte-Carlo
+        # interval straddles 0.05" after 50000 draws moved the interval
+        # entirely below the threshold. Prose written beside a number goes
+        # stale when the number moves; prose computed from it cannot.
+        "interpretation": _interpretation(per, spans_one, n_sig, holm_ci,
+                                          min(holm_unrounded.values()),
+                                          resolved, len(order)),
     }
+
+
+def _interpretation(per: dict, spans_one: int, n_sig: int, holm_ci: list,
+                    best_holm: float, resolved: bool, k_tests: int) -> str:
+    """The reading of this block, derived from the block."""
+    fixed = (
+        "`concentration` is `ring_coverage_concentration` computed per "
+        "typology: observed ring recall over a within-day permutation null "
+        "that conditions on the model's own per-day score multiset. Below 1 "
+        "means the alerts concentrate into FEWER DISTINCT RINGS than a "
+        "ring-blind reassignment of the same scores -- NOT that the model is "
+        "worse than chance at finding rings, and not that the typology is "
+        "harder to detect (see metrics.py:640). ")
+    order_note = (
+        f"No per-typology ORDERING is established: {spans_one} of "
+        f"{len(per)} intervals span 1. ")
+    if not n_sig:
+        return fixed + order_note + "No deviation survives Holm."
+    who = sorted((v["p_holm"], k) for k, v in per.items())[0][1]
+    # The family size at which the smallest adjusted p would cross 0.05. A
+    # finding that dies on the next test is fragile and has to say so.
+    raw = best_holm / k_tests
+    flips = next((k for k in range(1, 200) if raw * k >= 0.05), None)
+    return (
+        fixed + order_note +
+        f"{n_sig} deviation ({who}) has an adjusted p-value of {best_holm:.5f} "
+        f"with a Monte-Carlo interval of {holm_ci}, which "
+        f"{'clears' if resolved else 'straddles'} 0.05. "
+        + (f"It is FRAGILE IN THE FAMILY SIZE: the multiplier here is "
+           f"{k_tests}, declared in `holm_family`, and at {flips} tests the "
+           f"same raw p-value gives {raw * flips:.5f} and the finding is gone. "
+           if flips else "")
+        + "Report it with the family, or not at all.")
 
 
 def feasible_tail_range(exposure: dict, pooled: float) -> dict:
@@ -539,7 +650,14 @@ def main(argv=None) -> int:
                          "Defaults to the budget the stability artifact "
                          "actually used, which is NOT the one beside it in the "
                          "same file -- see below.")
-    ap.add_argument("--perm-draws", type=int, default=400,
+    # 50000, because that is what the committed artifact used and the
+    # documented command has to reproduce it. At 20000 the FAN-IN result came
+    # out p_holm = 0.0436 with a Monte-Carlo interval of [0.0354, 0.0518],
+    # straddling 0.05 -- so `python scripts/typology_null.py` produced a
+    # DIFFERENT CONCLUSION from the archived artifact, and the checklist told
+    # a reader to run exactly that. The draw count is not a tuning knob here:
+    # it is the difference between a resolved finding and an unresolved one.
+    ap.add_argument("--perm-draws", type=int, default=50000,
                     help="draws for the within-day permutation null, which "
                          "re-ranks every eligible account-day per draw and so "
                          "costs far more than a binomial")

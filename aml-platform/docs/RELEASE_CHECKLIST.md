@@ -13,7 +13,7 @@ weeks. Most of what this catches is the difference between the two.
 ```bash
 cd aml-platform
 make lint                                  # ruff
-make test                                  # 416 tests collected (pass/skip
+make test                                  # 420 tests collected (pass/skip
                                            # split varies by environment)
 python -m aml.cli demo --dest "$TMPDIR/demo"   # the real pipeline, generated corpus
 pytest tests/cloud/ -q                     # every stage through file:// URIs
@@ -36,7 +36,14 @@ python scripts/release_facts.py --check ../README.md ../HANDOFF.md \
 
 python scripts/check_links.py ..           # no broken relative links or anchors
 
-# A published number, recomputed from a few hundred KB and no dataset
+# The no-data replay MECHANISM, end to end, with nothing withheld.
+# Works in any clone: generates a synthetic corpus, cuts a bundle, and
+# recomputes every published budget metric from the bundle alone.
+make replay-demo
+
+# The ARCHIVED bundles, if this checkout has them. The public snapshot
+# withholds results_archive/replay/ while the CDLA question is unreviewed, so
+# this command fails there with FileNotFoundError -- it is not a public step.
 python scripts/verify_replay_bundle.py \
   --bundle   results_archive/replay/small_gbdt_s0 \
   --manifest results_archive/gold/infl_eval_ring-aware_s0/manifest.json
@@ -56,15 +63,17 @@ names what it needs; a reader with only a checkout can do the first two.
 
 | result / artifact | command | needs | ~time | determinism |
 |---|---|---|---|---|
-| the six pipeline stages compose | `make demo` | nothing | 30 s | exact; corpus is generated, numbers are meaningless by construction |
-| every published budget metric | `pytest -q -k replay` | nothing (9 MB of bundles) | 5 s | **exact** — recomputed from the bundle, compared to the manifest |
-| all derived artifacts' provenance | `pytest -q -k derived_artifact_names` | nothing | 3 s | exact, from git objects |
-| every published number and count | `make release-check` | nothing | ~2 min | exact |
+| the six pipeline stages compose | `make demo` | nothing | 7 s | exact; corpus is generated, numbers are meaningless by construction |
+| the no-data replay mechanism | `make replay-demo` | nothing | 2 s | **exact** — 42 metrics recomputed from a 0.03 MB synthetic bundle, zero AMLworld bytes |
+| every published budget metric | `pytest -q -k replay` | the archived bundles | 19 s | **exact** where present; in the public snapshot 11 of 14 SKIP, because `results_archive/replay/` is withheld |
+| all derived artifacts' provenance | `pytest -q -k derived_artifact_names` | nothing | 2 s | exact, from git objects where the commit resolves, else from the package tree hash |
+| budget metrics agree on their alert unit | `python scripts/check_units.py` | nothing | 1 s | exact |
+| every published number and count | `make release-check` | nothing | ~6 min | exact |
 | `dataset_pin.json` | `python scripts/verify_dataset.py --pin` | the CSVs | 1 min | exact (content hashes) |
 | `dataset_facts.json` | `python scripts/measure_dataset_facts.py` | HI-Medium CSV | 2 min | exact |
 | `split_inflation.json` | `python scripts/analyze_split_inflation.py` | `data/gold` from a Small run | 1 min | **exact** since the `ORDER BY` fix |
 | `split_inflation_counterfactual.json` | `python scripts/split_inflation_counterfactual.py` | `data/gold` from a Small run | 13 min | **exact** since the `ORDER BY` fix; was not before |
-| `typology_null.json` | `python scripts/typology_null.py` | the two `stability.json` files, `data/bronze/patterns_Medium/rings.parquet` and the `medium_gbdt_s0` bundle | 30 s | exact (seeded); without the parsed patterns it records an error instead of an exposure null |
+| `typology_null.json` | `python scripts/typology_null.py` | the two `stability.json` files, `data/bronze/patterns_Medium/rings.parquet` and the `medium_gbdt_s0` bundle | ~4 min | exact (seeded) at the DEFAULT `--perm-draws 50000`, which is what the committed artifact used. At 20000 the FAN-IN Holm interval straddles 0.05 and the run reports itself unresolved — a different conclusion, so the draw count is not a tuning knob; without the parsed patterns it records an error instead of an exposure null |
 | `categorical_ablation.json` | `python scripts/categorical_ablation.py --features … --splits …` | a built Small feature table | 2 min | exact (seeded) |
 | `categorical_ablation_medium.json` | the same, on HI-Medium features, with `--thin-from 2022-09-17` | **the cloud VM** — not reproducible locally | 9 min | **rerun 2026-09-17** inside the release container with full provenance; segmented figures included |
 | `cost.json` | `python scripts/cost_table.py --created …` | network (Azure retail prices) | 5 s | prices and elapsed time both move; timestamped |
