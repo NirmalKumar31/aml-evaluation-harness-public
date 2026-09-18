@@ -4,15 +4,24 @@
 #
 # WHAT THIS DOES NOT DO: it does not change the email addresses recorded in the
 # commits. One of them is a machine-local hostname address
-# (`user@Nirmals-MacBook-Air.local`) and the other is institutional. Both stay
+# (a machine hostname address) and the other is institutional. Both stay
 # visible in `git log --format=%ae` and in the raw objects once this repository
 # is public.
 #
-# Replacing them means either adding a mapping line with a chosen public
-# address, or rewriting history with git-filter-repo before the first public
-# push. Both are the maintainer's decision, not a cleanup task -- see the
-# authorship row in aml-platform/docs/RELEASE_CHECKLIST.md. Only the second
-# actually removes the old addresses; a .mailmap line only changes what tools
-# display.
+# DECIDED, on the evidence rather than on preference. Measured against the
+# public repository's own history:
+#
+#   thirupallikrishnan.n@northeastern.edu   appears in 1 public commit author
+#   the machine-local hostname address        appears in 0
+#
+# So the machine-local line was publishing a machine hostname while mapping an
+# address that no public commit contains -- disclosure for no benefit. It is
+# removed. The institutional line stays, because it maps an address that IS in
+# the public commit objects, which is what makes `git shortlog` read as one
+# author; deleting the line would not delete the address.
+#
+# History is NOT rewritten. The address is already in published commit objects,
+# so a rewrite would not un-publish it -- and the last force-push here orphaned
+# the shared base and closed six Dependabot PRs that could not be reopened.
+# That is a real cost against no gain.
 Nirmal Kumar Thirupallikrishnan <thirupallikrishnan.n@northeastern.edu>
-Nirmal Kumar Thirupallikrishnan <nirmalkumar@Nirmals-MacBook-Air.local>
