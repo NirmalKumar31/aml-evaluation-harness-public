@@ -85,6 +85,28 @@ GRANDFATHERED_NO_TREE_HASH: set[str] = set()
 # published number was produced by code that is no longer in the tree.
 STALE_GENERATOR_ACCEPTED: set[str] = set()
 
+# Replay bundles known to reproduce a SUPERSEDED lineage. An entry is not a
+# waiver -- it records that every published number derived from that bundle has
+# been withdrawn or caveated in prose, and that closing it needs a REFIT rather
+# than an edit.
+#
+# `medium_gbdt_s0` reproduces `gold/eval3_Medium/gbdt` bit-identically
+# (precision@50 = 761/864 = 0.880787) against the canonical 0.793981 from
+# `canonical_Medium_gbdt`, independently reproduced by
+# `canonical_Medium_gbdt_replica`. Those fits predate the restored row sort in
+# `load_train_xy`, which moves only the histogram learner -- the logistic
+# baseline reads 0.570602 in BOTH lineages, which is why five audit sittings
+# missed it.
+#
+# Withdrawn in consequence: the pooled 0.88079 and its 1.79x-1.94x lift, the
+# volume-segment 0.75714 and 310.3x, the 265-of-350 counts, and the
+# per-typology block including FAN-IN. The scores archived on the cloud VM are
+# the same superseded fits, so no canonical volume-segment decomposition can be
+# rebuilt from anything currently stored.
+SUPERSEDED_BUNDLE_ACCEPTED = {
+    "medium_gbdt_s0",
+}
+
 # ⛔ THIS SET SAID FOUR ARTIFACTS COULD NOT BE REGENERATED HERE, AND THEY
 # COULD. The comment read "each needs the dataset ... cannot be closed on a
 # machine that does not hold the CSVs" -- on a machine holding
@@ -6305,3 +6327,138 @@ def test_a_derived_marker_cannot_manufacture_its_own_value():
         assert mt._divides_by_power_of_ten(spelling.replace("x", "0.5")), spelling
     assert mt._divides_by_power_of_ten("0.5/7") is None
     assert mt._divides_by_power_of_ten("0.5/0.00244") is None
+
+
+def test_every_file_that_names_a_version_names_the_same_one():
+    """Four files disagreed about which version this is, and nothing checked.
+
+    Found by a cold read of the published v0.1.2 snapshot, in under a minute:
+
+        aml-platform/pyproject.toml   version = "0.1.0"   (so the wheel it
+                                      builds is aml_evaluation_harness-0.1.0)
+        CITATION.cff                  version: 0.1.2
+        HANDOFF.md                    "[PUBLIC, v0.1.1] ... is current"
+        CHANGELOG.md                  one heading, `## Unreleased`, naming
+                                      v0.1.0 -- with three releases published
+
+    The publication gate reads 23 documents and 1200+ values and none of these
+    fields, because they are metadata rather than measurements. A project whose
+    thesis is that every published number must trace to an artifact shipped
+    four contradictory answers to "what version is this".
+
+    The rule: whatever declares a version must declare the SAME version, and
+    where tags exist it must be the newest tag.
+    """
+    root = Path(__file__).resolve().parents[3]
+    if not (root / "CITATION.cff").exists():
+        pytest.skip("repository root not present (running inside the image)")
+
+    declared = {}
+    pyproj = (root / "aml-platform" / "pyproject.toml").read_text()
+    m = re.search(r'^version\s*=\s*"([^"]+)"', pyproj, re.M)
+    if m:
+        declared["pyproject.toml"] = m.group(1)
+    cff = (root / "CITATION.cff").read_text()
+    m = re.search(r"^version:\s*['\"]?([0-9][^'\"\s]*)", cff, re.M)
+    if m:
+        declared["CITATION.cff"] = m.group(1)
+
+    tags = subprocess.run(["git", "-C", str(root), "tag", "--list"],
+                          capture_output=True, text=True).stdout.split()
+    if tags:
+        newest = max(tags, key=lambda t: [int(x) for x in t.lstrip("v").split(".")
+                                          if x.isdigit()])
+        declared["newest git tag"] = newest.lstrip("v")
+
+    assert len(set(declared.values())) <= 1, (
+        "files disagree about which version this is: "
+        + "; ".join(f"{k} says {v}" for k, v in sorted(declared.items())))
+
+    # AND THE CHANGELOG MUST NAME THE RELEASES THAT EXIST. It carried exactly
+    # one heading, `## Unreleased`, while three tags were published -- so the
+    # document whose entire job is "what changed between versions" named no
+    # version at all.
+    changelog = (root / "CHANGELOG.md").read_text()
+    named = set(re.findall(r"^##\s+v?(\d+\.\d+\.\d+)", changelog, re.M))
+    missing = {t.lstrip("v") for t in tags} - named
+    assert not missing, (
+        f"CHANGELOG.md names no section for released tag(s) {sorted(missing)}; "
+        f"it has sections for {sorted(named) or 'nothing'}")
+
+
+def test_no_replay_bundle_reproduces_a_superseded_lineage():
+    """The headline was backed by a lineage the registry forbids.
+
+    `results_archive/CANONICAL.json` marks `eval3_Medium` and `models3_Medium`
+    SUPERSEDED -- "fitted during the window when load_train_xy did not sort" --
+    and states the rule: a superseded lineage must not back a current value.
+    `scripts/make_tables.py` enforces that by mapping a value's source path to
+    a lineage, but only for paths under `gold/`: anything else returns
+    "derived" and is laundered.
+
+    `results_archive/replay/medium_gbdt_s0` is such a path. Its
+    `precision@50` is 761/864 = 0.880787, bit-identical to
+    `gold/eval3_Medium/gbdt` (superseded) and 11% above
+    `gold/canonical_Medium_gbdt` (0.793981, reproduced independently by
+    `canonical_Medium_gbdt_replica`). Every figure downstream of that bundle
+    inherited it, including the published volume-segment headline, while the
+    gate reported "0 from a superseded lineage".
+
+    Five audit sittings missed it because the LOGISTIC agrees across lineages
+    -- it is a deterministic fit, so row order cannot move it -- and the
+    logistic is what most of the published comparisons use. Only the histogram
+    learner is order-sensitive, which is the whole reason the sort was
+    restored.
+    """
+    root = _archive_root()
+    reg = json.loads((root / "CANONICAL.json").read_text())
+    superseded = set(reg.get("superseded", {}))
+    if not superseded:
+        pytest.skip("no superseded lineages registered")
+
+    # What each lineage measured, per model arm, at the budget the project
+    # leads with. Keyed by arm so a superseded value can be compared with the
+    # canonical one for the SAME model.
+    by_arm: dict[str, dict[str, float]] = {}
+    for man in sorted(root.glob("gold/*/*/manifest.json")):
+        lineage, arm = man.parts[-3], man.parts[-2]
+        v = (json.loads(man.read_text()).get("metrics") or {}).get("precision@50")
+        if isinstance(v, (int, float)):
+            by_arm.setdefault(arm, {})[lineage] = round(float(v), 9)
+
+    # A value is only tainted if it matches a SUPERSEDED lineage **and differs
+    # from the canonical one for the same arm**. The logistic baseline is a
+    # deterministic fit, so row order cannot move it and it reads 0.570602 in
+    # both lineages -- matching eval3 there means nothing. Only the histogram
+    # learner is order-sensitive, which is exactly why the sort was restored,
+    # and it is the arm that diverges: 0.880787 superseded against 0.793981
+    # canonical.
+    forbidden = {}
+    for arm, per in by_arm.items():
+        sup = {lin: v for lin, v in per.items() if lin in superseded}
+        good = {lin: v for lin, v in per.items() if lin not in superseded}
+        for lin, v in sup.items():
+            if v not in good.values():
+                forbidden[v] = f"{lin}/{arm}"
+    if not forbidden:
+        pytest.skip("no superseded manifest publishes a divergent precision@50")
+
+    bad = []
+    for bundle in sorted((root / "replay").glob("*/account_days_topk.parquet")):
+        ad = pd.read_parquet(bundle)
+        top = ad["rank"] <= 50
+        n = int(top.sum())
+        if not n:
+            continue
+        got = round(float(int(((ad.y == 1) & top).sum()) / n), 9)
+        if got in forbidden and bundle.parts[-2] not in SUPERSEDED_BUNDLE_ACCEPTED:
+            bad.append(f"{bundle.parts[-2]}: precision@50 = {got} is "
+                       f"bit-identical to {forbidden[got]}, which CANONICAL.json "
+                       f"marks superseded")
+    assert not bad, (
+        "replay bundles reproduce a superseded lineage, and every published "
+        "number derived from them inherits it:\n  " + "\n  ".join(bad))
+    # The exemption is a debt, not a door. One entry, and it names a refit.
+    assert len(SUPERSEDED_BUNDLE_ACCEPTED) <= 1, (
+        f"{sorted(SUPERSEDED_BUNDLE_ACCEPTED)} bundles are exempted; each means "
+        f"published numbers rest on fits the registry has superseded")

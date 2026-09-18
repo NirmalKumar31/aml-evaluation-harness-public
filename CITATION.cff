@@ -12,8 +12,8 @@ authors:
     given-names: Nirmal Kumar
 repository-code: "https://github.com/NirmalKumar31/aml-evaluation-harness-public"
 license: MIT
-version: 0.1.2
-date-released: "2026-09-17"
+version: 0.1.3
+date-released: "2026-09-18"
 keywords:
   - anti-money-laundering
   - evaluation methodology

@@ -34,6 +34,26 @@
 > (`src/aml/eval/metrics.py:794`). One seed is not eight, and an ordinary
 > result on one seed is not evidence about the ensemble.
 >
+> ⛔ **AND THE WHOLE BLOCK BELOW RESTS ON A SUPERSEDED LINEAGE.** Every figure
+> here is computed from `results_archive/replay/medium_gbdt_s0`, whose
+> `precision@50` is 761/864 = 0.880787 — bit-identical to  <!-- derived: 0.880787 = the SUPERSEDED value this warning exists to name. Quoting it is the point; it is deliberately not restated as current -->
+> `gold/eval3_Medium/gbdt`, which `results_archive/CANONICAL.json` marks
+> **superseded** because those fits were made while the training loader did
+> not sort its rows. The canonical value for that model is 0.793981. The
+> ranking this null conditions on is therefore not the canonical ranking, and
+> **the FAN-IN result must not be quoted as a current finding** until it is
+> recomputed from a canonical fit. It is retained here because the METHOD --
+> a within-day permutation conditioned on the model's own per-day score
+> multiset, Holm over a declared family, with the Monte-Carlo interval on the
+> adjusted p and the family size at which it dies -- is what this section is
+> for, and that does not depend on which fit supplied the scores.
+>
+> The publication gate did not catch this: it resolves a value's lineage only
+> for paths under `gold/`, so anything laundered through `replay/` or
+> `derived/` returns "derived" and passes. A test now asserts that no replay
+> bundle reproduces a superseded lineage's `precision@50` while differing from
+> the canonical value for the same model arm.
+
 > **And one per-typology deviation survives Holm — which the 400-draw run could
 > not have found.** Each typology's `ring_coverage_concentration` — observed ring
 > recall over its own null — with a 95% interval and the draw count behind each

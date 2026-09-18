@@ -10,24 +10,38 @@ the published logistic model's 0.57060 beats it by only **1.16×–1.26×**. <!-
 Restrict to the seven days the generator was still running and the comparison
 starts to mean something:
 
-| ranker, 50 alerts/day | `precision@50` | vs the null | of the attainable |
+| ranker, 50 alerts/day | `precision@50` | true positives | vs the null |
 |---|---:|---:|---:|
-| uniformly random | 0.00243–0.00244 | 1× | — |
-| logistic regression, 32 features | 0.04286 | **17.6×** | 4.3% <!-- derived: 0.04286/0.00244 --> |
-| gradient-boosted trees, same features | 0.75714 | **310.3×** | 75.7% <!-- derived: 0.75714/0.00244 --> |
+| uniformly random | 0.00243–0.00244 | — | 1× |
+| logistic regression, 32 features | 0.04286 | 15 of 350 | **17.6×** <!-- derived: 0.04286/0.00244 --> |
 
-⚠️ **Read the last column, not the middle one.** Every head day holds more
-positives than the budget has slots, so a perfect ranker would score 1.0 and
-the largest lift attainable is **409.8×** — the reciprocal base rate, a <!-- derived: 1/0.00244 -->
-property of the generator rather than of any ranker. And the budget binds hard
-either way: at 50 alerts/day no model can exceed **4.73%** recall, because
+⛔ **The boosted-model row is withdrawn.** It read 0.75714 and 310.3×, from <!-- historical --><!-- derived: 310.3 = a WITHDRAWN value this sentence exists to narrate. It came from the superseded eval3_Medium lineage and is deliberately not restated as current; 0.75714 = the same -->
+`replay/medium_gbdt_s0` — a bundle that reproduces `gold/eval3_Medium/gbdt`
+bit-identically, and `results_archive/CANONICAL.json` marks that lineage
+**superseded**: those fits were made while the training loader did not sort
+its rows. The canonical value for that model is **0.793981** pooled against
+0.880787, and no canonical volume-segment decomposition exists — rebuilding  <!-- derived: 0.880787 = a WITHDRAWN value this sentence exists to narrate. It came from the superseded eval3_Medium lineage and is deliberately not restated as current -->
+one needs a refit, recorded as open rather than approximated. The logistic row
+stands: a deterministic fit, identical in both lineages.
+
+⚠️ **And a lift is bounded.** Every head day holds far more positives than the
+budget has slots, so a perfect ranker scores 1.0 there and the largest
+attainable lift is **409.8×** — the reciprocal of the null, a property of the <!-- derived: 1/0.00244 -->
+generator rather than of any ranker. Quoted bare it is the precision restated;
+quote the count, or the precision against that bound. The budget binds hard
+regardless: at 50 alerts/day no model can exceed **4.73%** recall, because
 only 858 of 18,130 positive account-days are reachable.
 
-Verify the machinery in about eight seconds, with no dataset and no AMLworld
-bytes:
+Verify the machinery in about a minute from a cold clone, with no dataset
+and no AMLworld bytes:
 
 ```bash
 cd aml-platform && make setup && make replay-demo   # 42 metrics, 0 mismatches
+# ~70 s cold -- it generates the corpus first -- and ~2 s once the stage cache
+# is warm. The metrics it prints are 1.000000 by construction: the corpus is
+# synthetic and trivially separable. What is verified is the MECHANISM, that
+# every published budget metric recomputes from a 0.03 MB bundle and nothing
+# else.
 ```
 
 AMLworld is synthetic, from a single generator, never validated against real
@@ -165,7 +179,7 @@ exchangeability assumption, not causal effects.
 cd aml-platform
 make setup          # venv + locked dependencies
 make demo           # generates a corpus, runs every stage, ~30 seconds
-make test           # 420 tests collected; pass and skip counts vary by
+make test           # 422 tests collected; pass and skip counts vary by
                     # environment (data-dependent contract tests)
 ```
 
@@ -328,8 +342,14 @@ cannot fit in 31; LightGBM needs 14.9 GB.
 ## How this project got things wrong
 
 1. **This benchmark's published test window is not an evaluation set.** Its
-   second half is a generator shutdown: volume falls 637,998× while prevalence <!-- derived: 4465985/7 -->
-   rises to 1.0, so a uniformly random ranker scores `precision@50` between
+   second half is a generator shutdown: within the test window volume falls <!-- historical -->
+   **431,695×**, from 3,021,866 transactions to 7, while transaction <!-- derived: 3021866/7 -->
+   prevalence rises from 0.0008 to 0.627119. (This read "637,998× ...  <!-- derived: 637998 = a WITHDRAWN ratio this sentence narrates: the whole-dataset max over min, wrongly attributed to the test window. Deliberately not restated as current -->
+   prevalence rises to 1.0". That ratio spanned the WHOLE dataset — 4,465,985
+   is 2022-09-01, a *training* day, against a cut of 2022-09-10 — and 1.0 is
+   the maximum ACCOUNT-DAY prevalence, a different unit. Both operands were
+   real artifact values, so the gate passed it: provenance verified, scope did
+   not.) A uniformly random ranker scores `precision@50` between
    **0.45392 and 0.49147**, and on three of nineteen days the budget exceeds
    the entire population — there, every ranker scores identically by
    construction.

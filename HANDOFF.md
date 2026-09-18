@@ -22,11 +22,11 @@ Every technical blocker any of them raised is closed; what is left needs a
 person rather than a commit, and is listed at the bottom.
 
 ```text
-repo      github.com/NirmalKumar31/aml-evaluation-harness-public   [PUBLIC, v0.1.1]
+repo      github.com/NirmalKumar31/aml-evaluation-harness-public   [PUBLIC, v0.1.2]
           github.com/NirmalKumar31/aml-evaluation-harness   [PRIVATE, dev archive]
 branch    main · ci + gates verified locally at this commit;
           the image job runs only in CI
-tests     420 collected · lint clean   (generated: results_archive/derived/release_facts.json)
+tests     422 collected · lint clean   (generated: results_archive/derived/release_facts.json)
 numbers   every published value traces to an artifact, from a canonical
           lineage, and is not on the retraction registry. The COUNT is not
           restated here -- it moves whenever a document does, and it was
@@ -239,7 +239,22 @@ sequence, including a failure table that is the most useful part of it.
 
 ## The public release, 2026-09-17
 
-**v0.1.1** at `2ffe3a5f` is current: signed tag, GitHub Release, and `ci`,
+**v0.1.2** at `1f891f4` is current: tag, GitHub Release, and `test`, `static`
+and `build` green on that exact SHA, which `main` was fast-forwarded to — so
+the tag is `main`'s head rather than a commit reachable from it. It withdraws
+the transaction-unit segmented table v0.1.1 shipped, restores the missing
+`**Not claimable:**` header, gives the volume-segment lift its ceiling, adds
+HI-Large non-binding accounting, settles the per-typology null at 50000 draws,
+and makes no-data replay demonstrable with `make replay-demo`. Content-addressed
+provenance takes the public clone from 0 of 13 artifacts verifiable to 12 of 13.
+
+⚠️ **A release must be tagged ON THE REMOTE before CI can pass.** The first
+`test` run on the v0.1.2 PR failed because the tag existed only locally:
+`CITATION.cff` declared 0.1.2 while the newest tag CI could see was v0.1.1, and
+`test_release_metadata_does_not_claim_a_release_that_does_not_exist` caught it.
+Push the tag, then let the checks run, then fast-forward.
+
+**v0.1.1** at `2ffe3a5f` was the previous release: signed tag, GitHub Release, and `ci`,
 `gates` and `image` green on that exact commit. `links` is **not** evidence:
 it is a weekly, deliberately non-blocking job that ends in `exit 0`, so it
 reports broken external links and cannot fail. Citing it alongside three real

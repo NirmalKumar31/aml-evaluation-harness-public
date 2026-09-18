@@ -1,12 +1,67 @@
 # Changelog
 
-Dates are when the work landed on `main`. **v0.1.0 was tagged and released on
-2026-09-17** from the public snapshot at <https://github.com/NirmalKumar31/aml-evaluation-harness-public/releases/tag/v0.1.0>; the
-remaining release items are in
+Dates are when the work landed on `main`. Three releases exist, all from the
+public snapshot at <https://github.com/NirmalKumar31/aml-evaluation-harness-public/releases>:
+**v0.1.0** and **v0.1.1** (2026-09-17) and **v0.1.2** (2026-09-18). Remaining
+release items are in
 [`aml-platform/docs/RELEASE_CHECKLIST.md`](aml-platform/docs/RELEASE_CHECKLIST.md).
+
+⚠️ This file carried exactly one heading -- `## Unreleased` -- while three
+releases were published, and named only v0.1.0 in its own preamble. A changelog
+that does not name the releases is the same defect as a metric that does not
+name its unit, and an audit found all four of `pyproject.toml`, `CITATION.cff`,
+`HANDOFF.md` and this file disagreeing about which version is current.
 
 Corrections and retractions are listed **first** in each entry, because they are
 the part a reader most needs and the part a changelog most often buries.
+
+## v0.1.3 — 2026-09-18
+
+**The volume-segment headline is withdrawn.** `replay/medium_gbdt_s0`
+reproduces `gold/eval3_Medium/gbdt` bit-identically (761/864 = 0.880787)  <!-- derived: 0.880787 = the SUPERSEDED value this entry names -->
+against the canonical 0.793981, and `CANONICAL.json` marks that lineage
+superseded — those fits predate the restored row sort in `load_train_xy`.
+Withdrawn with it: the pooled 0.88079 and its 1.79x-1.94x lift, the  <!-- derived: 1.94 = a WITHDRAWN value this entry exists to narrate. Deliberately not restated as current; 1.79 = the same; 0.88079 = the same -->
+volume-segment 0.75714 and 310.3x, the 265-of-350 counts, and the  <!-- derived: 310.3 = a WITHDRAWN value this entry exists to narrate. Deliberately not restated as current; 0.75714 = the same -->
+per-typology block including FAN-IN (the method stands; the result must not be
+quoted). The logistic survives untouched — a deterministic fit reads 0.570602
+in both lineages, which is why five audit sittings missed this.
+
+The publication gate could not see it: it resolves lineage only for paths
+under `gold/`, so a superseded value laundered through `replay/` or `derived/`
+returned "derived" and passed. A test now catches exactly that condition.
+
+Also: the lead finding's "volume falls 637,998x" was a whole-dataset ratio  <!-- derived: 637998 = a WITHDRAWN value this entry exists to narrate. Deliberately not restated as current -->
+attributed to the test window (correct: 431,695x), and "prevalence rises to  <!-- derived: 3021866/7 -->
+1.0" mixed transaction with account-day units (correct: 0.627119). The
+"of the attainable" column was vacuous — with the budget binding, precision's
+ceiling is 1, so the normalised lift is the precision restated. `replay-demo`
+was documented at "about eight seconds" and takes 69 s from a cold clone. Four
+files disagreed about the version, and nothing checked; a test now binds them
+to the newest tag.
+
+## v0.1.2 — 2026-09-18
+
+The segmented encoding result, recomputed on the account-day alert unit: the
+version v0.1.1 shipped ranked transactions, so its head-segment null read
+0.00077 against the 0.00243 `budget_null.py` computes for the same rung and  <!-- derived: 0.00077 = a WITHDRAWN transaction-unit null this entry narrates. Deliberately in no artifact -->
+segment, and every lift was inflated about 3.16x. <!-- derived: 3.16 = 0.00243/0.00077, the inflation factor of the withdrawn unit --> `LIMITATIONS.md` section 8
+regained its missing `**Not claimable:**` header. HI-Large gained non-binding-day
+accounting. The per-typology null moved to 50000 draws. `make replay-demo`
+demonstrates no-data replay in any clone. Derived artifacts record
+content-addressed provenance, taking the public clone from 0 of 13 artifacts
+verifiable to 12 of 13.
+
+## v0.1.1 — 2026-09-17
+
+The segmented categorical experiment, which had never executed (`m is
+slice(None)` compared two distinct slice objects); the typology report's use of
+a single-seed diagnostic to speak about the withdrawn ensemble; two wrong Holm
+cells; and this snapshot's claim to offer replay verification it withholds.
+
+## v0.1.0 — 2026-09-17
+
+First public snapshot.
 
 ## Unreleased
 

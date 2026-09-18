@@ -217,6 +217,8 @@ jobs:
               "no exposure measured in this checkout",
               "no gold archive in this checkout",
               "no replay bundles in this checkout",
+              "no superseded lineages registered",
+              "no superseded manifest publishes a divergent precision@50",
               "not a git checkout, so there is no real sha to prefer",
               "package source not present",
               "patterns absent; exposure correctly not computed",

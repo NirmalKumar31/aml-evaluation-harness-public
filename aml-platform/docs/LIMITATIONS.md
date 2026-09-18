@@ -13,10 +13,21 @@ from the results they qualify.
 > `precision@50` between **0.45392 and 0.49147** (hypergeometric sd 0.009078
 > at the low bound, 0.008194 at the high one).
 > The published logistic figure of 0.57060 therefore beats chance by
-> **1.16×–1.26×**, and the GBDT's 0.88079 by **1.79×–1.94×**. <!-- derived: 0.57060/0.49147; 0.57060/0.45392; 0.88079/0.49147; 0.88079/0.45392 -->
+> **1.16×–1.26×**. <!-- derived: 0.57060/0.49147; 0.57060/0.45392 -->
+>
+> ⛔ This sentence also read "and the GBDT's 0.88079 by **1.79×–1.94×**". That <!-- historical --><!-- derived: 1.79 = a WITHDRAWN lift narrated here, from the superseded eval3_Medium lineage; 1.94 = the same; 0.88079 = the superseded pooled value it was computed from -->
+> figure comes from `replay/medium_gbdt_s0`, which reproduces
+> `gold/eval3_Medium/gbdt` bit-identically — a lineage `CANONICAL.json` marks
+> **superseded**, because those fits predate the restored row sort. The
+> canonical value is **0.793981**, giving **1.62×–1.75×**; the eight-seed <!-- derived: 0.793981/0.49147; 0.793981/0.45392 -->
+> canonical spread is 0.59144–0.89815 with mean 0.82480, which is what the
+> figure on the README plots and what should be quoted for this model.
 >
 > Restricted to the seven volume days, where the null is
-> **0.00243–0.00244**, the same comparison is **17.6×** and **310.3×**.  <!-- derived: 0.04286/0.00244; 0.75714/0.00244 -->
+> **0.00243–0.00244**, the linear baseline is **17.6×**.  <!-- derived: 0.04286/0.00244 -->
+> The boosted figure that stood here, 310.3×, is withdrawn with the lineage <!-- historical --><!-- derived: 310.3 = a WITHDRAWN value narrated here. It comes from replay/medium_gbdt_s0, which reproduces the SUPERSEDED eval3_Medium lineage, and is deliberately not restated as current -->
+> above: no canonical volume-segment decomposition exists, and rebuilding one
+> needs a refit rather than an approximation.
 > That is the result. The pooled number never was one.
 >
 > Measured by `scripts/budget_null.py`,
@@ -703,7 +714,8 @@ The artifact ended up carrying `precision@50` twice, at two units, under one
 key name — 0.57060 account-day beside 0.48858 transaction, in the same arm.  <!-- derived: 0.48858 = a WITHDRAWN transaction-unit figure this paragraph narrates. Deliberately in no artifact -->
 And the consequence landed on a published figure: the transaction-unit pooled
 lift for the *linear* arm, 1.7798x, sits inside the published account-day  <!-- derived: 1.7798 = a WITHDRAWN transaction-unit figure this paragraph narrates. Deliberately in no artifact -->
-range for the *GBDT*, 1.79x–1.94x.  <!-- derived: 0.88079/0.49147; 0.88079/0.45392 --> `make_tables.UNITS` bound `precision@50` to
+range for the *GBDT*, 1.79x–1.94x — itself since withdrawn as <!-- historical --><!-- derived: 1.79 = a WITHDRAWN value narrated here. It comes from replay/medium_gbdt_s0, which reproduces the SUPERSEDED eval3_Medium lineage, and is deliberately not restated as current; 1.94 = the same -->
+superseded-backed. `make_tables.UNITS` bound `precision@50` to
 `acct-day` the entire time and referenced it exactly once, in an f-string that
 prints a table column. `scripts/check_units.py` now refuses a budget metric
 whose unit is undeclared or disagrees across artifacts.
@@ -1056,16 +1068,17 @@ state it.
   reaches precision@50 = 0.5706 at the top of the ranking" — a pooled level. That is a
   pooled level on a two-regime window and beats a random ranker by only
   1.16x-1.26x; §1 retracts it. What is claimable is the volume-segment lift,
-  **with its ceiling**: **17.6x** for the linear baseline and **310.3x** for the boosted model,  <!-- derived: 0.04286/0.00244; 0.75714/0.00244 -->
-  against a null of 0.00243-0.00244
+  **with its ceiling**: **17.6x** for the linear baseline, against a null of  <!-- derived: 0.04286/0.00244 -->
+  0.00243-0.00244. ⛔ The boosted model's 310.3x is **withdrawn** — its bundle <!-- historical --><!-- derived: 310.3 = a WITHDRAWN value narrated here. It comes from replay/medium_gbdt_s0, which reproduces the SUPERSEDED eval3_Medium lineage, and is deliberately not restated as current -->
+  reproduces the superseded eval3_Medium lineage
 - ⚠️ **and that pair means less than it looks.** Every head day holds far more
   positives than the budget has slots, so all **350** head alert slots are  <!-- source: 350 <- derived/window_decomposition.json#bundle_decomposition.medium_gbdt_s0.ceiling_count_head@50 -->
   fillable with positives and a perfect ranker would reach precision 1.0. The
   largest lift attainable on that segment is therefore **409.8x**, the  <!-- derived: 1/0.00244 -->
   reciprocal base rate — a property of IBM's generator, not of any ranker. The
   two lifts above are the head precisions 0.75714 and 0.04286 rescaled by that
-  one constant, and nothing more. In counts: the boosted model takes **265** of  <!-- source: 265 <- derived/window_decomposition.json#bundle_decomposition.medium_gbdt_s0.true_positives_head@50 -->
-  those slots and the linear baseline **15**. Quote the counts, or the  <!-- source: 15 <- derived/window_decomposition.json#bundle_decomposition.medium_baseline_s0.true_positives_head@50 -->
+  one constant, and nothing more. In counts: the linear baseline takes **15** of  <!-- source: 15 <- derived/window_decomposition.json#bundle_decomposition.medium_baseline_s0.true_positives_head@50 -->
+  those 350 slots. The boosted model's count is withdrawn with its lineage. Quote the counts, or the
   precisions against their ceiling, but do not quote a lift without saying what
   bounds it. This project invented `recall_ceiling@k` for exactly this reason
   and then published precision lifts without one.

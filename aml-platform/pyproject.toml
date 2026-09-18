@@ -1,6 +1,6 @@
 [project]
 name = "aml-evaluation-harness"
-version = "0.1.0"
+version = "0.1.3"
 # ONE NAME. The repository was `aml-evaluation-harness`, the package
 # `aml-platform`, the README "Alert-Budget-Aware Evaluation", and this field
 # still said "DriftGraph" -- a name dropped months earlier. Four names for one
